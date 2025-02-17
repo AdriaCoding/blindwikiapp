@@ -1,9 +1,15 @@
-import { View, Text, StyleSheet } from "react-native";
-
+import { View, Text, StyleSheet, Button} from "react-native";
+import InstructionsText from "../components/InstructionsText";
+import Location from "../components/Location";
 function HomeScreen() {
   return (
     <View>
-      <Text>Home Screen</Text>
+      <InstructionsText text="Prem el següent botó per actualitzar la teva ubicació GPS"/>
+      <Location text="Actualitzar ubicació"/>
+      <InstructionsText text="Prem el següent botó 'Gravar' per iniciar la gravació de so. Prem-lo novament per acabar la gravació"/>
+      <View>
+        <Button title="Gravar"/>
+      </View>
     </View>
   );
 }
