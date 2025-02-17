@@ -3,10 +3,11 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 function pressLocationHandler() {
   console.log("Location pressed : BEEP");
 }
-function Location({text}) {
+
+function Location({location}) {
   return (
-      <Pressable style={styles.outerBox} onPress={pressLocationHandler}>
-        <Text style={styles.text}>Carrer de Sant Antoni Maria Claret, 171, Horta-Guinardó, 08041 Barcelona, España : Alta Precisió del GPS</Text>
+      <Pressable style={styles.outerBox} onPress={pressLocationHandler} accessibilityLabel={"La teva ubicació eś:" + location}>
+        <Text style={styles.text}>{location}</Text>
       </Pressable>
   );
 }

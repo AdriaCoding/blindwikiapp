@@ -5,11 +5,14 @@ import Location from "../components/Location";
 function record() {
   console.log('Recording...');
 }
+const ubicació = () => {
+  return "Carrer de Sant Antoni Maria Claret, 171, Horta-Guinardó, 08041 Barcelona, España : Alta Precisió del GPS";
+}
 function HomeScreen() {
   return (
     <View>
       <InstructionsText text="Prem el següent botó per actualitzar la teva ubicació GPS"/>
-      <Location text="Actualitzar ubicació"/>
+      <Location text="Actualitzar ubicació" location={ubicació()} />
       <InstructionsText text="Prem el següent botó 'Gravar' per iniciar la gravació de so. Prem-lo novament per acabar la gravació"/>
       <Pressable style={styles.buttonContainer} onPress={record}>
         <Text style={styles.buttonText}>Gravar</Text>  
