@@ -3,6 +3,10 @@ import { StyleSheet, Text, View } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 
+// Multilingual Support
+import { I18nextProvider } from 'react-i18next';
+import i18n from './locales/i18n';
+
 import RecodingsScreen from "./screens/RecordingsScreen";
 import HomeScreen from "./screens/HomeScreen";
 import SettingsScreen from "./screens/Settings";
@@ -14,7 +18,7 @@ const Drawer = createDrawerNavigator();
 
 export default function App() {
   return (
-    <>
+    <I18nextProvider i18n={i18n}>
       <StatusBar style="auto" />
       <NavigationContainer>
         <Drawer.Navigator>
@@ -26,7 +30,7 @@ export default function App() {
           <Drawer.Screen name="Explore" component={ExploreScreen} />
         </Drawer.Navigator>
       </NavigationContainer>
-    </>
+    </I18nextProvider>
   );
 }
 
