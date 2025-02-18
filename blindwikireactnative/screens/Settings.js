@@ -1,20 +1,12 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActionSheetIOS,
-  Platform,
-  Modal,
-  Alert
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { ActionSheetProvider, connectActionSheet, useActionSheet } from '@expo/react-native-action-sheet';
 
 function SettingsScreen() {
+  const { showActionSheetWithOptions } = useActionSheet();
+
   const [selectedLanguage, setSelectedLanguage] = useState('es');
   const [selectedUnit, setSelectedUnit] = useState('meters');
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const [showUnitModal, setShowUnitModal] = useState(false);
 
   const languages = [
     { label: 'Español', value: 'es' },
@@ -28,70 +20,39 @@ function SettingsScreen() {
     { label: 'Millas', value: 'miles' },
   ];
 
-  // iOS: Show ActionSheetIOS
-  // Android: Show custom Modal
   const showLanguageOptions = () => {
-    if (Platform.OS === 'ios') {
-      const options = languages.map(lang => lang.label);
-      options.push('Cancelar');
-      const cancelButtonIndex = options.length - 1;
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options,
-          cancelButtonIndex,
-        },
-        buttonIndex => {
-          if (buttonIndex !== cancelButtonIndex) {
-            setSelectedLanguage(languages[buttonIndex].value);
-          }
+    const options = [...languages.map(lang => lang.label), 'Cancelar'];
+    const cancelButtonIndex = options.length - 1;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex !== cancelButtonIndex) {
+          setSelectedLanguage(languages[buttonIndex].value);
         }
-      );
-    } else {
-      setShowLanguageModal(true);
-    }
+      }
+    );
   };
 
   const showUnitOptions = () => {
-    if (Platform.OS === 'ios') {
-      const options = units.map(u => u.label);
-      options.push('Cancelar');
-      const cancelButtonIndex = options.length - 1;
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options,
-          cancelButtonIndex,
-        },
-        buttonIndex => {
-          if (buttonIndex !== cancelButtonIndex) {
-            setSelectedUnit(units[buttonIndex].value);
-          }
-        }
-      );
-    } else {
-      setShowUnitModal(true);
-    }
-  };
+    const options = [...units.map(u => u.label), 'Cancelar'];
+    const cancelButtonIndex = options.length - 1;
 
-  // Render modal lists for Android
-  const renderModalContent = (dataList, onSelect, onClose) => (
-    <View style={styles.modalContainer}>
-      {dataList.map((item, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.modalItem}
-          onPress={() => {
-            onSelect(item.value);
-            onClose();
-          }}
-        >
-          <Text>{item.label}</Text>
-        </TouchableOpacity>
-      ))}
-      <TouchableOpacity onPress={onClose}>
-        <Text style={{ color: 'blue', marginTop: 10 }}>Cancelar</Text>
-      </TouchableOpacity>
-    </View>
-  );
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex !== cancelButtonIndex) {
+          setSelectedUnit(units[buttonIndex].value);
+        }
+      }
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -108,43 +69,19 @@ function SettingsScreen() {
           {units.find(u => u.value === selectedUnit)?.label}
         </Text>
       </TouchableOpacity>
-
-      {/* Android Modal for language options */}
-      <Modal
-        visible={showLanguageModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowLanguageModal(false)}
-      >
-        <View style={styles.overlay}>
-          {renderModalContent(
-            languages,
-            value => setSelectedLanguage(value),
-            () => setShowLanguageModal(false)
-          )}
-        </View>
-      </Modal>
-
-      {/* Android Modal for unit options */}
-      <Modal
-        visible={showUnitModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowUnitModal(false)}
-      >
-        <View style={styles.overlay}>
-          {renderModalContent(
-            units,
-            value => setSelectedUnit(value),
-            () => setShowUnitModal(false)
-          )}
-        </View>
-      </Modal>
     </View>
   );
 }
 
-export default SettingsScreen;
+// Wrap your screen with the ActionSheetProvider
+const WrappedSettingsScreen = props => (
+  <ActionSheetProvider>
+    <SettingsScreen {...props} />
+  </ActionSheetProvider>
+);
+
+// Connect to the action sheet
+export default connectActionSheet(WrappedSettingsScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -167,20 +104,5 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 16,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: '#00000055',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '70%',
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 8,
-  },
-  modalItem: {
-    paddingVertical: 12,
   },
 });
