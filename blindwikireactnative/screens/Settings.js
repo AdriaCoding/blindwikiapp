@@ -1,32 +1,40 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActionSheetIOS, Platform } from "react-native";
-import ActionSheet from 'react-native-actionsheet';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActionSheetIOS,
+  Platform,
+  Modal,
+  Alert
+} from 'react-native';
 
 function SettingsScreen() {
-  const [selectedLanguage, setSelectedLanguage] = useState("es");
-  const [selectedUnit, setSelectedUnit] = useState("meters");
-
-  const languageActionSheet = useRef(null);
-  const unitActionSheet = useRef(null);
+  const [selectedLanguage, setSelectedLanguage] = useState('es');
+  const [selectedUnit, setSelectedUnit] = useState('meters');
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [showUnitModal, setShowUnitModal] = useState(false);
 
   const languages = [
-    { label: "Español", value: "es" },
-    { label: "Inglés", value: "en" },
-    { label: "Francés", value: "fr" },
-    { label: "Alemán", value: "de" },
+    { label: 'Español', value: 'es' },
+    { label: 'Inglés', value: 'en' },
+    { label: 'Francés', value: 'fr' },
+    { label: 'Alemán', value: 'de' },
   ];
 
   const units = [
-    { label: "Metros", value: "meters" },
-    { label: "Millas", value: "miles" },
+    { label: 'Metros', value: 'meters' },
+    { label: 'Millas', value: 'miles' },
   ];
 
+  // iOS: Show ActionSheetIOS
+  // Android: Show custom Modal
   const showLanguageOptions = () => {
     if (Platform.OS === 'ios') {
       const options = languages.map(lang => lang.label);
-      const cancelButtonIndex = options.length;
       options.push('Cancelar');
-
+      const cancelButtonIndex = options.length - 1;
       ActionSheetIOS.showActionSheetWithOptions(
         {
           options,
@@ -39,16 +47,15 @@ function SettingsScreen() {
         }
       );
     } else {
-      languageActionSheet.current.show();
+      setShowLanguageModal(true);
     }
   };
 
   const showUnitOptions = () => {
     if (Platform.OS === 'ios') {
-      const options = units.map(unit => unit.label);
-      const cancelButtonIndex = options.length;
+      const options = units.map(u => u.label);
       options.push('Cancelar');
-
+      const cancelButtonIndex = options.length - 1;
       ActionSheetIOS.showActionSheetWithOptions(
         {
           options,
@@ -61,45 +68,78 @@ function SettingsScreen() {
         }
       );
     } else {
-      unitActionSheet.current.show();
+      setShowUnitModal(true);
     }
   };
+
+  // Render modal lists for Android
+  const renderModalContent = (dataList, onSelect, onClose) => (
+    <View style={styles.modalContainer}>
+      {dataList.map((item, index) => (
+        <TouchableOpacity
+          key={index}
+          style={styles.modalItem}
+          onPress={() => {
+            onSelect(item.value);
+            onClose();
+          }}
+        >
+          <Text>{item.label}</Text>
+        </TouchableOpacity>
+      ))}
+      <TouchableOpacity onPress={onClose}>
+        <Text style={{ color: 'blue', marginTop: 10 }}>Cancelar</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Selecciona el idioma:</Text>
       <TouchableOpacity style={styles.dropdown} onPress={showLanguageOptions}>
-        <Text style={styles.dropdownText}>{languages.find(lang => lang.value === selectedLanguage).label}</Text>
+        <Text style={styles.dropdownText}>
+          {languages.find(l => l.value === selectedLanguage)?.label}
+        </Text>
       </TouchableOpacity>
 
       <Text style={styles.label}>Selecciona la unidad de medida:</Text>
       <TouchableOpacity style={styles.dropdown} onPress={showUnitOptions}>
-        <Text style={styles.dropdownText}>{units.find(unit => unit.value === selectedUnit).label}</Text>
+        <Text style={styles.dropdownText}>
+          {units.find(u => u.value === selectedUnit)?.label}
+        </Text>
       </TouchableOpacity>
 
-      <ActionSheet
-        ref={languageActionSheet}
-        title={'Selecciona el idioma'}
-        options={[...languages.map(lang => lang.label), 'Cancelar']}
-        cancelButtonIndex={languages.length}
-        onPress={(index) => {
-          if (index !== languages.length) {
-            setSelectedLanguage(languages[index].value);
-          }
-        }}
-      />
+      {/* Android Modal for language options */}
+      <Modal
+        visible={showLanguageModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLanguageModal(false)}
+      >
+        <View style={styles.overlay}>
+          {renderModalContent(
+            languages,
+            value => setSelectedLanguage(value),
+            () => setShowLanguageModal(false)
+          )}
+        </View>
+      </Modal>
 
-      <ActionSheet
-        ref={unitActionSheet}
-        title={'Selecciona la unidad de medida'}
-        options={[...units.map(unit => unit.label), 'Cancelar']}
-        cancelButtonIndex={units.length}
-        onPress={(index) => {
-          if (index !== units.length) {
-            setSelectedUnit(units[index].value);
-          }
-        }}
-      />
+      {/* Android Modal for unit options */}
+      <Modal
+        visible={showUnitModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowUnitModal(false)}
+      >
+        <View style={styles.overlay}>
+          {renderModalContent(
+            units,
+            value => setSelectedUnit(value),
+            () => setShowUnitModal(false)
+          )}
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -127,5 +167,20 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 16,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: '#00000055',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '70%',
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 8,
+  },
+  modalItem: {
+    paddingVertical: 12,
   },
 });
