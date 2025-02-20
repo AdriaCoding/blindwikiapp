@@ -1,6 +1,6 @@
 import { StyleSheet, Pressable} from 'react-native';
 
-import InstructionsText from '@/components/InstructionsText';
+import {InstructionsText} from '@/components/StyledText';
 import Location from '@/components/Location';
 import { Text, View } from 'react-native';
 
@@ -14,9 +14,13 @@ const ubicació = () => {
 export default function HomeScreen() {
   return (
     <View>
-      <InstructionsText text="Prem el següent botó per actualitzar la teva ubicació GPS"/>
+      <InstructionsText> 
+      {"Prem el següent botó per actualitzar la teva ubicació GPS"}
+      </InstructionsText> 
       <Location location={ubicació()} />
-      <InstructionsText text="Prem el següent botó 'Gravar' per iniciar la gravació de so. Prem-lo novament per acabar la gravació"/>
+      <InstructionsText>
+        {"Prem el següent botó 'Gravar' per iniciar la gravació de so. Prem-lo novament per acabar la gravació."}
+      </InstructionsText> 
       <Pressable style={styles.buttonContainer} onPress={record}>
         <Text style={styles.buttonText}>Gravar</Text>  
       </Pressable>

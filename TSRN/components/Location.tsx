@@ -4,14 +4,14 @@ function pressLocationHandler() {
   console.log("Location pressed : BEEP");
 }
 
-function Location({location}) {
+export default function Location({location}: {location: any}) {
   return (
       <Pressable style={styles.outerBox} onPress={pressLocationHandler} accessibilityLabel={"La teva ubicació eś:" + location}>
         <Text style={styles.text}>{location}</Text>
       </Pressable>
   );
 }
-export default Location;
+
 
 const styles = StyleSheet.create({
   outerBox: {
@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
     borderWidth: 2,
-    margin: 10,
     padding: 25,
   },
   text: {
