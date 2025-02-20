@@ -2,7 +2,7 @@ import { StyleSheet, Pressable} from 'react-native';
 
 import InstructionsText from '@/components/InstructionsText';
 import Location from '@/components/Location';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from 'react-native';
 
 function record() {
   console.log('Recording...');
