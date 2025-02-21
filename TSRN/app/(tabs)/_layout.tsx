@@ -27,8 +27,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Blind Wiki',
+          tabBarIcon: ({ color }) => <TabBarIcon name="microphone" color={color} />,
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -46,10 +46,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="settings"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Configuració',
+          tabBarIcon: ({ color }) => <TabBarIcon name="sliders" color={color} />,
         }}
       />
     </Tabs>
