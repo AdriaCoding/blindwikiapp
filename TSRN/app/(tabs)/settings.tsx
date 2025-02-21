@@ -3,7 +3,8 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { useState } from "react";
 
 export default function SettingsScreen() {
-  const [open, setOpen] = useState(false);
+  const [openLanguage, setOpenLanguage] = useState(false);
+  const [openUnit, setOpenUnit] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("ca");
   const [selectedUnit, setSelectedUnit] = useState("meters");
 
@@ -20,13 +21,13 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Idioma:</Text>
-      <View style={styles.dropdownContainer}>
+      <View style={styles.settingContainer}>
+        <Text style={styles.label}>Idioma:</Text>
         <DropDownPicker
-          open={open}
+          open={openLanguage}
           value={selectedLanguage}
           items={languages}
-          setOpen={setOpen}
+          setOpen={setOpenLanguage}
           setValue={setSelectedLanguage}
           placeholder="Selecciona un idioma"
           style={styles.dropdown}
@@ -38,43 +39,44 @@ export default function SettingsScreen() {
           modalTitle="Selecciona el idioma"
         />
       </View>
-      <Text style={styles.label}>Unitat de Mesura:</Text>
-      <DropDownPicker
-        open={open}
-        value={selectedUnit}
-        items={units}
-        setOpen={setOpen}
-        setValue={setSelectedUnit}
-        placeholder="Selecciona una unitat"
-        style={styles.dropdown}
-        textStyle={styles.dropdownText}
-        listMode="MODAL"
-        modalProps={{
-          animationType: "slide",
-        }}
-        modalTitle="Selecciona la unitat de mesura"
-      />
+      <View style={styles.settingContainer}>
+        <Text style={styles.label}>Unitat de Mesura:</Text>
+        <DropDownPicker
+          open={openUnit}
+          value={selectedUnit}
+          items={units}
+          setOpen={setOpenUnit}
+          setValue={setSelectedUnit}
+          placeholder="Selecciona una unitat"
+          style={styles.dropdown}
+          textStyle={styles.dropdownText}
+          listMode="MODAL"
+          modalProps={{
+            animationType: "slide",
+          }}
+          modalTitle="Selecciona la unitat de mesura"
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: "50%",
     justifyContent: "center",
     padding: 16,
+  },
+  settingContainer: {
+    flex:1    
   },
   label: {
     fontSize: 18,
     marginBottom: 8,
   },
-  dropdownContainer: {
-    marginBottom: 16,
-  },
   dropdown: {
     borderColor: "#ccc",
     height: 5,
-    margin: 16,
   },
   dropdownText: {
     fontSize: 18,
