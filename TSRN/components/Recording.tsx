@@ -9,7 +9,10 @@ import {
 import BWButton from "./BWButton";
 interface Recording {
   id: string;
-  tags: string[];
+  tags: {
+    id: number;
+    name: string;
+  }[];
   user: {
     id: string;
     name: string;
@@ -37,7 +40,9 @@ export default function RecordingComponent({
   return (
     <View style={styles.container}>
       {/* First line: tags */}
-      <Text style={styles.tagsLine}> {r.tags.join(", ")}</Text>
+      <Text style={styles.tagsLine}>
+        {r.tags.map((tag) => tag.name).join(", ")}
+      </Text>
 
       {/* Second line: userID in bold, then a dot, then location.
           The location can be multi-line if it's long */}
