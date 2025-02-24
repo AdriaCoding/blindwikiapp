@@ -1,13 +1,23 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
+interface Tag {
+  id: number;
+  name: string;
+}
 // Tag component: displays one tag. Toggles between unselected and selected styles on press.
-export function Tag({ text, onPress }: { text: string; onPress: (text: string) => void }) {
+export function Tag({
+  tag,
+  onPress,
+}: {
+  tag: Tag;
+  onPress: (id: number) => void;
+}) {
   const [selected, setSelected] = useState(false);
 
   const handlePress = () => {
     setSelected(!selected);
-    onPress(text);
+    onPress(tag.id);
   };
 
   return (
@@ -16,18 +26,24 @@ export function Tag({ text, onPress }: { text: string; onPress: (text: string) =
       onPress={handlePress}
     >
       <Text style={[styles.tagText, selected && styles.tagTextSelected]}>
-        {text}
+        {tag.name}
       </Text>
     </TouchableOpacity>
   );
 }
 
 // TagList component: displays all tags in a flexible row layout.
-export default function TagsList({ tags, onTagPress }: { tags: string[]; onTagPress: (text: string) => void }) {
+export default function TagsList({
+  tags,
+  onTagPress,
+}: {
+  tags: Tag[];
+  onTagPress: (id: number) => void;
+}) {
   return (
     <View style={styles.container}>
-      {tags.map((t) => (
-        <Tag key={t} text={t} onPress={onTagPress} />
+      {tags.map((tag) => (
+        <Tag key={tag.id} tag={tag} onPress={onTagPress} />
       ))}
     </View>
   );
@@ -42,7 +58,7 @@ const styles = StyleSheet.create({
   tag: {
     borderColor: "#000",
     borderWidth: 1,
-        paddingHorizontal: 4,
+    paddingHorizontal: 4,
     paddingVertical: 2,
     margin: 4,
   },
