@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { RECORDINGS } from "@/data/dummy-data";
 import RecordingComponent from "@/components/Recording";
 
@@ -12,7 +12,7 @@ const myRecordingsActions = {
 
 export default function MyRecordings() {
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {RECORDINGS.map((recording) => (
         <RecordingComponent
           r={recording}
@@ -20,7 +20,7 @@ export default function MyRecordings() {
           actions={myRecordingsActions}
         />
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
