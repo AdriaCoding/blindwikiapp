@@ -7,12 +7,11 @@ import {
   GestureResponderEvent,
 } from "react-native";
 import BWButton from "./BWButton";
+import { TAGS } from "@/data/dummy-data";
+
 interface Recording {
   id: string;
-  tags: {
-    id: number;
-    name: string;
-  }[];
+  tags: number[];
   user: {
     id: string;
     name: string;
@@ -41,7 +40,7 @@ export default function RecordingComponent({
     <View style={styles.container}>
       {/* First line: tags */}
       <Text style={styles.tagsLine}>
-        {r.tags.map((tag) => tag.name).join(", ")}
+        {r.tags.map((id) => TAGS.find(tag => tag.id == id)?.name).join(", ")}
       </Text>
 
       {/* Second line: userID in bold, then a dot, then location.

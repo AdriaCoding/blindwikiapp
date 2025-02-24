@@ -1,22 +1,9 @@
 import { t } from "i18next";
 
-export const TAGS = [
-  {id: 0, name: "tomàquet"},
-  {id: 1, name: "ceba"},
-  {id: 2, name: "olives"},
-  {id: 3, name: "picaporte"},
-  {id: 4, name: "banco"},
-  {id: 5, name: "carretera"},
-  {id: 6, name: "critical"},
-  {id: 7, name: "eccentric"},
-  {id: 8, name: "dangerous"},
-  {id: 9, name: "accessible"},
-]
-
 export const RECORDINGS = [
 {
   id: "rec1",
-  tags: [TAGS[0], TAGS[1], TAGS[2]],
+  tags: [0, 1, 2],
   user: {
     id: "user123",
     name: "John Doe",
@@ -27,7 +14,7 @@ export const RECORDINGS = [
 },
 {
   id: "rec2",
-  tags: [TAGS[3], TAGS[4], TAGS[5]],
+  tags: [3, 4, 5],
   user: {
     id: "user456",
     name: "John Doe",
@@ -38,7 +25,7 @@ export const RECORDINGS = [
 },
 {
   id: "rec3",
-  tags: [TAGS[6], TAGS[7], TAGS[8], TAGS[9]],
+  tags: [6, 7, 8, 9],
   user: {
     id: "user789",
     name: "John Doe",
@@ -48,3 +35,16 @@ export const RECORDINGS = [
   audioFileId: "audio_3",
 },
 ];
+
+export const TAGS = [
+  {id: 0, name: "tomàquet"},
+  {id: 1, name: "ceba"},
+  {id: 2, name: "olives"},
+  {id: 3, name: "picaporte"},
+  {id: 4, name: "banco"},
+  {id: 5, name: "carretera"},
+  {id: 6, name: "critical"},
+  {id: 7, name: "eccentric"},
+  {id: 8, name: "dangerous"},
+  {id: 9, name: "accessible"}
+]
