@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet } from "react-native";
 import { RECORDINGS } from "@/data/dummy-data";
-import RecordingComponent from "@/components/Recording";
+import RecordingComponent from "@/components/RecordingView";
 
 const myRecordingsActions = {
   onListen: () => console.log("Listen"),

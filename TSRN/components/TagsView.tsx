@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { InstructionsText } from "./StyledText";
 import { TAGS } from "../data/dummy-data";
-import RecordingComponent from "./Recording";
+import RecordingComponent from "./RecordingView";
 import Tag from "@/models/tag";
 import Recording from "@/models/recording";
 
