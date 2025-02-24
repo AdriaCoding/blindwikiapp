@@ -1,3 +1,14 @@
 {
-  "hello": "Hola!"
+  "hello": "Hola!",
+  "home": {
+    "title": "Gravar",
+    "info-gps": "Prem el següent botó per actualitzar la teva ubicació GPS",
+    "info-recors": "Prem el següent botó 'Gravar' per iniciar la gravació de so. Prem-lo novament per acabar la gravació.",
+    "record": "Gravar"
+  },
+  "settings": {
+    "title": "Configuració",
+    "language": "Idioma",
+    "measure unit": "Unitat de mesura"
+  }
 }
