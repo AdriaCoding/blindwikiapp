@@ -9,7 +9,7 @@ import {
 import BWButton from "./BWButton";
 import { TAGS } from "@/data/dummy-data";
 
-interface Recording {
+export interface Recording {
   id: string;
   tags: number[];
   user: {
