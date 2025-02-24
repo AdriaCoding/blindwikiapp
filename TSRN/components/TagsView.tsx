@@ -6,8 +6,7 @@ import RecordingComponent from "./Recording";
 import Tag from "@/models/tag";
 import Recording from "@/models/recording";
 
-// Tag component: stateless, shows selected style if its id is in selectedTags.
-function Tag({
+function TagBox({
   tag,
   selected,
   onPress,
@@ -41,7 +40,7 @@ function TagsList({
   return (
     <View style={styles.container}>
       {tags.map((tag) => (
-        <Tag
+        <TagBox
           key={tag.id}
           tag={tag}
           selected={selectedTags.includes(tag.id)}
