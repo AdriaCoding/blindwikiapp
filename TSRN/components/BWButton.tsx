@@ -23,8 +23,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     width: "100%",
     paddingHorizontal: 10,
-    paddingVertical: 12,
-    marginVertical: 4,
+    paddingVertical: 8,
+    marginVertical: 2,
     borderRadius: 4,
   },
   bwButtonText: {
