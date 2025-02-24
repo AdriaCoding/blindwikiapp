@@ -52,6 +52,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="sliders" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name='myRecordings'
+        options={{
+          title: 'Les meves gravacions',
+          tabBarIcon: ({ color }) => <TabBarIcon name="file-audio-o" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
