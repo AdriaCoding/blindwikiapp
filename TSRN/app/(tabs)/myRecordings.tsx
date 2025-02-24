@@ -4,7 +4,7 @@ import RecordingComponent from '@/components/Recording';
 
 export default function MyRecordings () {
   return (
-    <View>
+    <View style={styles.container}>
       {RECORDINGS.map((rec) => (
         <RecordingComponent {...rec} key={rec.id} />
       ))}
@@ -13,5 +13,9 @@ export default function MyRecordings () {
 }
 
 const styles = StyleSheet.create({
-
+  container: {
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+    marginVertical: 10,
+  }
 });

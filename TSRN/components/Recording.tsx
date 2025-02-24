@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet } from "react-native";
-
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from "react-native";
+import BWButton from "./BWButton";
 interface Recording {
   id: string;
   tags: string[];
@@ -9,17 +10,44 @@ interface Recording {
   };
   location: string;
   comments: string[];
-  audioFileId: string; // Reference or ID for the audio file
+  audioFileId: string;
 }
+
+
 
 export default function RecordingComponent(r: Recording) {
   return (
-    <View>
-      <Text>Tags: {r.tags.join(", ")}</Text>
-      <Text>User: {r.user.name}</Text>
-      <Text>Location: {r.location}</Text>
-      <Text>Comments: {r.comments.join(" | ")}</Text>
-      <Text>Audio File ID: {r.audioFileId}</Text>
+    <View style={styles.container}>
+      {/* First line: tags */}
+      <Text style={styles.tagsLine}> {r.tags.join(", ")}</Text>
+
+      {/* Second line: userID in bold, then a dot, then location.
+          The location can be multi-line if it's long */}
+      <Text style={styles.lineTwo}>
+        <Text style={styles.user}>{r.user.id}</Text>. {r.location}
+      </Text>
+
+      {/* Black buttons for actions */}
+      <BWButton title="Listen" onPress={() => {}} />
+      <BWButton title="Edit Tags" onPress={() => {}} />
+      <BWButton title="Delete" onPress={() => {}} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    padding: 10,
+  },
+  tagsLine: {
+    marginBottom: 6,
+  },
+  lineTwo: {
+    marginBottom: 6,
+  },
+  user: {
+    fontWeight: "bold",
+  }
+});
