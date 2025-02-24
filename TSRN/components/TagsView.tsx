@@ -28,7 +28,7 @@ function TagBox({
 }
 
 // TagsList component: lays out tags in a row; passes 'selected' state and onPress handler to each tag.
-function TagsList({
+export function TagsList({
   tags,
   selectedTags,
   onTagPress,
