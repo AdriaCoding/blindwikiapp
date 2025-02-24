@@ -7,10 +7,7 @@ interface Recording {
     id: string;
     name: string;
   };
-  location: {
-    latitude: number;
-    longitude: number;
-  };
+  location: string;
   comments: string[];
   audioFileId: string; // Reference or ID for the audio file
 }
@@ -18,10 +15,9 @@ interface Recording {
 export default function RecordingComponent(r: Recording) {
   return (
     <View>
-      <Text>Recording ID: {r.id}</Text>
       <Text>Tags: {r.tags.join(", ")}</Text>
       <Text>User: {r.user.name}</Text>
-      <Text>Location: {r.location.latitude}, {r.location.longitude}</Text>
+      <Text>Location: {r.location}</Text>
       <Text>Comments: {r.comments.join(" | ")}</Text>
       <Text>Audio File ID: {r.audioFileId}</Text>
     </View>

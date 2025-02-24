@@ -6,10 +6,7 @@ export const RECORDINGS = [
     id: "user123",
     name: "John Doe",
   },
-  location: {
-    latitude: 41.3868,
-    longitude: 2.1701,
-  },
+  location: "Carrer de Montcada, 15-23, 08003 Barcelona, Spain",
   comments: ["Great place to visit!", "Very accessible entrance."],
   audioFileId: "audio_123",
 },
@@ -20,10 +17,7 @@ export const RECORDINGS = [
     id: "user123",
     name: "John Doe",
   },
-  location: {
-    latitude: 41.3868,
-    longitude: 2.1701,
-  },
+  location: "Calle de la Princesa, 1, 28008 Madrid, Spain",
   comments: ["Great place to visit!", "Very accessible entrance."],
   audioFileId: "audio_123",
 }
