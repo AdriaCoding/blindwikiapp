@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { InstructionsText } from "./StyledText";
 import { TAGS } from "../data/dummy-data";
-import RecordingComponent, { Recording } from "./Recording";
-
-export interface Tag {
-  id: number;
-  name: string;
-}
+import RecordingComponent from "./Recording";
+import Tag from "@/models/tag";
+import Recording from "@/models/recording";
 
 // Tag component: stateless, shows selected style if its id is in selectedTags.
 function Tag({

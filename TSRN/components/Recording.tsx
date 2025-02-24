@@ -8,18 +8,7 @@ import {
 } from "react-native";
 import BWButton from "./BWButton";
 import { TAGS } from "@/data/dummy-data";
-
-export interface Recording {
-  id: string;
-  tags: number[];
-  user: {
-    id: string;
-    name: string;
-  };
-  location: string;
-  comments: string[];
-  audioFileId: string;
-}
+import Recording from "@/models/recording";
 
 interface RecordingActions {
   onListen?: (event: GestureResponderEvent) => void;
