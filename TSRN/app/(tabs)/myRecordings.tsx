@@ -1,12 +1,24 @@
-import { View, StyleSheet } from 'react-native';
-import { RECORDINGS } from '@/data/dummy-data';
-import RecordingComponent from '@/components/Recording';
+import { View, StyleSheet } from "react-native";
+import { RECORDINGS } from "@/data/dummy-data";
+import RecordingComponent from "@/components/Recording";
 
-export default function MyRecordings () {
+const myRecordingsActions = {
+  onListen: () => console.log("Listen"),
+  onEditTags: () => console.log("Edit Tags"),
+  onDelete: () => console.log("Delete"),
+  onViewComments: undefined,
+  onDirection: undefined,
+};
+
+export default function MyRecordings() {
   return (
     <View style={styles.container}>
-      {RECORDINGS.map((rec) => (
-        <RecordingComponent {...rec} key={rec.id} />
+      {RECORDINGS.map((recording) => (
+        <RecordingComponent
+          r={recording}
+          key={recording.id}
+          actions={myRecordingsActions}
+        />
       ))}
     </View>
   );
@@ -17,5 +29,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#ccc",
     marginVertical: 10,
-  }
+  },
 });

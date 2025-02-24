@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  GestureResponderEvent,
+} from "react-native";
 import BWButton from "./BWButton";
 interface Recording {
   id: string;
@@ -13,9 +19,21 @@ interface Recording {
   audioFileId: string;
 }
 
+interface RecordingActions {
+  onListen?: (event: GestureResponderEvent) => void;
+  onEditTags?: (event: GestureResponderEvent) => void;
+  onDelete?: (event: GestureResponderEvent) => void;
+  onViewComments?: (event: GestureResponderEvent) => void;
+  onDirection?: (event: GestureResponderEvent) => void;
+}
 
-
-export default function RecordingComponent(r: Recording) {
+export default function RecordingComponent({
+  r,
+  actions,
+}: {
+  r: Recording;
+  actions: RecordingActions;
+}) {
   return (
     <View style={styles.container}>
       {/* First line: tags */}
@@ -28,9 +46,21 @@ export default function RecordingComponent(r: Recording) {
       </Text>
 
       {/* Black buttons for actions */}
-      <BWButton title="Listen" onPress={() => {}} />
-      <BWButton title="Edit Tags" onPress={() => {}} />
-      <BWButton title="Delete" onPress={() => {}} />
+      {actions.onListen && (
+        <BWButton title="Listen" onPress={actions.onListen} />
+      )}
+      {actions.onViewComments && (
+        <BWButton title="Comments" onPress={actions.onViewComments} />
+      )}
+      {actions.onEditTags && (
+        <BWButton title="Edit Tags" onPress={actions.onEditTags} />
+      )}
+      {actions.onDelete && (
+        <BWButton title="Delete" onPress={actions.onDelete} />
+      )}
+      {actions.onDirection && (
+        <BWButton title="Direction" onPress={actions.onDirection} />
+      )}
     </View>
   );
 }
@@ -49,5 +79,5 @@ const styles = StyleSheet.create({
   },
   user: {
     fontWeight: "bold",
-  }
+  },
 });
