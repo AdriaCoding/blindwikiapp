@@ -1,12 +1,18 @@
 import { Text, View, StyleSheet } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function SettingsScreen() {
+  const { t, i18n } = useTranslation();
   const [openLanguage, setOpenLanguage] = useState(false);
   const [openUnit, setOpenUnit] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("ca");
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
   const [selectedUnit, setSelectedUnit] = useState("meters");
+
+  useEffect(() => {
+    i18n.changeLanguage(selectedLanguage);
+  }, [selectedLanguage, i18n]);
 
   const languages = [
     { label: "English", value: "en" },
@@ -22,7 +28,7 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.settingContainer}>
-        <Text style={styles.label}>Idioma:</Text>
+        <Text style={styles.label}>{t('hello')}</Text>
         <DropDownPicker
           open={openLanguage}
           value={selectedLanguage}
@@ -68,7 +74,9 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   settingContainer: {
-    flex:1    
+    flex: 1,
+    marginBottom: 24, // Adds space between settings
+    paddingVertical: 8,  // Adds internal padding
   },
   label: {
     fontSize: 18,
@@ -76,7 +84,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     borderColor: "#ccc",
-    height: 5,
+    height: 50,  // Fixed the height to make dropdown visible
   },
   dropdownText: {
     fontSize: 18,
