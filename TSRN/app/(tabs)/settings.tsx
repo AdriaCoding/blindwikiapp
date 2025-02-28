@@ -15,52 +15,52 @@ export default function SettingsScreen() {
   }, [selectedLanguage, i18n]);
 
   const languages = [
-    { label: "English", value: "en" },
-    { label: "Español", value: "es" },
-    { label: "Català", value: "ca" },
+    { label: t('settings.language.en'), value: "en" },
+    { label: t('settings.language.es'), value: "es" },
+    { label: t('settings.language.ca'), value: "ca" },
   ];
 
   const units = [
-    { label: "Meters", value: "meters" },
-    { label: "Miles", value: "miles" },
+    { label: t('settings.measureUnit.meters'), value: "meters" },
+    { label: t('settings.measureUnit.miles'), value: "miles" },
   ];
 
   return (
     <View style={styles.container}>
       <View style={styles.settingContainer}>
-        <Text style={styles.label}>{t('hello')}</Text>
+        <Text style={styles.label}>{t('settings.language.title')}</Text>
         <DropDownPicker
           open={openLanguage}
           value={selectedLanguage}
           items={languages}
           setOpen={setOpenLanguage}
           setValue={setSelectedLanguage}
-          placeholder="Selecciona un idioma"
+          placeholder={t('settings.language.modalTitle')}
           style={styles.dropdown}
           textStyle={styles.dropdownText}
           listMode="MODAL" // Makes it more accessible
           modalProps={{
             animationType: "slide",
           }}
-          modalTitle="Selecciona el idioma"
+          modalTitle={t('settings.language.modalTitle')}
         />
       </View>
       <View style={styles.settingContainer}>
-        <Text style={styles.label}>Unitat de Mesura:</Text>
+        <Text style={styles.label}>{t('settings.measureUnit.title')}</Text>
         <DropDownPicker
           open={openUnit}
           value={selectedUnit}
           items={units}
           setOpen={setOpenUnit}
           setValue={setSelectedUnit}
-          placeholder="Selecciona una unitat"
+          placeholder={t('settings.measureUnit.modalTitle')}
           style={styles.dropdown}
           textStyle={styles.dropdownText}
           listMode="MODAL"
           modalProps={{
             animationType: "slide",
           }}
-          modalTitle="Selecciona la unitat de mesura"
+          modalTitle={t('settings.measureUnit.modalTitle')}
         />
       </View>
     </View>

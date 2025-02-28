@@ -1,7 +1,7 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
+import { Tabs } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 import Colors from "@/constants/Colors";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
@@ -15,6 +15,8 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   return (
     <Tabs
       screenOptions={{
@@ -27,7 +29,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Gravar",
+          title: t('home.title'),
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="microphone" color={color} />
           ),
@@ -36,7 +38,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="myRecordings"
         options={{
-          title: "Les meves gravacions",
+          title: t('myRecordings.title'),
+          tabBarLabel: t('myRecordings.tabLabel'),
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="file-audio-o" color={color} />
           ),
@@ -45,28 +48,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: "Explorar",
+          title: t('explore.title'),
           tabBarIcon: ({ color }) => <TabBarIcon name="map-marker" color={color} />,
         }}
       />
       <Tabs.Screen
         name="world"
         options={{
-          title: "Món",
+          title: t('world.title'),
           tabBarIcon: ({ color }) => <TabBarIcon name="globe" color={color} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          title: "Cerca",
+          title: t('search.title'),
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Configuració",
+          title: t('settings.title'),
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="sliders" color={color} />
           ),

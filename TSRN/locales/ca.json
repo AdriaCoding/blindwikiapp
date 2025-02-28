@@ -8,7 +8,32 @@
   },
   "settings": {
     "title": "Configuració",
-    "language": "Idioma",
-    "measure unit": "Unitat de mesura"
+    "language":{
+      "title": "Idioma",
+      "modalTitle": "Selecciona l'idioma",
+      "ca": "Català",
+      "es": "Espanyol",
+      "en": "Anglès"
+    },
+    "measureUnit": {
+      "title": "Unitat de mesura",
+      "modalTitle": "Selecciona la unitat de mesura",
+      "meters": "Metres",
+      "miles": "Milles"
+    }
+  },
+  "explore": {
+    "title": "Explorar"
+  },
+  "search": {
+    "title": "Cercar"
+  },
+  "world": {
+    "title": "Món"
+  },
+  "myRecordings": {
+    "title": "Les meves gravacions",
+    "tabLabel": "Gravacions"
+
   }
 }

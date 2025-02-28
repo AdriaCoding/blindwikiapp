@@ -1,3 +1,38 @@
 {
-  "hello": "¡Hola!"
+  "hello": "¡Hola!",
+  "home": {
+    "title": "Grabar",
+    "info-gps": "Presiona el siguiente botón para actualizar tu ubicación GPS",
+    "info-recors": "Presiona el botón 'Grabar' para comenzar a grabar audio. Presiónalo nuevamente para detener la grabación.",
+    "record": "Grabar"
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": {
+      "title": "Idioma",
+      "modalTitle": "Selecciona el idioma",
+      "ca": "Catalán",
+      "es": "Español",
+      "en": "Inglés"
+    },
+    "measureUnit": {
+      "title": "Unidad de medida",
+      "modalTitle": "Selecciona la unidad de medida",
+      "meters": "Metros",
+      "miles": "Millas"
+    }
+  },
+  "explore": {
+    "title": "Explorar"
+  },
+  "search": {
+    "title": "Buscar"
+  },
+  "world": {
+    "title": "Mundo"
+  },
+  "myRecordings": {
+    "title": "Mis grabaciones",
+    "tabLabel": "Mis audios"
+  }
 }
