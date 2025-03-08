@@ -1,0 +1,293 @@
+{
+  "info": {
+    "name": "BlindWiki API",
+    "_postman_id": "bf9c3e1d-8b4f-4da8-9c1e-7f89e45b0123",
+    "description": "API endpoints for the BlindWiki application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/site/login",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "LoginForm[username]",
+                  "value": "{{username}}"
+                },
+                {
+                  "key": "LoginForm[password]",
+                  "value": "{{password}}"
+                },
+                {
+                  "key": "LoginForm[latitude]",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "LoginForm[longitude]",
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/user/register",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "User[username]",
+                  "value": "{{username}}"
+                },
+                {
+                  "key": "User[password]",
+                  "value": "{{password}}"
+                },
+                {
+                  "key": "User[password_repeat]",
+                  "value": "{{password}}"
+                },
+                {
+                  "key": "User[email]",
+                  "value": "{{email}}"
+                },
+                {
+                  "key": "User[latitude]",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "User[longitude]",
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "User[registerHash]",
+                  "value": "{{registerHash}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/site/logout",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "POST", 
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/user/deleteAccount",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "hash",
+                  "value": "{{deleteHash}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Get Posts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/message/index?lat={{latitude}}&long={{longitude}}&dist=2000&PHPSESSID={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["message", "index"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "long", 
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "dist",
+                  "value": "2000"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Posts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/message/search",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "MessageSearchForm[latitude]",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "MessageSearchForm[longitude]",
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "MessageSearchForm[q]",
+                  "value": "{{searchTerm}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/message/hide/{{messageId}}",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tags",
+      "item": [
+        {
+          "name": "Get Tags",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/tag/proposed",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Near Tags",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tag/index?lat={{latitude}}&long={{longitude}}&PHPSESSID={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tag", "index"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "long",
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
