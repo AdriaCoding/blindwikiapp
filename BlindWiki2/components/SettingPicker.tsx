@@ -5,7 +5,7 @@ import Colors from "@/constants/Colors";
 import { useState, useEffect } from "react";
 
 interface SettingPickerProps {
-  label: string;
+  label?: string;
   value: string | number;
   items: Array<{ label: string; value: string | number }>;
   setValue: (callback: (val: any) => any) => void;
