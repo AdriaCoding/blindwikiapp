@@ -4,6 +4,7 @@ import Location from '@/components/Location';
 import { useTranslation } from 'react-i18next';
 import Colors from '@/constants/Colors';
 import { Text, View } from 'react-native';
+import BWButton from '@/components/BWButton';
 function record() {
   console.log('Recording...');
 }
@@ -29,17 +30,18 @@ const styles = StyleSheet.create({
   homeContainer: {
     flex: 1,
     alignItems: "center",
-    margin: 15
+    margin: 10
   },
   buttonContainer: {
     alignSelf: "center",
+    flex: 2,
     width: "95%",
     backgroundColor: Colors.light.BWButton.background,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    borderWidth: 2,
     padding: 25,
+    marginVertical: 10,
   },
   buttonText: {
     color: Colors.light.BWButton.text,
