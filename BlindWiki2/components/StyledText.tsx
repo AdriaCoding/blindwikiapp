@@ -1,9 +1,13 @@
 import { Text, TextProps, StyleSheet, View} from 'react-native';
-
+import { useSettings } from '@/contexts/SettingsContext';
 export function MonoText(props: TextProps) {
   return <Text {...props} style={[props.style, { fontFamily: 'SpaceMono' }]} />;
 }
 export function InstructionsText (props: TextProps) {
+  const { showInstructions } = useSettings();
+  if (!showInstructions) {
+    return null;
+  }
   return (
     <View style={styles.container}>
       <Text {...props} style={styles.text}/>
