@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
   container: {
     borderTopWidth: 1,
     borderTopColor: "#ccc",
-    marginVertical: 10,
+    margin: 10,
   },
 });

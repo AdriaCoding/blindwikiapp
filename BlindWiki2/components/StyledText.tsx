@@ -17,11 +17,10 @@ export function InstructionsText (props: TextProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 25,
-    marginVertical: 10,
+    paddingVertical: 10,
   },
   text: {
-    fontSize: 16,
+    fontSize: 20,
     color: "#333",
   },
 });

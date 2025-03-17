@@ -13,7 +13,7 @@ const ubicació = () => {
 export default function HomeScreen() {
   const { t } = useTranslation();
   return (
-    <View>
+    <View style={styles.homeContainer}>
       <InstructionsText>{t('home.info-gps')}</InstructionsText>
       <Location location={ubicació()} />
       <InstructionsText>{t('home.info-record')}</InstructionsText>
@@ -25,8 +25,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  homeContainer: {
+    flex: 1,
+    alignItems: "center",
+    margin: 15
+  },
   buttonContainer: {
-    margin: 15,
     alignSelf: "center",
     width: "95%",
     backgroundColor: "black",

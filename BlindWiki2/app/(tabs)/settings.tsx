@@ -5,6 +5,8 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 import { useSettings, MeasureUnit, createUnitItems } from "@/contexts/SettingsContext";
 import { createLanguageItems } from "@/locales/i18n";
+import BWButton from "@/components/BWButton";
+import { InstructionsText } from "@/components/StyledText";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -60,7 +62,7 @@ export default function SettingsScreen() {
         />
       </View>
       <View style={styles.settingContainer}>
-        <Text style={styles.label}>{t('settings.measureUnit.title')}</Text>
+        <InstructionsText style={styles.label}>{t('settings.measureUnit.title')}</InstructionsText>
         <DropDownPicker
           open={openUnit}
           value={selectedUnit}
@@ -96,12 +98,17 @@ export default function SettingsScreen() {
           </View>
         </Pressable>
       </View>
+      <View style={styles.settingContainer}>
+          <BWButton title="Log In" onPress={()=>null}/>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    flexDirection: "column",
     height: "50%",
     justifyContent: "center",
     padding: 16,
@@ -112,7 +119,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,  // Adds internal padding
   },
   label: {
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 8,
   },
   dropdown: {
@@ -120,7 +127,7 @@ const styles = StyleSheet.create({
     height: 50,  // Fixed the height to make dropdown visible
   },
   dropdownText: {
-    fontSize: 18,
+    fontSize: 24,
   },
   checkboxContainer: {
     alignItems: 'center', // Centers items horizontally

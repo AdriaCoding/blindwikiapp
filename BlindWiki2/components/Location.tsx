@@ -15,7 +15,6 @@ export default function Location({location}: {location: any}) {
 
 const styles = StyleSheet.create({
   outerBox: {
-    margin: 15,
     alignSelf: "center",
     width: "90%",
     justifyContent: "center",

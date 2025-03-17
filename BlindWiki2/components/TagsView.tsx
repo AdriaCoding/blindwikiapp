@@ -83,22 +83,22 @@ export default function TagsView({
         tags={availableTags}
         selectedTags={selectedTags}
         onTagPress={handleTagPress}
-      />
+        />
 
       <View style={styles.separator} />
 
       {/* Filtered recordings */}
       {filteredRecordings.map((recording) => (
         <RecordingComponent
-          key={recording.id}
-          r={recording}
-          actions={{
-            onListen: () => console.log("Listen"),
-            onEditTags: undefined,
-            onDelete: undefined,
-            onViewComments: () => console.log("View Comments"),
-            onDirection: () => console.log("Direction"),
-          }}
+        key={recording.id}
+        r={recording}
+        actions={{
+          onListen: () => console.log("Listen"),
+          onEditTags: undefined,
+          onDelete: undefined,
+          onViewComments: () => console.log("View Comments"),
+          onDirection: () => console.log("Direction"),
+        }}
         />
       ))}
     </>

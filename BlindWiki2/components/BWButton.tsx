@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from "react-native";
+import { Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from "react-native";
 
 // A special black button with full width, optional height, and a press handler
 interface BWButtonProps {

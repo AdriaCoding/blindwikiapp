@@ -10,12 +10,14 @@ const location = () => {
 export default function Explore() {
   const filteredRecordings = RECORDINGS.filter((rec) => rec.id !== "rec2"); // Example: exclude "rec2"
   return (
-    <ScrollView>
+    <ScrollView style={styles.container}>
       <Location location={location()} />
       <TagsView recordings={filteredRecordings}/>
     </ScrollView>
   );
 }
 const styles = StyleSheet.create({
-
+  container: {
+    margin: 15,
+  }
 });

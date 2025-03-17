@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
-    padding: 10,
+    paddingVertical: 10,
   },
   tagsLine: {
     marginBottom: 6,

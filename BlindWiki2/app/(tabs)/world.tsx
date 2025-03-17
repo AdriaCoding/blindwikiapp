@@ -30,7 +30,7 @@ export default function World() {
         })
       : [];
   return (
-    <ScrollView>
+    <ScrollView style={styles.container}>
       <TagsList
         tags={cities}
         selectedTags={selectedCity !== null ? [selectedCity] : []}
@@ -40,4 +40,8 @@ export default function World() {
     </ScrollView>
   );
 }
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    margin: 15,
+  },
+});
