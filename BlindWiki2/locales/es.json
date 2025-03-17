@@ -3,7 +3,7 @@
   "home": {
     "title": "Grabar",
     "info-gps": "Presiona el siguiente botón para actualizar tu ubicación GPS",
-    "info-recors": "Presiona el botón 'Grabar' para comenzar a grabar audio. Presiónalo nuevamente para detener la grabación.",
+    "info-record": "Presiona el botón 'Grabar' para comenzar a grabar audio. Presiónalo nuevamente para detener la grabación.",
     "record": "Grabar"
   },
   "settings": {

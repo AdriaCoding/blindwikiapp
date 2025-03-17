@@ -1,9 +1,8 @@
-import { StyleSheet, Pressable} from 'react-native';
-
-import {InstructionsText} from '@/components/StyledText';
+import { StyleSheet, Pressable } from 'react-native';
+import { InstructionsText } from '@/components/StyledText';
 import Location from '@/components/Location';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-
 function record() {
   console.log('Recording...');
 }
@@ -12,17 +11,14 @@ const ubicació = () => {
 }
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   return (
     <View>
-      <InstructionsText> 
-      {"Prem el següent botó per actualitzar la teva ubicació GPS"}
-      </InstructionsText> 
+      <InstructionsText>{t('home.info-gps')}</InstructionsText>
       <Location location={ubicació()} />
-      <InstructionsText>
-        {"Prem el següent botó 'Gravar' per iniciar la gravació de so. Prem-lo novament per acabar la gravació."}
-      </InstructionsText> 
+      <InstructionsText>{t('home.info-record')}</InstructionsText>
       <Pressable style={styles.buttonContainer} onPress={record}>
-        <Text style={styles.buttonText}>Gravar</Text>  
+        <Text style={styles.buttonText}>{t('home.record')}</Text>
       </Pressable>
     </View>
   );
