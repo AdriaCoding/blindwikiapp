@@ -1,18 +1,20 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Pressable } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { useState, useEffect } from "react";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const [openLanguage, setOpenLanguage] = useState(false);
   const [openUnit, setOpenUnit] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
-  const [selectedUnit, setSelectedUnit] = useState("meters");
+  const [language, setSelectedLanguage] = useState(i18n.language);
+  const [unit, setSelectedUnit] = useState("meters");
+  const [showInstructions, setShowInstructions] = useState(true);
 
   useEffect(() => {
-    i18n.changeLanguage(selectedLanguage);
-  }, [selectedLanguage, i18n]);
+    i18n.changeLanguage(language);
+  }, [language, i18n]);
 
   const languages = [
     { label: t('settings.language.en'), value: "en" },
@@ -31,7 +33,7 @@ export default function SettingsScreen() {
         <Text style={styles.label}>{t('settings.language.title')}</Text>
         <DropDownPicker
           open={openLanguage}
-          value={selectedLanguage}
+          value={language}
           items={languages}
           setOpen={setOpenLanguage}
           setValue={setSelectedLanguage}
@@ -49,7 +51,7 @@ export default function SettingsScreen() {
         <Text style={styles.label}>{t('settings.measureUnit.title')}</Text>
         <DropDownPicker
           open={openUnit}
-          value={selectedUnit}
+          value={unit}
           items={units}
           setOpen={setOpenUnit}
           setValue={setSelectedUnit}
@@ -62,6 +64,25 @@ export default function SettingsScreen() {
           }}
           modalTitle={t('settings.measureUnit.modalTitle')}
         />
+      </View>
+      <View style={styles.settingContainer}>
+        <Pressable
+          onPress={() => setShowInstructions(!showInstructions)}
+          accessible={true}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: showInstructions }}
+          style={styles.checkboxContainer}
+        >
+          <View style={styles.checkboxRow}>
+            <FontAwesome
+              name={showInstructions ? "check-square-o" : "square-o"}
+              size={24}
+              color={showInstructions ? "blue" : "gray"}
+              style={styles.checkboxIcon}
+            />
+            <Text style={styles.checkboxLabel}>{t('settings.showInstructions')}</Text>
+          </View>
+        </Pressable>
       </View>
     </View>
   );
@@ -89,4 +110,19 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 18,
   },
+  checkboxContainer: {
+    alignItems: 'center', // Centers items horizontally
+    paddingVertical: 8,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center', // Centers items vertically
+  },
+  checkboxIcon: {
+    marginRight: 8, // Adds space between icon and text
+  },
+  checkboxLabel: {
+    fontSize: 18,
+  }
+
 });
