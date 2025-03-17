@@ -51,7 +51,13 @@ export default function RootLayout() {
 function RootLayoutNav() {
   //<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
   return (
-      <Stack>
+      <Stack
+        screenOptions={{
+          contentStyle: {
+            backgroundColor: 'white'  // This will set the background color for all screens
+          }
+        }}
+      >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
