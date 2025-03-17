@@ -3,29 +3,41 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { useState, useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
+import { useSettings, MeasureUnit, createUnitItems } from "@/contexts/SettingsContext";
+import { createLanguageItems } from "@/locales/i18n";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
+  // Get global state from context
+  const { 
+    unit: globalUnit, 
+    setUnit: setGlobalUnit,
+    showInstructions: globalShowInstructions,
+    setShowInstructions: setGlobalShowInstructions
+  } = useSettings();
+
   const [openLanguage, setOpenLanguage] = useState(false);
   const [openUnit, setOpenUnit] = useState(false);
-  const [language, setSelectedLanguage] = useState(i18n.language);
-  const [unit, setSelectedUnit] = useState("meters");
-  const [showInstructions, setShowInstructions] = useState(true);
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
+  const [selectedUnit, setSelectedUnit] = useState<MeasureUnit>(globalUnit);
+  const [selectedShowInstructions, setSelectedShowInstructions] = useState(globalShowInstructions);
+
+  
+  useEffect(() => {
+    i18n.changeLanguage(selectedLanguage);
+  }, [selectedLanguage, i18n]);
 
   useEffect(() => {
-    i18n.changeLanguage(language);
-  }, [language, i18n]);
+    setGlobalUnit(selectedUnit);
+  }, [selectedUnit, setGlobalUnit]);
 
-  const languages = [
-    { label: t('settings.language.en'), value: "en" },
-    { label: t('settings.language.es'), value: "es" },
-    { label: t('settings.language.ca'), value: "ca" },
-  ];
+  useEffect(() => {
+    setGlobalShowInstructions(selectedShowInstructions);
+  }, [selectedShowInstructions, setGlobalShowInstructions]);
 
-  const units = [
-    { label: t('settings.measureUnit.meters'), value: "meters" },
-    { label: t('settings.measureUnit.miles'), value: "miles" },
-  ];
+  const languages = createLanguageItems(t);
+
+  const units = createUnitItems(t);
 
   return (
     <View style={styles.container}>
@@ -33,7 +45,7 @@ export default function SettingsScreen() {
         <Text style={styles.label}>{t('settings.language.title')}</Text>
         <DropDownPicker
           open={openLanguage}
-          value={language}
+          value={selectedLanguage}
           items={languages}
           setOpen={setOpenLanguage}
           setValue={setSelectedLanguage}
@@ -51,7 +63,7 @@ export default function SettingsScreen() {
         <Text style={styles.label}>{t('settings.measureUnit.title')}</Text>
         <DropDownPicker
           open={openUnit}
-          value={unit}
+          value={selectedUnit}
           items={units}
           setOpen={setOpenUnit}
           setValue={setSelectedUnit}
@@ -67,17 +79,17 @@ export default function SettingsScreen() {
       </View>
       <View style={styles.settingContainer}>
         <Pressable
-          onPress={() => setShowInstructions(!showInstructions)}
+          onPress={() => setSelectedShowInstructions(!selectedShowInstructions)}
           accessible={true}
           accessibilityRole="checkbox"
-          accessibilityState={{ checked: showInstructions }}
+          accessibilityState={{ checked: selectedShowInstructions }}
           style={styles.checkboxContainer}
         >
           <View style={styles.checkboxRow}>
             <FontAwesome
-              name={showInstructions ? "check-square-o" : "square-o"}
+              name={selectedShowInstructions ? "check-square-o" : "square-o"}
               size={24}
-              color={showInstructions ? "blue" : "gray"}
+              color={selectedShowInstructions ? "blue" : "gray"}
               style={styles.checkboxIcon}
             />
             <Text style={styles.checkboxLabel}>{t('settings.showInstructions')}</Text>

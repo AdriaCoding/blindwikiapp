@@ -7,6 +7,7 @@
     "record": "Record"
   },
   "settings": {
+    "showInstructions": "Show instructions",
     "title": "Settings",
     "language": {
       "title": "Language",

@@ -5,6 +5,14 @@ import en from './en.json';
 import es from './es.json';
 import ca from './ca.json';
 
+export type SupportedLanguage = 'en' | 'es' | 'ca';
+
+export const createLanguageItems = (t: (key: string) => string): Array<{label: string, value: SupportedLanguage}> => [
+  { label: t('settings.language.en'), value: 'en' },
+  { label: t('settings.language.es'), value: 'es' },
+  { label: t('settings.language.ca'), value: 'ca' },
+];
+
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
