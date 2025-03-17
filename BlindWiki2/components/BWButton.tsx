@@ -1,5 +1,5 @@
 import { Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from "react-native";
-
+import Colors from "@/constants/Colors";
 // A special black button with full width, optional height, and a press handler
 interface BWButtonProps {
   title: string;
@@ -20,7 +20,7 @@ export default function BWButton({ title, onPress, height }: BWButtonProps) {
 
 const styles = StyleSheet.create({
   bwButton: {
-    backgroundColor: "#000",
+    backgroundColor: Colors.light.BWButton.background ,
     width: "100%",
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   bwButtonText: {
-    color: "#fff",
+    color: Colors.light.BWButton.text,
     textAlign: "center",
     fontSize: 16,
   },

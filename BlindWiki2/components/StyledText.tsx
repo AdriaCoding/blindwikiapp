@@ -1,5 +1,6 @@
 import { Text, TextProps, StyleSheet, View} from 'react-native';
 import { useSettings } from '@/contexts/SettingsContext';
+import Colors from '@/constants/Colors';
 export function MonoText(props: TextProps) {
   return <Text {...props} style={[props.style, { fontFamily: 'SpaceMono' }]} />;
 }
@@ -21,6 +22,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
-    color: "#333",
+    color: Colors.light.text,
   },
 });

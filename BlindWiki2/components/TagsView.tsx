@@ -5,6 +5,7 @@ import { TAGS } from "../data/dummy-data";
 import RecordingComponent from "./RecordingView";
 import Tag from "@/models/tag";
 import Recording from "@/models/recording";
+import Colors from "@/constants/Colors";
 
 function TagBox({
   tag,
@@ -112,24 +113,25 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   tag: {
-    borderColor: "#000",
+    borderColor: Colors.light.tag.border,
+    backgroundColor: Colors.light.tag.background,
     borderWidth: 1,
     paddingHorizontal: 4,
     paddingVertical: 2,
     margin: 4,
   },
   tagSelected: {
-    backgroundColor: "#000",
+    backgroundColor: Colors.light.tag.activeBackground,
   },
   tagText: {
-    color: "#000",
+    color: Colors.light.tag.text,
   },
   tagTextSelected: {
-    color: "#fff",
+    color: Colors.light.tag.activeText,
   },
   separator: {
     marginVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: Colors.light.border,
   },
 });

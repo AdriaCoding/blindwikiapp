@@ -7,6 +7,7 @@ import { useSettings, MeasureUnit, createUnitItems } from "@/contexts/SettingsCo
 import { createLanguageItems } from "@/locales/i18n";
 import BWButton from "@/components/BWButton";
 import { InstructionsText } from "@/components/StyledText";
+import Colors from "@/constants/Colors";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -91,7 +92,7 @@ export default function SettingsScreen() {
             <FontAwesome
               name={selectedShowInstructions ? "check-square-o" : "square-o"}
               size={24}
-              color={selectedShowInstructions ? "blue" : "gray"}
+              color={selectedShowInstructions ? Colors.light.primary : Colors.light.tabBar.inactive}
               style={styles.checkboxIcon}
             />
             <Text style={styles.checkboxLabel}>{t('settings.showInstructions')}</Text>
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   dropdown: {
-    borderColor: "#ccc",
+    borderColor: Colors.light.border,
     height: 50,  // Fixed the height to make dropdown visible
   },
   dropdownText: {

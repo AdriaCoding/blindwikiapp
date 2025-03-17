@@ -9,6 +9,7 @@ import {
 import BWButton from "./BWButton";
 import { TAGS } from "@/data/dummy-data";
 import Recording from "@/models/recording";
+import Colors from "@/constants/Colors";
 
 interface RecordingActions {
   onListen?: (event: GestureResponderEvent) => void;
@@ -61,7 +62,7 @@ export default function RecordingComponent({
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: Colors.light.border,
     paddingVertical: 10,
   },
   tagsLine: {

@@ -2,6 +2,7 @@ import { StyleSheet, Pressable } from 'react-native';
 import { InstructionsText } from '@/components/StyledText';
 import Location from '@/components/Location';
 import { useTranslation } from 'react-i18next';
+import Colors from '@/constants/Colors';
 import { Text, View } from 'react-native';
 function record() {
   console.log('Recording...');
@@ -33,7 +34,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignSelf: "center",
     width: "95%",
-    backgroundColor: "black",
+    backgroundColor: Colors.light.BWButton.background,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     padding: 25,
   },
   buttonText: {
-    color: "white",
+    color: Colors.light.BWButton.text,
     fontSize: 20,
   }
 });

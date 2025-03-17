@@ -7,7 +7,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '../locales/i18n';
 import 'react-native-reanimated';
 import { SettingsProvider } from '@/contexts/SettingsContext';
-
+import Colors from '@/constants/Colors';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -57,7 +57,7 @@ function RootLayoutNav() {
     <Stack
       screenOptions={{
         contentStyle: {
-          backgroundColor: 'white'  // This will set the background color for all screens
+          backgroundColor: Colors.light.background
         }
       }}
     >
