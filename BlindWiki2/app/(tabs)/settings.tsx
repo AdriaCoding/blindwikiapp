@@ -13,6 +13,7 @@ import BWButton from "@/components/BWButton";
 import { InstructionsText } from "@/components/StyledText";
 import Colors from "@/constants/Colors";
 import { SettingPicker } from "@/components/SettingPicker";
+import { router } from "expo-router";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -96,7 +97,7 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
       <View style={styles.settingContainer}>
-        <BWButton title="Log In" onPress={() => null} />
+        <BWButton title="Log In" onPress={() => router.push('/logInScreen')} />
       </View>
     </View>
   );
