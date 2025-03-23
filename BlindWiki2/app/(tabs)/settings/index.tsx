@@ -17,29 +17,18 @@ export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   // Get global state from context
   const {
-    unit: globalUnit,
-    setUnit: setGlobalUnit,
-    showInstructions: globalShowInstructions,
-    setShowInstructions: setGlobalShowInstructions,
+    unit,
+    setUnit,
+    showInstructions ,
+    setShowInstructions,
   } = useSettings();
 
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
-  const [selectedUnit, setSelectedUnit] = useState<MeasureUnit>(globalUnit);
-  const [selectedShowInstructions, setSelectedShowInstructions] = useState(
-    globalShowInstructions
-  );
 
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage);
   }, [selectedLanguage, i18n]);
 
-  useEffect(() => {
-    setGlobalUnit(selectedUnit);
-  }, [selectedUnit, setGlobalUnit]);
-
-  useEffect(() => {
-    setGlobalShowInstructions(selectedShowInstructions);
-  }, [selectedShowInstructions, setGlobalShowInstructions]);
 
   const languages = createLanguageItems(t);
   const units = createUnitItems(t);
@@ -59,27 +48,27 @@ export default function SettingsScreen() {
       <View style={styles.settingContainer}>
         <SettingPicker
           label={t("settings.measureUnit.title")}
-          value={selectedUnit}
+          value={unit}
           items={units}
-          setValue={setSelectedUnit}
+          setValue={setUnit}
           placeholder={t("settings.measureUnit.modalTitle")}
           modalTitle={t("settings.measureUnit.modalTitle")}
         />
       </View>
       <View style={styles.settingContainer}>
         <Pressable
-          onPress={() => setSelectedShowInstructions(!selectedShowInstructions)}
+          onPress={() => setShowInstructions(!showInstructions)}
           accessible={true}
           accessibilityRole="checkbox"
-          accessibilityState={{ checked: selectedShowInstructions }}
+          accessibilityState={{ checked: showInstructions }}
           style={styles.checkboxContainer}
         >
           <View style={styles.checkboxRow}>
             <FontAwesome
-              name={selectedShowInstructions ? "check-square-o" : "square-o"}
+              name={showInstructions ? "check-square-o" : "square-o"}
               size={24}
               color={
-                selectedShowInstructions
+                showInstructions
                   ? Colors.light.primary
                   : Colors.light.tabBar.inactive
               }

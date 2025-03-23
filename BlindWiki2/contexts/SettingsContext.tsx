@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, ReactNode } from 'react';
+import { createContext, useState, useContext, ReactNode, useCallback } from 'react';
 
 export type MeasureUnit = "meters" | "miles";
 
@@ -9,16 +9,36 @@ export const createUnitItems = (t: (key: string) => string): Array<{label: strin
 
 type SettingsContextType = {
   unit: MeasureUnit;
-  setUnit: (unit: MeasureUnit) => void;
+  setUnit: (unit: MeasureUnit | ((prev: MeasureUnit) => MeasureUnit)) => void;
   showInstructions: boolean;
-  setShowInstructions: (show: boolean) => void;
+  setShowInstructions: (show: boolean | ((prev: boolean) => boolean)) => void;
+  language?: string;
+  setLanguage?: (language: string | ((prev: string) => string)) => void;
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [unit, setUnit] = useState<MeasureUnit>("meters");
-  const [showInstructions, setShowInstructions] = useState(true);
+  const [unit, setUnitState] = useState<MeasureUnit>("meters");
+  const [showInstructions, setShowInstructionsState] = useState(true);
+
+  // Custom setters that handle both value and callback updates
+  const setUnit = useCallback((value: MeasureUnit | ((prev: MeasureUnit) => MeasureUnit)) => {
+    if (typeof value === 'function') {
+      setUnitState(prev => (value as Function)(prev));
+    } else {
+      setUnitState(value);
+    }
+  }, []);
+
+  const setShowInstructions = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
+    if (typeof value === 'function') {
+      setShowInstructionsState(prev => (value as Function)(prev));
+    } else {
+      setShowInstructionsState(value);
+    }
+  }, []);
+
 
   return (
     <SettingsContext.Provider 
@@ -27,7 +47,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         setUnit,
         showInstructions,
         setShowInstructions,
-      }}
+              }}
     >
       {children}
     </SettingsContext.Provider>
