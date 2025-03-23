@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     flex: 2,
     width: "95%",
-    backgroundColor: Colors.light.BWButton.background,
+    backgroundColor: Colors.light.button.background,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   buttonText: {
-    color: Colors.light.BWButton.text,
+    color: Colors.light.button.text,
     fontSize: 20,
   }
 });

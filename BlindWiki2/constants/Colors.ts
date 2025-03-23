@@ -15,7 +15,7 @@ export default {
     border: '#cccccc',
     formBackground: '#fee300',
     placeHolderText: '#404040',
-    BWButton: {
+    button: {
       text: whiteColor,
       background: blackColor
     },
