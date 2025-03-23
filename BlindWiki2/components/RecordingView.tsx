@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   GestureResponderEvent,
 } from "react-native";
-import BWButton from "./BWButton";
+import StyledButton from "./StyledButton";
 import { TAGS } from "@/data/dummy-data";
 import Recording from "@/models/recording";
 import Colors from "@/constants/Colors";
@@ -41,19 +41,19 @@ export default function RecordingComponent({
 
       {/* Black buttons for actions */}
       {actions.onListen && (
-        <BWButton title="Listen" onPress={actions.onListen} />
+        <StyledButton title="Listen" onPress={actions.onListen} />
       )}
       {actions.onViewComments && (
-        <BWButton title="Comments" onPress={actions.onViewComments} />
+        <StyledButton title="Comments" onPress={actions.onViewComments} />
       )}
       {actions.onEditTags && (
-        <BWButton title="Edit Tags" onPress={actions.onEditTags} />
+        <StyledButton title="Edit Tags" onPress={actions.onEditTags} />
       )}
       {actions.onDelete && (
-        <BWButton title="Delete" onPress={actions.onDelete} />
+        <StyledButton title="Delete" onPress={actions.onDelete} />
       )}
       {actions.onDirection && (
-        <BWButton title="Direction" onPress={actions.onDirection} />
+        <StyledButton title="Direction" onPress={actions.onDirection} />
       )}
     </View>
   );

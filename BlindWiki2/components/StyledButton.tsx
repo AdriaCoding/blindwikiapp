@@ -7,7 +7,7 @@ interface BWButtonProps {
   height?: number;
 }
 
-export default function BWButton({ title, onPress, height }: BWButtonProps) {
+export default function StyledButton({ title, onPress, height }: BWButtonProps) {
   return (
     <TouchableOpacity
       onPress={onPress}

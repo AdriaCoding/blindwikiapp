@@ -8,7 +8,7 @@ import {
   createUnitItems,
 } from "@/contexts/SettingsContext";
 import { createLanguageItems } from "@/locales/i18n";
-import BWButton from "@/components/BWButton";
+import StyledButton from "@/components/StyledButton";
 import Colors from "@/constants/Colors";
 import { SettingPicker } from "@/components/SettingPicker";
 import { router } from "expo-router";
@@ -92,7 +92,7 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
       <View style={styles.settingContainer}>
-        <BWButton 
+        <StyledButton 
           title="Log In" 
           onPress={() => router.push("/(tabs)/settings/login")} 
         />

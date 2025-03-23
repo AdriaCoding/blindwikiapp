@@ -4,7 +4,7 @@ import Location from '@/components/Location';
 import { useTranslation } from 'react-i18next';
 import Colors from '@/constants/Colors';
 import { Text, View } from 'react-native';
-import BWButton from '@/components/BWButton';
+import StyledButton from '@/components/StyledButton';
 function record() {
   console.log('Recording...');
 }

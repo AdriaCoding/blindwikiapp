@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TextInput, View, Alert} from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import BWButton from '@/components/BWButton';
+import StyledButton from '@/components/StyledButton';
 import Colors from '@/constants/Colors';
 
 export default function LogInScreen() {
@@ -82,9 +82,15 @@ export default function LogInScreen() {
         />
         
         <View style={styles.buttonContainer}>
-          <BWButton title="Log In" onPress={handleLogin} />
-          <BWButton title="Cancel" onPress={() => router.back()} />
+          <StyledButton title="Log In" onPress={handleLogin} />
+          <StyledButton title="Forgot your password?" onPress={() => router.back()} /> 
         </View>
+        <Text>
+          Join the BlindWiki community by filling the following form
+        </Text>
+        <Text>
+          By Signing up, you agree to our Terms of Service and Privacy Policy
+        </Text>
     </View>
   );
 }
