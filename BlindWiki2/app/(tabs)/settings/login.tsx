@@ -12,6 +12,7 @@ import StyledButton from "@/components/StyledButton";
 import Colors from "@/constants/Colors";
 import StyledInput from "@/components/StyledInput";
 import TextLink from "@/components/TextLink";
+import { login } from '@/services/authService';
 
 export default function LogInScreen() {
   const [username, setUsername] = useState("");
@@ -24,48 +25,31 @@ export default function LogInScreen() {
       Alert.alert("Error", "Please enter both username and password");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
-      // Create form data for x-www-form-urlencoded content type
-      const formData = new URLSearchParams();
-      formData.append("LoginForm[username]", username);
-      formData.append("LoginForm[password]", password);
-      formData.append("LoginForm[latitude]", "41.38879"); // Use actual location values from device
-      formData.append("LoginForm[longitude]", "2.15899"); // or use global state
-
-      const response = await fetch("https://api.blind.wiki/site/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log("Login successful:", data);
-
-        // Save the session ID or token
-        if (data.PHPSESSID) {
-          // Store this in secure storage or context
-          console.log("Session ID:", data.PHPSESSID);
-        }
-
-        // Navigate back to previous screen
+      // The login service now returns a cleaned response
+      const response = await login(
+        username, 
+        password, 
+        "41.38879", 
+        "2.15899"
+      );
+      
+      if (response.success) {
+        console.log("Login successful as:", response.username);
         router.back();
       } else {
-        // Handle API errors
-        Alert.alert(
-          "Login Failed",
-          data.message || "Please check your credentials"
-        );
+        // Handle login failure with error from response
+        Alert.alert("Login Failed", response.errorMessage || "Please check your credentials");
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      Alert.alert("Error", "Network error. Please try again.");
+    } catch (error: unknown) {
+      // This will only trigger for network errors or other exceptions
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Network error occurred";
+      Alert.alert("Connection Error", errorMessage);
     } finally {
       setLoading(false);
     }

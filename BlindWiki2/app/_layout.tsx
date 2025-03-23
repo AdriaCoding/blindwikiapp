@@ -63,18 +63,6 @@ function RootLayoutNav() {
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-      <Stack.Screen
-        name="logInScreen"
-        options={{
-          presentation: "transparentModal",
-          contentStyle: {
-            // Leave space for tab bar at bottom
-            marginBottom: 60,
-          },
-          headerShown: false,
-          animation: "slide_from_bottom",
-        }}
-      />
     </Stack>
   );
 }
