@@ -17,6 +17,7 @@ export default function SettingsLayout() {
       <Stack.Screen 
         name="index" 
         options={{ 
+          title: "Settings",
           headerShown: false,
         }} 
       />
@@ -26,6 +27,13 @@ export default function SettingsLayout() {
           title: "Log In",
           presentation: "card",
         }} 
+      />
+      <Stack.Screen 
+        name="signup" 
+        options={{ 
+          title: "Sign Up",
+          presentation: "card",
+        }}
       />
     </Stack>
   );

@@ -22,7 +22,7 @@ export default function StyledInput({
   return (
     <TextInput
       style={styles.input}
-      placeholder="Password"
+      placeholder={placeholder}
       placeholderTextColor={Colors.light.placeHolderText}
       secureTextEntry={secure}
       value={value}
