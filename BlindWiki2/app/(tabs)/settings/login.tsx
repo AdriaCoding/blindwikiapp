@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { router } from 'expo-router';
 import StyledButton from '@/components/StyledButton';
 import Colors from '@/constants/Colors';
+import StyledInput from '@/components/StyledInput';
 
 export default function LogInScreen() {
   const [username, setUsername] = useState('');
@@ -62,24 +63,8 @@ export default function LogInScreen() {
   return (
     <View style={styles.container}>
         
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          placeholderTextColor={Colors.light.placeHolderText}
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-        />
-        
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor={Colors.light.placeHolderText}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          autoCapitalize="none"
-        />
+        <StyledInput value={username} onchangeText={setUsername} placeholder="Username"/>
+        <StyledInput value={password} onchangeText={setPassword} placeholder="Password" secure={true} />
         
         <View style={styles.buttonContainer}>
           <StyledButton title="Log In" onPress={handleLogin} />
@@ -101,16 +86,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20
   },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: Colors.light.border,
-    borderRadius: 4,
-    marginBottom: 16,
-    paddingHorizontal: 10,
-    fontSize: 16,
-    backgroundColor: Colors.light.formBackground,
-  },
+
   buttonContainer: {
     flexDirection: 'column',
     justifyContent: 'space-between',
