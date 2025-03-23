@@ -61,12 +61,11 @@ export default function LogInScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Log In</Text>
         
         <TextInput
           style={styles.input}
           placeholder="Username"
+          placeholderTextColor={Colors.light.placeHolderText}
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
@@ -75,6 +74,7 @@ export default function LogInScreen() {
         <TextInput
           style={styles.input}
           placeholder="Password"
+          placeholderTextColor={Colors.light.placeHolderText}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -85,7 +85,6 @@ export default function LogInScreen() {
           <BWButton title="Log In" onPress={handleLogin} />
           <BWButton title="Cancel" onPress={() => router.back()} />
         </View>
-      </View>
     </View>
   );
 }
@@ -94,23 +93,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  card: {
-    backgroundColor: Colors.light.surface,
-    borderRadius: 8,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    padding: 20
   },
   input: {
     height: 50,
@@ -120,6 +103,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 10,
     fontSize: 16,
+    backgroundColor: Colors.light.formBackground,
   },
   buttonContainer: {
     flexDirection: 'column',

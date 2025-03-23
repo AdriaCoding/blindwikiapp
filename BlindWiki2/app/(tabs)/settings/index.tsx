@@ -1,5 +1,4 @@
 import { Text, View, StyleSheet, Pressable } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
 import { useState, useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useTranslation } from "react-i18next";
@@ -10,7 +9,6 @@ import {
 } from "@/contexts/SettingsContext";
 import { createLanguageItems } from "@/locales/i18n";
 import BWButton from "@/components/BWButton";
-import { InstructionsText } from "@/components/StyledText";
 import Colors from "@/constants/Colors";
 import { SettingPicker } from "@/components/SettingPicker";
 import { router } from "expo-router";
@@ -25,8 +23,6 @@ export default function SettingsScreen() {
     setShowInstructions: setGlobalShowInstructions,
   } = useSettings();
 
-  const [openLanguage, setOpenLanguage] = useState(false);
-  const [openUnit, setOpenUnit] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
   const [selectedUnit, setSelectedUnit] = useState<MeasureUnit>(globalUnit);
   const [selectedShowInstructions, setSelectedShowInstructions] = useState(
@@ -46,7 +42,6 @@ export default function SettingsScreen() {
   }, [selectedShowInstructions, setGlobalShowInstructions]);
 
   const languages = createLanguageItems(t);
-
   const units = createUnitItems(t);
 
   return (
@@ -97,7 +92,10 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
       <View style={styles.settingContainer}>
-        <BWButton title="Log In" onPress={() => router.push('/logInScreen')} />
+        <BWButton 
+          title="Log In" 
+          onPress={() => router.push("/(tabs)/settings/login")} 
+        />
       </View>
     </View>
   );

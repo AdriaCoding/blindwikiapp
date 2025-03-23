@@ -14,6 +14,7 @@ export default {
     surface: whiteColor,
     border: '#cccccc',
     formBackground: '#fee300',
+    placeHolderText: '#404040',
     BWButton: {
       text: whiteColor,
       background: blackColor
