@@ -22,7 +22,6 @@ export default function SettingsScreen() {
   const languages = createLanguageItems(t);
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage);
-    console.log(user);
   }, [selectedLanguage, i18n]);
   
   const { unit, setUnit, showInstructions, setShowInstructions } = useSettings();

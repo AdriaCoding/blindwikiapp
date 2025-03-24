@@ -25,15 +25,8 @@ export interface LoginCleanResponse extends CleanResponse {
 }
 
 // LOGOUT endpoint
-export interface LogoutRequest {
-  PHPSESSID: string;
-}
 
-export interface LogoutServerResponse extends ServerResponse {
-}
 
-export interface LogoutCleanResponse extends CleanResponse {
-}
 
 
 // REGISTER endpoint
@@ -122,7 +115,8 @@ export async function login(
  * Logs out the current user and removes their session
  * @returns A clean response indicating success or failure
  */
-export async function logout(): Promise<LogoutCleanResponse> {
+
+export async function logout(): Promise<CleanResponse> {
   const sessionId = await getSessionToken();
 
   if (!sessionId) {
@@ -132,15 +126,15 @@ export async function logout(): Promise<LogoutCleanResponse> {
     };
   }
 
-  const data: LogoutRequest = {
+  const data ={
     PHPSESSID: sessionId,
   };
 
   try {
     // Call the logout endpoint
     const response = await apiRequest<
-      LogoutServerResponse,
-      LogoutCleanResponse
+      ServerResponse,
+      CleanResponse
     >("/site/logout", "POST", data);
 
     // Always remove the session token on logout attempt,

@@ -12,9 +12,9 @@ import {
   logout as apiLogout,
   register as apiRegister,
   LoginCleanResponse,
-  LogoutCleanResponse,
   RegisterCleanResponse,
 } from "@/services/authService";
+import { CleanResponse } from "@/services/api";
 import { 
   getSessionToken, 
   getCredentials, 
@@ -28,7 +28,7 @@ type AuthContextType = {
   isLoading: boolean;
   error: string | null;
   login: (username: string, password: string) => Promise<LoginCleanResponse>;
-  logout: () => Promise<LogoutCleanResponse>;
+  logout: () => Promise<CleanResponse>;
   register: (
     username: string,
     password: string,
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await login(credentials.username, credentials.password);
           return; // login() will set isLoading=false when done
         }
-        console.log("👤 No stored credentials found, entering guest mode");
+        console.log("👤 No stored credentials found, entering guest mode.");
         // If we get here, no auto-login was attempted or it failed
         // Just check for an existing session token
         const token = await getSessionToken();
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   // Logout function that wraps the API logout
-  const logout = useCallback(async (): Promise<LogoutCleanResponse> => {
+  const logout = useCallback(async (): Promise<CleanResponse> => {
     setIsLoading(true);
     setError(null);
 
