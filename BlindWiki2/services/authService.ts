@@ -98,7 +98,6 @@ export async function login(
         };
       }
     );
-    console.log("Cleaned response:", response);
     // Save session token if available
     if (response.sessionId) {
       await saveSessionToken(response.sessionId);

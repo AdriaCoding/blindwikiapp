@@ -15,7 +15,12 @@ import {
   LogoutCleanResponse,
   RegisterCleanResponse,
 } from "@/services/authService";
-import { getSessionToken, saveSessionToken } from "@/services/secureStorage";
+import { 
+  getSessionToken, 
+  getCredentials, 
+  saveCredentials, 
+  removeCredentials,
+} from "@/services/secureStorage";
 
 type AuthContextType = {
   user: User | null;
@@ -38,25 +43,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // Changed to false as we're not loading on init
+  const [isLoading, setIsLoading] = useState(true); // Start as true while checking auto-login 
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize auth state on mount - just check for session token
+  // Initialize auth state and attempt auto-login
   useEffect(() => {
-    const checkSessionToken = async () => {
+    const initAuth = async () => {
       try {
+        // Check if we have stored credentials
+        const credentials = await getCredentials();
+        if (credentials) {
+          // Attempt to login with stored credentials
+          await login(credentials.username, credentials.password);
+          return; // login() will set isLoading=false when done
+        }
+        console.log("👤 No stored credentials found, entering guest mode");
+        // If we get here, no auto-login was attempted or it failed
+        // Just check for an existing session token
         const token = await getSessionToken();
         if (token) {
           setSessionId(token);
-          // Note: We can't load user data without an endpoint
-          // The user will need to log in again to get their data
         }
       } catch (error) {
-        console.error("Error checking session token:", error);
+        console.error("Error during auth initialization:", error);
+      } finally {
+        // Whether login succeeded or not, we're done loading
+        setIsLoading(false);
       }
     };
 
-    checkSessionToken();
+    initAuth();
   }, []);
 
   // Function to clear error state
@@ -78,11 +94,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "41.38879",
           "2.15899"
         );
-
         // Update context state based on response
         if (response.success && response.user) {
           setUser(response.user);
+          console.log("👤 Logged with username:", response.user.username);
           setSessionId(response.sessionId || null);
+          // Always store credentials for auto-login on successful login
+          await saveCredentials(username, password);
+
         } else if (!response.success) {
           setError(response.errorMessage || "Login failed");
         }
@@ -116,6 +135,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Always clear the auth state, even if the API call fails
       setUser(null);
       setSessionId(null);
+      
+      // Always remove credentials on logout
+      await removeCredentials();
 
       return response;
     } catch (error) {
@@ -162,9 +184,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
 
         // Update context state based on response
+        // Note: Unlike login, registration doesn't necessarily result in an active user
+        // since the user might need to confirm their email first
         if (response.success && response.user) {
           setUser(response.user);
           setSessionId(response.sessionId || null);
+          
+          // Don't store credentials on registration since email confirmation is required
         } else if (!response.success) {
           setError(response.errorMessage || "Registration failed");
         }
@@ -200,7 +226,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     isLoggedIn,
-    clearError
+    clearError,
   };
 
   return (

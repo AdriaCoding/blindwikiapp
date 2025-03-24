@@ -7,11 +7,12 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../locales/i18n";
 import "react-native-reanimated";
 import { SettingsProvider } from "@/contexts/SettingsContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Colors from "@/constants/Colors";
 
 // Only enable in development
 import { setupDebugAuth } from '@/utils/debugAuth';
+import LoadingScreen from "./loading";
 if (__DEV__) {
   setupDebugAuth();
 }
@@ -63,6 +64,11 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const { isLoading } = useAuth();
+  // Show loading screen while checking credentials and auto-login
+  if (isLoading) {
+    return <LoadingScreen/>;
+  }
   //<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
   return (
     <Stack
@@ -77,3 +83,4 @@ function RootLayoutNav() {
     </Stack>
   );
 }
+
