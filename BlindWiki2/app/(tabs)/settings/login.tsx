@@ -11,47 +11,25 @@ import { router } from "expo-router";
 import StyledButton from "@/components/StyledButton";
 import Colors from "@/constants/Colors";
 import StyledInput from "@/components/StyledInput";
-import TextLink from "@/components/TextLink";
-import { login } from '@/services/authService';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LogInScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleLogin = async () => {
-    // Validation
+    // Input validation
     if (!username || !password) {
       Alert.alert("Error", "Please enter both username and password");
       return;
     }
-  
-    setLoading(true);
-  
-    try {
-      // The login service now returns a cleaned response
-      const response = await login(
-        username, 
-        password, 
-        "41.38879", 
-        "2.15899"
-      );
-      
-      if (response.success) {
-        console.log("Login successful as:", response.username);
-        router.back();
-      } else {
-        // Handle login failure with error from response
-        Alert.alert("Login Failed", response.errorMessage || "Please check your credentials");
-      }
-    } catch (error: unknown) {
-      // This will only trigger for network errors or other exceptions
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : "Network error occurred";
-      Alert.alert("Connection Error", errorMessage);
-    } finally {
-      setLoading(false);
+   
+    const response = await login(username, password);
+    if (response.success) {
+      router.back();
+    } else {
+      Alert.alert('Login Failed', response.errorMessage || 'Please check your credentials');
     }
   };
 

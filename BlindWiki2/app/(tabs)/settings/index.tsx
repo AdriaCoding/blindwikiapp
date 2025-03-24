@@ -12,26 +12,32 @@ import StyledButton from "@/components/StyledButton";
 import Colors from "@/constants/Colors";
 import { SettingPicker } from "@/components/SettingPicker";
 import { router } from "expo-router";
+import { Alert } from "react-native";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
-  // Get global state from context
-  const {
-    unit,
-    setUnit,
-    showInstructions ,
-    setShowInstructions,
-  } = useSettings();
-
+  
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
-
+  const languages = createLanguageItems(t);
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage);
+    console.log(user);
   }, [selectedLanguage, i18n]);
-
-
-  const languages = createLanguageItems(t);
+  
+  const { unit, setUnit, showInstructions, setShowInstructions } = useSettings();
   const units = createUnitItems(t);
+  
+  const { user, logout, isLoggedIn, isLoading } = useAuth();
+  const handleLogout = async () => {
+    const response = await logout();
+    
+    if (response.success) {
+      Alert.alert('Success', 'You have been logged out');
+    } else {
+      Alert.alert('Logout Error', response.errorMessage || 'Failed to logout properly');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -81,10 +87,19 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
       <View style={styles.settingContainer}>
-        <StyledButton 
-          title="Log In" 
-          onPress={() => router.push("/(tabs)/settings/login")} 
-        />
+        {!isLoggedIn() ? (
+          <StyledButton
+            title={"Log In"}
+            onPress={() => router.push("/(tabs)/settings/login")}
+          />
+        ) : (
+          <>
+            <StyledButton 
+              title={"Log Out"}
+              onPress={handleLogout}
+            />
+          </>
+        )}
       </View>
     </View>
   );
@@ -116,5 +131,10 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 18,
+  },
+  welcomeText: {
+    fontSize: 16,
+    marginBottom: 16,
+    textAlign: 'center',
   },
 });

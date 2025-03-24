@@ -7,6 +7,8 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "../locales/i18n";
 import "react-native-reanimated";
 import { SettingsProvider } from "@/contexts/SettingsContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+
 import Colors from "@/constants/Colors";
 export {
   // Catch any errors thrown by the Layout component.
@@ -44,9 +46,11 @@ export default function RootLayout() {
 
   return (
     <SettingsProvider>
-      <I18nextProvider i18n={i18n}>
-        <RootLayoutNav />
-      </I18nextProvider>
+      <AuthProvider>
+        <I18nextProvider i18n={i18n}>
+          <RootLayoutNav />
+        </I18nextProvider>
+      </AuthProvider>
     </SettingsProvider>
   );
 }

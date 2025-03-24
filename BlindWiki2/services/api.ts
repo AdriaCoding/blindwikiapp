@@ -113,7 +113,6 @@ export async function apiRequest<T extends ServerResponse, C extends CleanRespon
 
     const response = await fetch(url, options);
     const responseData = await response.json();
-    console.log('API response:', responseData);
     if (response.ok && responseData.status === 'ok') {
       const additionalData = cleanMapper ? cleanMapper(responseData as T) : {};
       return cleanResponse<C>(responseData, additionalData);
