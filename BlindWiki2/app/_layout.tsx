@@ -13,8 +13,12 @@ import Colors from "@/constants/Colors";
 // Only enable in development
 import { setupDebugAuth } from '@/utils/debugAuth';
 import LoadingScreen from "./loading";
+import { setupDebugMessage } from "@/utils/debugMessage";
+
 if (__DEV__) {
   setupDebugAuth();
+  setupDebugMessage();
+  console.log('🛠️ Debug tools initialized!');
 }
 
 

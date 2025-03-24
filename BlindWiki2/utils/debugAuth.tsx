@@ -126,7 +126,6 @@ export function setupDebugAuth(): void {
       clearAllSecureItems
     };
     
-    console.log('🛠️ Auth debug utils are ready! Use global.debugAuth to access auth functions');
   }
   
   // For Web (if using Expo Web)
@@ -138,6 +137,5 @@ export function setupDebugAuth(): void {
       clearAllSecureItems
     };
     
-    console.log('🛠️ Auth debug utils are ready! Use window.debugAuth to access auth functions');
   }
 }
