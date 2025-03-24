@@ -193,9 +193,10 @@ export async function fetchRegistrationNonce(): Promise<string | null> {
  * @returns Register hash for validation
  */
 export async function computeRegisterHash(nonce: string): Promise<string> {
-  // The server uses md5(nonce + secret) where secret is "8976" as seen in WebApi.php
-  const secret = "8976";
-  return MD5(nonce + secret).toString();
+  // The server uses md5(nonce + secret) as seen in WebApi.php
+  // I do not mind exposing it, but we will name it randomly
+  const OttoVonBismark = "8976";
+  return MD5(nonce + OttoVonBismark).toString();
 }
 
 /**
