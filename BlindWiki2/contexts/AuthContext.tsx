@@ -11,12 +11,11 @@ import {
   login as apiLogin,
   logout as apiLogout,
   register as apiRegister,
-  fetchUserProfile,
   LoginCleanResponse,
   LogoutCleanResponse,
   RegisterCleanResponse,
 } from "@/services/authService";
-import { getSessionToken } from "@/services/secureStorage";
+import { getSessionToken, saveSessionToken } from "@/services/secureStorage";
 
 type AuthContextType = {
   user: User | null;
@@ -31,7 +30,7 @@ type AuthContextType = {
     email: string
   ) => Promise<RegisterCleanResponse>;
   isLoggedIn: () => boolean;
-  refreshUserProfile: () => Promise<boolean>;
+  clearError: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,60 +38,30 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // Changed to false as we're not loading on init
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize auth state on mount
+  // Initialize auth state on mount - just check for session token
   useEffect(() => {
-    const initializeAuth = async () => {
-      setIsLoading(true);
-      setError(null);
-
+    const checkSessionToken = async () => {
       try {
         const token = await getSessionToken();
-
         if (token) {
           setSessionId(token);
-          const profileResponse = await fetchUserProfile();
-
-          if (profileResponse.success && profileResponse.user) {
-            setUser(profileResponse.user);
-          }
+          // Note: We can't load user data without an endpoint
+          // The user will need to log in again to get their data
         }
       } catch (error) {
-        console.error("Auth initialization error:", error);
-        setError("Failed to initialize authentication");
-      } finally {
-        setIsLoading(false);
+        console.error("Error checking session token:", error);
       }
     };
 
-    initializeAuth();
+    checkSessionToken();
   }, []);
 
-  // Refresh user profile function
-  const refreshUserProfile = useCallback(async (): Promise<boolean> => {
-    setIsLoading(true);
+  // Function to clear error state
+  const clearError = useCallback(() => {
     setError(null);
-
-    try {
-      const response = await fetchUserProfile();
-
-      if (response.success && response.user) {
-        setUser(response.user);
-        return true;
-      } else {
-        setError(response.errorMessage || "Failed to load user profile");
-        return false;
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      setError(errorMessage);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
   }, []);
 
   // Login function that wraps the API login
@@ -145,14 +114,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await apiLogout();
 
       // Always clear the auth state, even if the API call fails
-      if (response.success) {
-        setUser(null);
-        setSessionId(null);
-      } else {
-        setError(response.errorMessage || "Logout failed");
-      }
-
-      // Always clear state even if API fails
       setUser(null);
       setSessionId(null);
 
@@ -239,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     isLoggedIn,
-    refreshUserProfile
+    clearError
   };
 
   return (

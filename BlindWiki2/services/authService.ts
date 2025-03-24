@@ -7,72 +7,8 @@ import {
 } from "@/services/secureStorage";
 import { MD5 } from "crypto-js";
 
-// Add new interfaces for profile fetching
-export interface ProfileRequest {
-  PHPSESSID: string;
-}
 
-export interface ProfileServerResponse extends ServerResponse {
-  data: Array<User>;
-}
-
-export interface ProfileCleanResponse extends CleanResponse {
-  user?: User;
-}
-
-/**
- * Fetches the current user profile using the session token
- * @returns A clean response with the user profile if successful
- */
-export async function fetchUserProfile(): Promise<ProfileCleanResponse> {
-  const sessionId = await getSessionToken();
-
-  if (!sessionId) {
-    return {
-      success: false,
-      errorMessage: "No active session found",
-    };
-  }
-
-  const data: ProfileRequest = {
-    PHPSESSID: sessionId,
-  };
-
-  try {
-    // Use the user profile endpoint - adjust path as needed for your API
-    const response = await apiRequest<
-      ProfileServerResponse,
-      ProfileCleanResponse
-    >(
-      "/site/profile", // Update this to match your actual endpoint
-      "POST",
-      data,
-      (serverResponse) => {
-        if (!serverResponse.data || serverResponse.data.length === 0) {
-          return {}; // No user data
-        }
-        return {
-          user: serverResponse.data[0],
-        };
-      }
-    );
-
-    return response;
-  } catch (error) {
-    if (error instanceof Error) {
-      return {
-        success: false,
-        errorMessage: error.message,
-      };
-    }
-    return {
-      success: false,
-      errorMessage: "Failed to fetch user profile",
-    };
-  }
-}
-
-// Request type
+// LOGIN endpoint
 export interface LoginRequest {
   "LoginForm[username]": string;
   "LoginForm[password]": string;
@@ -80,16 +16,48 @@ export interface LoginRequest {
   "LoginForm[longitude]": string;
   PHPSESSID?: string;
 }
-
-// Server response extension
 export interface LoginServerResponse extends ServerResponse {
   data: Array<User>;
 }
-
-// Clean response type
 export interface LoginCleanResponse extends CleanResponse {
   user?: User;
   sessionId?: string;
+}
+
+// LOGOUT endpoint
+export interface LogoutRequest {
+  PHPSESSID: string;
+}
+
+export interface LogoutServerResponse extends ServerResponse {
+}
+
+export interface LogoutCleanResponse extends CleanResponse {
+}
+
+
+// REGISTER endpoint
+export interface RegisterRequest {
+  "User[username]": string;
+  "User[password]": string;
+  "User[password_repeat]": string;
+  "User[email]": string;
+  "User[latitude]": string;
+  "User[longitude]": string;
+  "User[registerHash]"?: string;
+  PHPSESSID?: string;
+}
+export interface RegisterServerResponse extends ServerResponse {
+  data?: Array<User>;
+  userRegisterInfo: {
+    nonce: string;
+  };
+}
+export interface RegisterCleanResponse extends CleanResponse {
+  user?: User;
+  sessionId?: string;
+  activationNeeded?: boolean;
+  email?: string;
 }
 
 // Login function
@@ -151,20 +119,6 @@ export async function login(
   }
 }
 
-export interface LogoutRequest {
-  PHPSESSID: string;
-}
-
-export interface LogoutServerResponse extends ServerResponse {
-  // The logout endpoint doesn't return any specific data
-}
-
-// Clean response type
-export interface LogoutCleanResponse extends CleanResponse {
-  // We don't need additional fields for logout response
-}
-
-
 /**
  * Logs out the current user and removes their session
  * @returns A clean response indicating success or failure
@@ -210,34 +164,6 @@ export async function logout(): Promise<LogoutCleanResponse> {
       errorMessage: "Logout failed",
     };
   }
-}
-
-// Register Request type
-export interface RegisterRequest {
-  "User[username]": string;
-  "User[password]": string;
-  "User[password_repeat]": string;
-  "User[email]": string;
-  "User[latitude]": string;
-  "User[longitude]": string;
-  "User[registerHash]"?: string;
-  PHPSESSID?: string;
-}
-
-// Server response extension
-export interface RegisterServerResponse extends ServerResponse {
-  data?: Array<User>;
-  userRegisterInfo: {
-    nonce: string;
-  };
-}
-
-// Clean response type
-export interface RegisterCleanResponse extends CleanResponse {
-  user?: User;
-  sessionId?: string;
-  activationNeeded?: boolean;
-  email?: string;
 }
 
 
