@@ -44,9 +44,6 @@ export interface ServerResponse {
   error?: {
     message: string;
   };
-  registerInfo?: {
-    nonce: string;
-  };
 }
 
 // Interface without ServerResponse junk

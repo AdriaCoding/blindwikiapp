@@ -8,14 +8,14 @@ import Colors from "@/constants/Colors";
 // A special black button with full width, optional height, and a press handler
 interface StyledInputProps {
   value: string;
-  onchangeText: (text: string) => void;
+  onChangeText: (text: string) => void;
   placeholder?: string;
   secure?: boolean;
 }
 
 export default function StyledInput({
   value,
-  onchangeText,
+  onChangeText,
   placeholder,
   secure,
 }: StyledInputProps) {
@@ -26,7 +26,7 @@ export default function StyledInput({
       placeholderTextColor={Colors.light.placeHolderText}
       secureTextEntry={secure}
       value={value}
-      onChangeText={onchangeText}
+      onChangeText={onChangeText}
       autoCapitalize="none"
     />
   );

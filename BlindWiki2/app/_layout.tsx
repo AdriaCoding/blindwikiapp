@@ -8,8 +8,15 @@ import i18n from "../locales/i18n";
 import "react-native-reanimated";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-
 import Colors from "@/constants/Colors";
+
+// Only enable in development
+import { setupDebugAuth } from '@/utils/debugAuth';
+if (__DEV__) {
+  setupDebugAuth();
+}
+
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,

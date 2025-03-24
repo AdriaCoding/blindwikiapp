@@ -1,65 +1,85 @@
-import { StyleSheet, Text, TextInput, View, Alert, Pressable} from 'react-native';
+import { StyleSheet, Text, View, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import StyledButton from '@/components/StyledButton';
 import Colors from '@/constants/Colors';
-import StyledInput from '@/components/StyledInput';
 import TextLink from '@/components/TextLink';
+import { useAuth } from '@/contexts/AuthContext';
+import StyledInput from '@/components/StyledInput';
 
 export default function SignUpScreen() {
+  const { t } = useTranslation();
+  const { register, isLoading } = useAuth();
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [repeatedPassword, setrepeatedPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [repeatPassword, setRepeatPassword] = useState('');
+  const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
   
-  const handleLogin = async () => {
-    // Validation
-    if (!username || !password) {
-      Alert.alert('Error', 'Please enter both username and password');
-      return;
+  const validateForm = (): boolean => {
+    if (!username.trim()) {
+      Alert.alert(t('register.error.title'), t('register.error.emptyUsername'));
+      return false;
     }
+    
+    if (!email.trim() || !email.includes('@')) {
+      Alert.alert(t('register.error.title'), t('register.error.invalidEmail'));
+      return false;
+    }
+    
+    if (password.length < 4) {
+      Alert.alert(t('register.error.title'), t('register.error.passwordTooShort'));
+      return false;
+    }
+    
+    if (password !== repeatPassword) {
+      Alert.alert(t('register.error.title'), t('register.error.passwordsDoNotMatch'));
+      return false;
+    }
+    
+    return true;
+  };
 
-    setLoading(true);
 
+  const handleRegister = async () => {
+    if (!validateForm()) return;
+    
     try {
-      // Create form data for x-www-form-urlencoded content type
-      const formData = new URLSearchParams();
-      formData.append('LoginForm[username]', username);
-      formData.append('LoginForm[password]', password);
-      formData.append('LoginForm[latitude]', '41.38879');  // Use actual location values from device
-      formData.append('LoginForm[longitude]', '2.15899');  // or use global state
-
-      const response = await fetch('https://api.blind.wiki/site/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData.toString()
-      });
+      const response = await register(username, password, email);
       
-      const data = await response.json();
-      
-      if (response.ok) {
-        console.log('Login successful:', data);
+      if (response.success) {
+        // Save the email for reference
+        setRegisteredEmail(response.email || email);
         
-        // Save the session ID or token
-        if (data.PHPSESSID) {
-          // Store this in secure storage or context
-          console.log('Session ID:', data.PHPSESSID);
-        }
-        
-        // Navigate back to previous screen
-        router.back();
+        // Show confirmation alert
+        Alert.alert(
+          t('register.success.title', 'Registration Successful'),
+          t('register.success.emailSent', 'A confirmation link has been sent to your email address. Please check your inbox and click the link to activate your account.'),
+          [
+            {
+              text: t('register.success.ok', 'OK'),
+              onPress: () => {
+                // Clear navigation stack and go back to settings
+                router.navigate('/(tabs)');
+              }
+            }
+          ],
+          { cancelable: false }
+        );
       } else {
-        // Handle API errors
-        Alert.alert('Login Failed', data.message || 'Please check your credentials');
+        Alert.alert(
+          t('register.error.title'), 
+          response.errorMessage || t('register.error.defaultError')
+        );
       }
     } catch (error) {
-      console.error('Login error:', error);
-      Alert.alert('Error', 'Network error. Please try again.');
-    } finally {
-      setLoading(false);
+      Alert.alert(
+        t('register.error.title'),
+        error instanceof Error ? error.message : t('register.error.networkError')
+      );
     }
   };
 
@@ -69,12 +89,12 @@ export default function SignUpScreen() {
         <Text style={styles.text}>
           Join the BlindWiki community by filling the following form
         </Text>
-        <StyledInput value={email} onchangeText={setEmail} placeholder="Email" />
-        <StyledInput value={username} onchangeText={setUsername} placeholder="Username"/>
-        <StyledInput value={password} onchangeText={setPassword} placeholder="Password" secure={true} />
-        <StyledInput value={repeatedPassword} onchangeText={setrepeatedPassword} placeholder="Repeat Password" secure={true} />
+        <StyledInput value={email} onChangeText={setEmail} placeholder="Email" />
+        <StyledInput value={username} onChangeText={setUsername} placeholder="Username"/>
+        <StyledInput value={password} onChangeText={setPassword} placeholder="Password" secure={true} />
+        <StyledInput value={repeatPassword} onChangeText={setRepeatPassword} placeholder="Repeat Password" secure={true} />
         
-          <StyledButton title="Register" onPress={handleLogin} />
+          <StyledButton title="Register" onPress={handleRegister} />
 
         <TextLink url='www.blind.wiki/terms' style={styles.text}>
           By Signing up, you agree to our Terms of Service and Privacy Policy

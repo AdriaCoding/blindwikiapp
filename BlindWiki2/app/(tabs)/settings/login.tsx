@@ -37,12 +37,12 @@ export default function LogInScreen() {
     <View style={styles.container}>
       <StyledInput
         value={username}
-        onchangeText={setUsername}
+        onChangeText={setUsername}
         placeholder="Username"
       />
       <StyledInput
         value={password}
-        onchangeText={setPassword}
+        onChangeText={setPassword}
         placeholder="Password"
         secure={true}
       />
