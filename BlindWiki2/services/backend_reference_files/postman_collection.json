@@ -210,35 +210,6 @@
       "name": "Messages",
       "item": [
         {
-          "name": "Get Posts",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{baseUrl}}/message/index?lat={{latitude}}&long={{longitude}}&dist=2000&PHPSESSID={{sessionId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["message", "index"],
-              "query": [
-                {
-                  "key": "lat",
-                  "value": "{{latitude}}"
-                },
-                {
-                  "key": "long", 
-                  "value": "{{longitude}}"
-                },
-                {
-                  "key": "dist",
-                  "value": "2000"
-                },
-                {
-                  "key": "PHPSESSID",
-                  "value": "{{sessionId}}"
-                }
-              ]
-            }
-          }
-        },
-        {
           "name": "Get My Messages",
           "request": {
             "method": "GET",
