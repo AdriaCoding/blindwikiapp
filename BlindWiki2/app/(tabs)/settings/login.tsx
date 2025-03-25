@@ -39,12 +39,13 @@ export default function LogInScreen() {
         value={username}
         onChangeText={setUsername}
         placeholder="Username"
+        autoFocus={true}
       />
       <StyledInput
         value={password}
         onChangeText={setPassword}
         placeholder="Password"
-        secure={true}
+        secureTextEntry={true}
       />
 
       <View style={styles.buttonContainer}>

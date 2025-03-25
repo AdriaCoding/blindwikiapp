@@ -1,5 +1,6 @@
 import {
   TextInput,
+  TextInputProps,
   StyleSheet,
   TouchableOpacity,
   GestureResponderEvent,
@@ -13,21 +14,13 @@ interface StyledInputProps {
   secure?: boolean;
 }
 
-export default function StyledInput({
-  value,
-  onChangeText,
-  placeholder,
-  secure,
-}: StyledInputProps) {
+export default function StyledInput(props: TextInputProps) {
   return (
     <TextInput
-      style={styles.input}
-      placeholder={placeholder}
-      placeholderTextColor={Colors.light.placeHolderText}
-      secureTextEntry={secure}
-      value={value}
-      onChangeText={onChangeText}
-      autoCapitalize="none"
+    autoCapitalize="none"
+    placeholderTextColor={Colors.light.placeHolderText}
+    style={styles.input}
+      {...props}
     />
   );
 }

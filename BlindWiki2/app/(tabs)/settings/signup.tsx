@@ -89,10 +89,10 @@ export default function SignUpScreen() {
         <Text style={styles.text}>
           Join the BlindWiki community by filling the following form
         </Text>
-        <StyledInput value={email} onChangeText={setEmail} placeholder="Email" />
+        <StyledInput value={email} onChangeText={setEmail} placeholder="Email"/>
         <StyledInput value={username} onChangeText={setUsername} placeholder="Username"/>
-        <StyledInput value={password} onChangeText={setPassword} placeholder="Password" secure={true} />
-        <StyledInput value={repeatPassword} onChangeText={setRepeatPassword} placeholder="Repeat Password" secure={true} />
+        <StyledInput value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry={true} />
+        <StyledInput value={repeatPassword} onChangeText={setRepeatPassword} placeholder="Repeat Password" secureTextEntry={true} />
         
           <StyledButton title="Register" onPress={handleRegister} />
 
