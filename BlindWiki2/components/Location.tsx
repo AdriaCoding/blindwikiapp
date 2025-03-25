@@ -1,17 +1,111 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
+import * as Location from "expo-location";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
-function pressLocationHandler() {
-  console.log("Location pressed : BEEP");
-}
+export default function LocationComponent() {
+  const { t } = useTranslation();
+  const [location, setLocation] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default function Location({location}: {location: any}) {
+  const parseLocationText = (
+    address: Location.LocationGeocodedAddress,
+    position: Location.LocationObject
+  ): string => {
+    const accuracy = position.coords.accuracy ?? 0;
+    const isHighAccuracy = accuracy < 20;
+    return `${address.street || ""}, ${address.district || ""}, ${
+      address.postalCode || ""
+    } ${address.city || ""}, ${address.country || ""} : ${
+      isHighAccuracy ? t("location.highAccuracy") : t("location.normalAccuracy")
+    }`;
+  };
+  // Function to get the current location
+  const getCurrentLocation = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Request permissions
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        setError(t("location.permissionDenied"));
+        setLoading(false);
+        return;
+      }
+
+      // Get current position
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      // Get address from coordinates (reverse geocoding)
+      const addressResponse = await Location.reverseGeocodeAsync({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+
+      if (addressResponse && addressResponse.length > 0) {
+        const address = addressResponse[0];
+        const locationText = parseLocationText(address, position);
+        setLocation(locationText);
+      } else {
+        // Fallback to coordinates if geocoding fails
+        setLocation(
+          `${position.coords.latitude.toFixed(
+            6
+          )}, ${position.coords.longitude.toFixed(6)}`
+        );
+      }
+    } catch (err) {
+      setError(t("location.error"));
+      console.error("Error getting location:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get location when component mounts
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
+
+  // Handle press on location box
+  const pressLocationHandler = () => {
+    getCurrentLocation(); // Refresh location on press
+  };
+
   return (
-      <Pressable style={styles.outerBox} onPress={pressLocationHandler} accessibilityLabel={"La teva ubicació eś:" + location}>
+    <Pressable
+      style={[styles.outerBox, error ? styles.errorBox : {}]}
+      onPress={pressLocationHandler}
+      accessibilityLabel={
+        location
+          ? t("location.currentLocation") + location
+          : error || t("location.loading")
+      }
+    >
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+          <Text style={styles.loadingText}>{t("location.loading")}</Text>
+        </View>
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : (
         <Text style={styles.text}>{location}</Text>
-      </Pressable>
+      )}
+    </Pressable>
   );
 }
-
 
 const styles = StyleSheet.create({
   outerBox: {
@@ -24,8 +118,24 @@ const styles = StyleSheet.create({
     padding: 25,
     marginVertical: 10,
   },
+  errorBox: {
+    borderColor: "red",
+  },
   text: {
     textAlign: "center",
     fontSize: 17,
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 17,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    padding: 10,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
   },
 });
