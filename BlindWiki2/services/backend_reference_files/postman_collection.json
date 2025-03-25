@@ -48,6 +48,65 @@
           }
         },
         {
+          "name": "Change Language",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/site/login",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "LoginForm[username]",
+                  "value": "{{username}}"
+                },
+                {
+                  "key": "LoginForm[password]",
+                  "value": "{{password}}"
+                },
+                {
+                  "key": "lang",
+                  "value": "{{language}}"
+                },
+                {
+                  "key": "LoginForm[latitude]",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "LoginForm[longitude]",
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "First Login (Get Languages)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/site/login?lang={{language}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["site", "login"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "{{language}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Register",
           "request": {
             "method": "POST",
@@ -180,6 +239,114 @@
           }
         },
         {
+          "name": "Get My Messages",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/message/index?author_id={{authorId}}&PHPSESSID={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["message", "index"],
+              "query": [
+                {
+                  "key": "author_id",
+                  "value": "{{authorId}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Posts By Tags",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/message/index?lat={{latitude}}&long={{longitude}}&tags={{tags}}&PHPSESSID={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["message", "index"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "long",
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "tags",
+                  "value": "{{tags}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Posts By Tags In Area",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/message/index?in={{area}}&tags={{tags}}&PHPSESSID={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["message", "index"],
+              "query": [
+                {
+                  "key": "in",
+                  "value": "{{area}}"
+                },
+                {
+                  "key": "tags",
+                  "value": "{{tags}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Posts By Tag Search",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/message/index?lat={{latitude}}&long={{longitude}}&tags={{tags}}&sort=0&PHPSESSID={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["message", "index"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "long",
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "tags",
+                  "value": "{{tags}}"
+                },
+                {
+                  "key": "sort",
+                  "value": "0"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Search Posts",
           "request": {
             "method": "POST",
@@ -227,6 +394,125 @@
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/message/update/{{messageId}}",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "Message[tags]",
+                  "value": "{{tags}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Publish Message",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/message/publish",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "PublishForm[files][0]",
+                  "type": "file",
+                  "src": "{{audioFile}}"
+                },
+                {
+                  "key": "PublishForm[longitude]",
+                  "value": "{{longitude}}"
+                },
+                {
+                  "key": "PublishForm[latitude]",
+                  "value": "{{latitude}}"
+                },
+                {
+                  "key": "PublishForm[address]",
+                  "value": "{{address}}"
+                },
+                {
+                  "key": "PublishForm[text]",
+                  "value": ""
+                },
+                {
+                  "key": "PublishForm[newtags]",
+                  "value": "{{tagsField}}"
+                },
+                {
+                  "key": "PublishForm[device]",
+                  "value": "{{device}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Post Comment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/message/postComment",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "Comment[files][0]",
+                  "type": "file",
+                  "src": "{{dummyFile}}"
+                },
+                {
+                  "key": "Comment[message_id]",
+                  "value": "{{messageId}}"
+                },
+                {
+                  "key": "Comment[text]",
+                  "value": "{{commentText}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Audio Played",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/attachment/play/{{attachmentId}}?PHPSESSID={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["attachment", "play", "{{attachmentId}}"],
+              "query": [
                 {
                   "key": "PHPSESSID",
                   "value": "{{sessionId}}"
@@ -282,6 +568,80 @@
                 {
                   "key": "PHPSESSID",
                   "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tags By Place",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tag/index?in={{place}}&PHPSESSID={{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tag", "index"],
+              "query": [
+                {
+                  "key": "in",
+                  "value": "{{place}}"
+                },
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Areas",
+      "item": [
+        {
+          "name": "Get Places",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": "{{baseUrl}}/area/index",
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "External APIs",
+      "item": [
+        {
+          "name": "Google Place Autocomplete",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "https://maps.googleapis.com/maps/api/place/autocomplete/json?input={{query}}&key={{googleApiKey}}",
+              "host": ["https://maps.googleapis.com"],
+              "path": ["maps", "api", "place", "autocomplete", "json"],
+              "query": [
+                {
+                  "key": "input",
+                  "value": "{{query}}"
+                },
+                {
+                  "key": "key",
+                  "value": "{{googleApiKey}}"
                 }
               ]
             }
