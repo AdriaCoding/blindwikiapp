@@ -1,10 +1,19 @@
-import { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, ActivityIndicator, View, GestureResponderEvent } from "react-native";
-import MessageComponent from "@/components/MessageView";
+import { useState, useEffect } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  View,
+} from "react-native";
+import MessageComponent, { useMessageActions } from "@/components/MessageView";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { Message } from "@/models/message";
-import { getMessagesFromUser, deleteMessage, updateMessageTags } from "@/services/messageService";
+import { getMessagesFromUser } from "@/services/messageService";
+import StyledButton from "@/components/StyledButton";
+import { router } from "expo-router";
+
 
 export default function MyMessages() {
   const { user } = useAuth();
@@ -12,68 +21,21 @@ export default function MyMessages() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Set up actions for messages
-  const handleDelete = async (messageId: string) => {
-    try {
-      const response = await deleteMessage(messageId);
-      if (response.success) {
-        // Remove the deleted message from state
-        setMessages(prevMessages => 
-          prevMessages.filter(message => message.id !== messageId)
-        );
-      } else {
-        console.error("Failed to delete message:", response.errorMessage);
-      }
-    } catch (err) {
-      console.error("Error deleting message:", err);
-    }
-  };
-
-  const handleEditTags = async (messageId: string, tags: string) => {
-    try {
-      const response = await updateMessageTags(messageId, tags);
-      if (response.success) {
-        // Refresh the messages to show updated tags
-        fetchUserMessages();
-      } else {
-        console.error("Failed to update tags:", response.errorMessage);
-      }
-    } catch (err) {
-      console.error("Error updating tags:", err);
-    }
-  };
-
-  // Action handlers that match the MessageActions interface
-  const myMessagesActions = {
-    onListen: (event: GestureResponderEvent) => {
-      // Here you would actually get the message ID from the currently selected message
-      // or perhaps from a data attribute on the button
-      console.log("Listen to message");
-    },
-    onEditTags: (event: GestureResponderEvent) => {
-      console.log("Edit tags for message");
-    },
-    onDelete: (event: GestureResponderEvent) => {
-      // In a real implementation, you would get the messageId somehow
-      // For now, we'll just log
-      console.log("Delete message");
-    },
-    onViewComments: (event: GestureResponderEvent) => {
-      console.log("View comments for message");
-    },
-    onDirection: undefined,
-  };
-
   // Function to fetch user messages
   const fetchUserMessages = async () => {
-    if (!user) return;
-    
+    if (!user) {
+      return (
+        setError("You must be logged in to view your messages."),
+        setIsLoading(false)
+      );
+    }
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await getMessagesFromUser(user.id);
-      
+
       if (response.success) {
         setMessages(response.messages);
       } else {
@@ -87,33 +49,59 @@ export default function MyMessages() {
     }
   };
 
+  // Use our shared message actions hook
+  const {
+    getActionsForMessage,
+    isProcessing,
+    error: actionError,
+  } = useMessageActions(messages, setMessages, fetchUserMessages);
+
   // Fetch messages when component mounts
   useEffect(() => {
     fetchUserMessages();
-  }, [user]); // Re-fetch if user changes
+  }, [user]);
 
-  // If user is not logged in
-  if (!user) {
-    return <Text>Please log in to view your messages.</Text>;
-  }
-
-  // Show loading indicator while fetching messages
+  // Render loading, error or empty states
   if (isLoading) {
-    return <ActivityIndicator size="large" color={Colors.light.primary} />;
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color={Colors.light.primary} />
+        <Text>Loading your messages...</Text>
+      </View>
+    );
   }
 
-  // Show error message if there was an error fetching messages
-  if (error) {
-    return <Text style={styles.errorText}>{error}</Text>;
+  if (error || actionError) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>{error || actionError}</Text>
+        <StyledButton
+          title="Log In"
+          onPress={() => router.push("/(tabs)/settings/login")}
+        />
+      </View>
+    );
+  }
+
+  if (messages.length === 0) {
+    return (
+      <View style={styles.centerContainer}>
+        <Text>You haven't created any messages yet.</Text>
+      </View>
+    );
   }
 
   return (
     <ScrollView style={styles.container}>
+      {isProcessing && (
+        <ActivityIndicator size="small" color={Colors.light.primary} />
+      )}
+
       {messages.map((message) => (
         <MessageComponent
-          m={message}
           key={message.id}
-          actions={myMessagesActions}
+          m={message}
+          actions={getActionsForMessage(message)}
         />
       ))}
     </ScrollView>
@@ -122,13 +110,18 @@ export default function MyMessages() {
 
 const styles = StyleSheet.create({
   container: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.light.border,
-    margin: 10,
+    flex: 1,
+    padding: 10,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
   errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 20,
+    fontSize: 20,
+    textAlign: "center",
   },
 });

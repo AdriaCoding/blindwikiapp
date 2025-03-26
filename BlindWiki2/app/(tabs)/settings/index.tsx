@@ -32,7 +32,7 @@ export default function SettingsScreen() {
     const response = await logout();
     
     if (response.success) {
-      Alert.alert('Success', 'You have been logged out');
+      Alert.alert('You have been logged out');
     } else {
       Alert.alert('Logout Error', response.errorMessage || 'Failed to logout properly');
     }

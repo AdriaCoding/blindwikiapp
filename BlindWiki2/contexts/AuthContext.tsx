@@ -102,10 +102,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Always store credentials for auto-login on successful login
           await saveCredentials(username, password);
 
-        } else if (!response.success) {
-          setError(response.errorMessage || "Login failed");
+        } else if (!response.success && response.errorMessage === "Incorrect username or password.") {
+          console.log("🔐Credential error from authcontext", response);
+          return response;
         }
 
+        setError(response.errorMessage || "Login failed");
         return response;
       } catch (error) {
         console.error("Login error:", error);

@@ -9,13 +9,6 @@ import { MD5 } from "crypto-js";
 
 
 // LOGIN endpoint
-export interface LoginRequest {
-  "LoginForm[username]": string;
-  "LoginForm[password]": string;
-  "LoginForm[latitude]": string;
-  "LoginForm[longitude]": string;
-  PHPSESSID?: string;
-}
 export interface LoginServerResponse extends ServerResponse {
   data: Array<User>;
 }
@@ -57,16 +50,17 @@ export interface RegisterCleanResponse extends CleanResponse {
 export async function login(
   username: string,
   password: string,
-  lat: string,
-  long: string
+  lat?: string,
+  long?: string
 ): Promise<LoginCleanResponse> {
-  const data: LoginRequest = {
+  const data: Record<string, any> = {
     "LoginForm[username]": username,
     "LoginForm[password]": password,
-    "LoginForm[latitude]": lat,
-    "LoginForm[longitude]": long,
   };
-
+  if (lat && long) {
+    data["LoginForm[latitude]"] = lat;
+    data["LoginForm[longitude]"] = long;
+  }
   const sessionId = await getSessionToken();
   if (sessionId) {
     data["PHPSESSID"] = sessionId;

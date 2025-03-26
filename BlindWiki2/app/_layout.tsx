@@ -11,7 +11,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Colors from "@/constants/Colors";
 
 // Only enable in development
-import { setupDebugAuth } from '@/utils/debugAuth';
+import { setupDebugAuth } from "@/utils/debugAuth";
 import LoadingScreen from "./loading";
 import { setupDebugMessage } from "@/utils/debugMessage";
 import { setupDebugTag } from "@/utils/debugTag";
@@ -20,9 +20,8 @@ if (__DEV__) {
   setupDebugAuth();
   setupDebugMessage();
   setupDebugTag();
-  console.log('🛠️ Debug tools initialized!');
+  console.log("🛠️ Debug tools initialized!");
 }
-
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -70,23 +69,27 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const { isLoading } = useAuth();
+  //const { isLoading } = useAuth();
   // Show loading screen while checking credentials and auto-login
-  if (isLoading) {
-    return <LoadingScreen/>;
-  }
+  const isLoading = false;
+
   //<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
   return (
-    <Stack
-      screenOptions={{
-        contentStyle: {
-          backgroundColor: Colors.light.background,
-        },
-      }}
-    >
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-    </Stack>
+    <>
+      {isLoading ? (
+        <LoadingScreen />
+      ) : (
+        <Stack
+          screenOptions={{
+            contentStyle: {
+              backgroundColor: Colors.light.background,
+            },
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        </Stack>
+      )}
+    </>
   );
 }
-
