@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, ScrollView } from "react-native";
 import { Button, ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
 import { Tag } from "@/models/tag";
+import { getAreas } from "@/services/areaService";
 
 // Create a global debug object to access tag functions
 declare global {
@@ -218,7 +219,7 @@ export async function testGetAreas(): Promise<void> {
   try {
     console.log(`🔍 Fetching all available areas...`);
     
-    const response = await TagService.getAreas();
+    const response = await getAreas();
 
     const { areas, ...responseMetadata } = response;
     console.log("🔍 Response metadata:", responseMetadata);
