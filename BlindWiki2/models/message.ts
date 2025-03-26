@@ -13,7 +13,7 @@ export interface Message {
   authorUser: User;
   attachments?: Attachment[];
   tagsText?: string;
-  tags?: Tag[];
+  tags: Tag[];
   comments?: Comment[];
 }
 

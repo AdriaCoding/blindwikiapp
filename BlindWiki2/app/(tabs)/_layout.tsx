@@ -41,10 +41,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="myRecordings"
+        name="myMessages"
         options={{
-          title: t('myRecordings.title'),
-          tabBarLabel: t('myRecordings.tabLabel'),
+          title: t('myMessages.title'),
+          tabBarLabel: t('myMessages.tabLabel'),
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="file-audio-o" color={color} />
           ),

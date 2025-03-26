@@ -167,7 +167,16 @@ export async function getMessages(options: {
 }
 
 /**
- * Hhides a message
+ * Helper function to get Messages from user
+ * @param user_id The user ID to get messages from
+ * @returns A clean response with array of Messages
+ */
+export async function getMessagesFromUser(user_id: string): Promise<GetPostsCleanResponse> {
+  return getMessages({ authorId: user_id });
+}
+
+/**
+ * Hides a message (like deleting, but not really). Requires authentication.
  * If the message is already hidden, the response will still be successful
  * @param messageId ID of the message to hide
  * @returns A clean response indicating success or failure

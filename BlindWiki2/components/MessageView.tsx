@@ -3,15 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   GestureResponderEvent,
 } from "react-native";
 import StyledButton from "./StyledButton";
-import { TAGS } from "@/data/dummy-data";
-import Recording from "@/models/recording";
+import { Message } from "@/models/message";
 import Colors from "@/constants/Colors";
 
-interface RecordingActions {
+interface MessageActions {
   onListen?: (event: GestureResponderEvent) => void;
   onEditTags?: (event: GestureResponderEvent) => void;
   onDelete?: (event: GestureResponderEvent) => void;
@@ -19,24 +17,24 @@ interface RecordingActions {
   onDirection?: (event: GestureResponderEvent) => void;
 }
 
-export default function RecordingComponent({
-  r,
+export default function MessageComponent({
+  m,
   actions,
 }: {
-  r: Recording;
-  actions: RecordingActions;
+  m: Message;
+  actions: MessageActions;
 }) {
   return (
     <View style={styles.container}>
       {/* First line: tags */}
       <Text style={styles.tagsLine}>
-        {r.tags.map((id) => TAGS.find(tag => tag.id == id)?.name).join(", ")}
+        {m.tags.join(", ")}
       </Text>
 
       {/* Second line: userID in bold, then a dot, then location.
           The location can be multi-line if it's long */}
       <Text style={styles.lineTwo}>
-        <Text style={styles.user}>{r.user.id}</Text>. {r.location}
+        <Text style={styles.user}>{m.authorUser.id}</Text>. {m.address}
       </Text>
 
       {/* Black buttons for actions */}

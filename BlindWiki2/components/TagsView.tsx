@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { InstructionsText } from "./StyledText";
 import { TAGS } from "../data/dummy-data";
-import RecordingComponent from "./RecordingView";
+import MessageComponent from "./MessageView";
 import Tag from "@/models/tag";
 import Recording from "@/models/recording";
 import Colors from "@/constants/Colors";
@@ -90,7 +90,7 @@ export default function TagsView({
 
       {/* Filtered recordings */}
       {filteredRecordings.map((recording) => (
-        <RecordingComponent
+        <MessageComponent
         key={recording.id}
         r={recording}
         actions={{
