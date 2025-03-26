@@ -10,26 +10,18 @@ export interface Message {
   latitude: string;
   longitude: string;
   address?: string;
-  author_user_id?: string;
-  area_id?: string;
-  authorUser?: User;
+  authorUser: User;
   attachments?: Attachment[];
-  tags?: Tag[];
   tagsText?: string;
+  tags?: Tag[];
   comments?: Comment[];
-  distance?: number;
 }
 
 export interface Attachment {
   id: string;
-  filename?: string;
-  extension?: string;
-  mime_type?: string;
-  visible?: string;
   type: string;
   url?: string;
   externalUrl?: string | null;
-  thumbnail_url?: string;
   lastPlayed?: boolean;
 }
 
@@ -37,5 +29,7 @@ export interface Comment {
   id: string;
   text: string;
   dateTime: string;
-  user?: User;
+  authorUser: User;  
+  audio_url: string | null;
+  visible: string;  
 }

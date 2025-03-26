@@ -24,7 +24,7 @@ declare global {
 }
 
 // Add a function to retrieve all secure items
-async function getAllSecureItems(): Promise<Record<string, string | null>> {
+export async function getAllSecureItems(): Promise<Record<string, string | null>> {
   console.log('🔍 Retrieving all secure items...');
   
   try {

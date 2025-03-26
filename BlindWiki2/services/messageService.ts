@@ -2,6 +2,8 @@ import { ServerResponse, CleanResponse, apiRequest } from "./api";
 import { getSessionToken } from "./secureStorage";
 import { Message, Attachment, Comment } from "@/models/message";
 import * as FileSystem from 'expo-file-system';
+import { useAuth } from "@/contexts/AuthContext"; // Add this import
+
 
 // Server response interfaces
 export interface MessagesResponse extends ServerResponse {
@@ -36,7 +38,7 @@ export interface CommentCleanResponse extends CleanResponse {
  * @param searchTerm Text to search for
  * @returns A clean response with matching messages
  */
-export async function searchPosts(
+export async function searchMessages(
   lat: string,
   long: string,
   searchTerm: string
@@ -81,79 +83,50 @@ export async function searchPosts(
 }
 
 /**
- * Fetches messages created by the currently logged in user
- * @returns A clean response with the user's messages
+ * Generalized function for accessing the message/index endpoint with various parameter combinations
+ * 
+ * @param options - Optional parameters for the request
+ * @returns A clean response with messages matching the criteria
  */
-export async function getMyMessages(): Promise<GetPostsCleanResponse> {
+export async function getMessages(options: {
+  lat?: string;                 // Latitude coordinate
+  long?: string;                // Longitude coordinate
+  dist?: string;                // Distance in meters
+  authorId?: string;            // User ID to filter messages by author
+  tags?: string;                // Comma-separated tag IDs
+  area?: string;                // Area identifier (used with 'in' parameter)
+  sort?: string;                // Sort order (0 for default)
+  customParams?: Record<string, any>; // Any additional parameters
+} = {}): Promise<GetPostsCleanResponse> {
   try {
     // Get session token from secure storage
     const sessionId = await getSessionToken();
     
-    if (!sessionId) {
-      return {
-        success: false,
-        errorMessage: "Authentication required to fetch your messages",
-        messages: [],
-      };
-    }
-    
-    // Build request parameters
+    // Build request parameters based on provided options
     const params: Record<string, any> = {
-      author_id: "current", // The API interprets this as the current user
-      PHPSESSID: sessionId,
+      ...options.customParams
     };
-
-    // Make API request
-    const response = await apiRequest<
-      MessagesResponse,
-      GetPostsCleanResponse
-    >("/message/index", "GET", params, (serverResponse) => {
-      return {
-        messages: serverResponse.data || [],
-      };
-    });
-
-    return response;
-  } catch (error) {
-    console.error("Error fetching user's messages:", error);
-
-    return {
-      success: false,
-      errorMessage:
-        error instanceof Error ? error.message : "Failed to fetch your messages",
-      messages: [],
-    };
-  }
-}
-
-/**
- * Fetches posts with specific tags near a location
- * @param lat Latitude of the location
- * @param long Longitude of the location
- * @param tags Comma-separated list of tag IDs
- * @returns A clean response with matching messages
- */
-export async function getPostsByTags(
-  lat: string,
-  long: string,
-  tags: string
-): Promise<GetPostsCleanResponse> {
-  try {
-    // Get session token from secure storage
-    const sessionId = await getSessionToken();
     
-    // Build request parameters
-    const params: Record<string, any> = {
-      lat,
-      long,
-      tags,
-    };
-
+    // Add parameters if they exist
+    if (options.lat) params.lat = options.lat;
+    if (options.long) params.long = options.long;
+    if (options.dist) params.dist = options.dist;
+    if (options.authorId) params.author_id = options.authorId;
+    if (options.tags) params.tags = options.tags;
+    if (options.area) params.in = options.area;
+    if (options.sort) params.sort = options.sort;
+    
     // Add session ID if available
     if (sessionId) {
       params.PHPSESSID = sessionId;
     }
 
+    // Determine what type of request we're making for better error handling
+    let requestType = "messages";
+    if (options.authorId) requestType = "user messages";
+    if (options.tags && options.area) requestType = "area messages with tags";
+    else if (options.tags && options.lat) requestType = "location messages with tags";
+    
     // Make API request
     const response = await apiRequest<
       MessagesResponse,
@@ -164,123 +137,38 @@ export async function getPostsByTags(
       };
     });
 
-    return response;
-  } catch (error) {
-    console.error("Error fetching posts by tags:", error);
-
-    return {
-      success: false,
-      errorMessage:
-        error instanceof Error ? error.message : "Failed to fetch posts by tags",
-      messages: [],
-    };
-  }
-}
-
-/**
- * Fetches posts with specific tags in a particular area
- * @param area Area identifier
- * @param tags Comma-separated list of tag IDs
- * @returns A clean response with matching messages
- */
-export async function getPostsByTagsInArea(
-  area: string,
-  tags: string
-): Promise<GetPostsCleanResponse> {
-  try {
-    // Get session token from secure storage
-    const sessionId = await getSessionToken();
-    
-    // Build request parameters
-    const params: Record<string, any> = {
-      in: area,
-      tags,
-    };
-
-    // Add session ID if available
-    if (sessionId) {
-      params.PHPSESSID = sessionId;
+    // Extra validation for user messages
+    if (options.authorId && response.success) {
+      // Check if any messages don't belong to the requested user
+      if (response.messages.some(msg => 
+        msg.authorUser?.id && msg.authorUser.id !== options.authorId)
+      ) {
+        console.warn(`Warning: returned messages do not all belong to the user with id ${options.authorId}`);
+      }
+      
+      // Check if no messages were found
+      if (response.messages.length === 0) {
+        console.warn(`Warning: no messages found for user with id ${options.authorId}`);
+      }
     }
 
-    // Make API request
-    const response = await apiRequest<
-      MessagesResponse,
-      GetPostsCleanResponse
-    >("/message/index", "GET", params, (serverResponse) => {
-      return {
-        messages: serverResponse.data || [],
-      };
-    });
-
     return response;
   } catch (error) {
-    console.error("Error fetching posts by tags in area:", error);
+    console.error(`Error fetching ${options.authorId ? "user" : ""} messages:`, error);
 
     return {
       success: false,
-      errorMessage:
-        error instanceof Error ? error.message : "Failed to fetch posts by tags in area",
+      errorMessage: error instanceof Error 
+        ? error.message 
+        : `Failed to fetch ${options.authorId ? "user" : ""} messages`,
       messages: [],
     };
   }
 }
 
 /**
- * Fetches posts with specific tags near a location and sorts them
- * @param lat Latitude of the location
- * @param long Longitude of the location
- * @param tags Comma-separated list of tag IDs
- * @param sort Sort order (0 for default)
- * @returns A clean response with matching messages
- */
-export async function getPostsByTagSearch(
-  lat: string,
-  long: string,
-  tags: string,
-  sort: string = "0"
-): Promise<GetPostsCleanResponse> {
-  try {
-    // Get session token from secure storage
-    const sessionId = await getSessionToken();
-    
-    // Build request parameters
-    const params: Record<string, any> = {
-      lat,
-      long,
-      tags,
-      sort,
-    };
-
-    // Add session ID if available
-    if (sessionId) {
-      params.PHPSESSID = sessionId;
-    }
-
-    // Make API request
-    const response = await apiRequest<
-      MessagesResponse,
-      GetPostsCleanResponse
-    >("/message/index", "GET", params, (serverResponse) => {
-      return {
-        messages: serverResponse.data || [],
-      };
-    });
-
-    return response;
-  } catch (error) {
-    console.error("Error fetching posts by tag search:", error);
-
-    return {
-      success: false,
-      errorMessage:
-        error instanceof Error ? error.message : "Failed to fetch posts by tag search",
-      messages: [],
-    };
-  }
-}
-
-/**
- * Deletes/hides a message
+ * Hhides a message
+ * If the message is already hidden, the response will still be successful
  * @param messageId ID of the message to hide
  * @returns A clean response indicating success or failure
  */
@@ -305,7 +193,7 @@ export async function deleteMessage(messageId: string): Promise<CleanResponse> {
 
     return response;
   } catch (error) {
-    console.error("Error deleting message:", error);
+    console.error(`Error deleting message, probably because message ${messageId} does not exist.`, error);
 
     return {
       success: false,
@@ -316,12 +204,13 @@ export async function deleteMessage(messageId: string): Promise<CleanResponse> {
 }
 
 /**
- * Updates a message's tags
+ * Updates a message's tags. The new set of tags will replace the existing tags.
+ * Can apply succesfully to hidden messages.
  * @param messageId ID of the message to update
  * @param tags New tags to assign to the message
  * @returns A clean response indicating success or failure
  */
-export async function updateMessage(
+export async function updateMessageTags(
   messageId: string,
   tags: string
 ): Promise<CleanResponse> {
@@ -351,7 +240,7 @@ export async function updateMessage(
 
     return response;
   } catch (error) {
-    console.error("Error updating message:", error);
+    console.error(`Error updating message, probably because message ${messageId} does not exist:`, error);
 
     return {
       success: false,
@@ -362,7 +251,7 @@ export async function updateMessage(
 }
 
 /**
- * Publishes a new message with an audio attachment
+ * Publishes a new message with an audio attachment. Requires authentication.
  * @param audioFilePath Path to the audio file to upload
  * @param latitude Latitude where the message was recorded
  * @param longitude Longitude where the message was recorded
@@ -390,10 +279,6 @@ export async function publishMessage(
       };
     }
 
-    // For this function, we'll need to handle FormData differently 
-    // This would typically require a different approach than our standard apiRequest
-    // In a production app, you would use something like FormData with React Native's fetch
-    
     const formData = new FormData();
     
     // Add the audio file
@@ -451,11 +336,13 @@ export async function publishMessage(
  * Posts a comment on a message
  * @param messageId ID of the message to comment on
  * @param text Text content of the comment
+ * @param audioFilePath Optional path to an audio file for the comment
  * @returns A clean response with the posted comment
  */
 export async function postComment(
   messageId: string,
-  text: string
+  text: string,
+  audioFilePath?: string
 ): Promise<CommentCleanResponse> {
   try {
     // Get session token from secure storage
@@ -471,20 +358,35 @@ export async function postComment(
     // Similar to publishMessage, this requires FormData
     const formData = new FormData();
     
-    // The API expects a dummy file
-    // In a real app, you'd create a small temporary file
-    const dummyFilePath = await createDummyFile();
-    
-    formData.append("Comment[files][0]", {
-      uri: dummyFilePath,
-      name: "dummy.txt",
-      type: "text/plain",
-    } as any);
-    
+    // Add required comment data
     formData.append("Comment[message_id]", messageId);
     formData.append("Comment[text]", text);
     formData.append("PHPSESSID", sessionId);
     
+    // Handle file attachment based on what's provided
+    if (audioFilePath) {
+      // If an audio file is provided, use it
+      try {
+        const fileInfo = await FileSystem.getInfoAsync(audioFilePath);
+        if (fileInfo.exists) {
+          // Determine file extension and mime type from the path
+          const extension = audioFilePath.split('.').pop()?.toLowerCase() || 'mp3';
+          const mimeType = getMimeTypeForExtension(extension);
+          
+          formData.append("Comment[files][0]", {
+            uri: audioFilePath,
+            name: `comment_audio.${extension}`,
+            type: mimeType,
+          } as any);
+          
+          console.log(`Attaching audio file: ${audioFilePath}`);
+        } else {
+          console.warn(`Audio file not found at path: ${audioFilePath}`);
+        }
+      } catch (error) {
+        console.error("Error accessing audio file:", error);
+      }
+    }     
     // Use fetch directly for FormData
     const response = await fetch("https://api.blind.wiki/message/postComment", {
       method: "POST",
@@ -520,13 +422,24 @@ export async function postComment(
 }
 
 /**
- * Creates a temporary dummy file for comment uploads
+ * Helper function to get the MIME type for a file extension
  */
-async function createDummyFile(): Promise<string> {
-  const fileUri = `${FileSystem.cacheDirectory}dummy.txt`;
-  await FileSystem.writeAsStringAsync(fileUri, "dummy file for comment");
-  return fileUri;
+function getMimeTypeForExtension(extension: string): string {
+  const mimeTypes: Record<string, string> = {
+    'mp3': 'audio/mpeg',
+    'mp4': 'audio/mp4',
+    'm4a': 'audio/mp4',
+    'aac': 'audio/aac',
+    'wav': 'audio/wav',
+    'ogg': 'audio/ogg',
+    'webm': 'audio/webm',
+    '3gp': 'audio/3gpp',
+  };
+  
+  return mimeTypes[extension] || 'audio/mpeg';
 }
+
+
 
 /**
  * Records that an audio attachment was played

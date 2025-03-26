@@ -1,10 +1,18 @@
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
-import { testGetNearbyPosts, testSearchPosts } from "@/utils/debugMessage";
-
+import { testSearchMessages } from "@/utils/debugMessage";
+import { getSessionToken } from "@/services/secureStorage";
+import { getAllSecureItems } from "@/utils/debugAuth";
 export default function Search() {
-  const testhandler = () => {
-    testGetNearbyPosts();
-    testSearchPosts();
+  const testhandler = async () => {
+    try {
+      const sessionId = await getSessionToken();
+      getAllSecureItems();
+      console.log('🔑 Session ID:', sessionId || 'No session ID found');
+    } catch (error) {
+      console.error('Error fetching session ID:', error);
+    }
+
+    testSearchMessages();
   };
 
   return (
