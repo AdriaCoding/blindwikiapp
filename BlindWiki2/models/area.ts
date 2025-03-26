@@ -1,4 +1,4 @@
-export default interface Area {
+export interface Area {
   id: number;
   name: string;
   displayName: string;

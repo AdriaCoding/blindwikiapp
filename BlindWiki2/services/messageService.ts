@@ -83,7 +83,7 @@ export async function searchMessages(
 }
 
 /**
- * Generalized function for accessing the message/index endpoint with various parameter combinations
+ * Fetches messages based on various filtering creiteria (see options)
  * 
  * @param options - Optional parameters for the request
  * @returns A clean response with messages matching the criteria

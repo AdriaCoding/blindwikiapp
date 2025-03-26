@@ -14,10 +14,12 @@ import Colors from "@/constants/Colors";
 import { setupDebugAuth } from '@/utils/debugAuth';
 import LoadingScreen from "./loading";
 import { setupDebugMessage } from "@/utils/debugMessage";
+import { setupDebugTag } from "@/utils/debugTag";
 
 if (__DEV__) {
   setupDebugAuth();
   setupDebugMessage();
+  setupDebugTag();
   console.log('🛠️ Debug tools initialized!');
 }
 
