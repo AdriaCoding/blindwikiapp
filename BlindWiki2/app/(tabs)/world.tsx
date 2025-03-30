@@ -1,45 +1,46 @@
 import { StyleSheet, ScrollView } from "react-native";
 import TagsView, { TagsList } from "@/components/TagsView";
 import { useState } from "react";
-import { RECORDINGS } from "@/data/dummy-data";
-const cities = [
-  {
-    id: 0,
-    name: "Barcelona",
-  },
-  {
-    id: 1,
-    name: "Madrid",
-  },
-];
+import { RECORDINGS, AREAS } from "@/data/dummy-data";
+import { Area } from "@/models/area";
+import { Tag } from "@/models/tag";
 
 export default function World() {
-  const [selectedCity, setSelectedCity] = useState<number | null>(null);
-  function chosenCityHandler(cityId: number) {
-    setSelectedCity(cityId);
+  
+  function areaToTag(area: Area): Tag {
+    return {
+      id: area.id.toString(),
+      name: area.displayName,
+      asString: area.name
+    };
   }
-  const filteredRecordings =
-    selectedCity !== null
-      ? RECORDINGS.filter((rec) => {
-          if (selectedCity === 0) {
-            return rec.location.includes("Barcelona");
-          } else if (selectedCity === 1) {
-            return rec.location.includes("Madrid");
-          }
-          return false;
-        })
-      : [];
+  const areasAsTags = AREAS.map((a) => areaToTag(a));
+  const [selectedArea, setSelectedArea] = useState<Tag | null>(null);
+
+  function chosenAreaHandler(area: Tag) {
+    setSelectedArea(prev => prev?.id === area.id ? null : area);
+  }
+
+  const filteredRecordings = selectedArea
+    ? RECORDINGS.filter((rec) => 
+        rec.authorUser.currentArea.id.toString() === selectedArea.id
+      )
+    : [];
+
   return (
     <ScrollView style={styles.container}>
       <TagsList
-        tags={cities}
-        selectedTags={selectedCity !== null ? [selectedCity] : []}
-        onTagPress={chosenCityHandler}
+        tags={areasAsTags}
+        selectedTags={selectedArea ? [selectedArea] : []}
+        onTagPress={chosenAreaHandler}
       />
-      <TagsView recordings={filteredRecordings} />
+      {filteredRecordings.length > 0 && (
+        <TagsView messages={filteredRecordings} />
+      )}
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     margin: 15,

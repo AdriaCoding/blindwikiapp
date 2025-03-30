@@ -2,6 +2,105 @@ import { t } from "i18next";
 import { Message } from "@/models/message";
 import { Tag } from "@/models/tag";
 import Language from "@/models/language";
+import { Area } from "@/models/area";
+
+export const ALL_AREAS: Area[] = [
+  {
+    id: 322,
+    name: "metropolitan_city_of_venice",
+    displayName: "Venecia", 
+    message_count: "1257",
+    path: "/area322"
+  },
+  {
+    id: 276,
+    name: "s%C3%A3o_paulo",
+    displayName: "São Paulo",
+    message_count: "552",
+    path: "/area276"
+  },
+  {
+    id: 693,
+    name: "municipality_of_valencia",
+    displayName: "Valencia",
+    message_count: "285",
+    path: "/area693"
+  },
+  {
+    id: 308,
+    name: "wroc%C5%82aw_county",
+    displayName: "Breslavia",
+    message_count: "254",
+    path: "/area308"
+  },
+  {
+    id: 309,
+    name: "santiago_de_compostela",
+    displayName: "Santiago de Compostela",
+    message_count: "185",
+    path: "/area309"
+  },
+  {
+    id: 279,
+    name: "sydney_metropolitan_area",
+    displayName: "Sídney",
+    message_count: "128",
+    path: "/area279"
+  },
+  {
+    id: 288,
+    name: "berlin_metropolitan_area",
+    displayName: "Berlín",
+    message_count: "126",
+    path: "/area288"
+  },
+  {
+    id: 489,
+    name: "province_of_trieste",
+    displayName: "Trieste",
+    message_count: "124",
+    path: "/area489"
+  },
+  {
+    id: 62,
+    name: "roma",
+    displayName: "Roma",
+    message_count: "82",
+    path: "/area62"
+  },
+  {
+    id: 640,
+    name: "el_barcelon%C3%A8s",
+    displayName: "Barcelona",
+    message_count: "76",
+    path: "/area640"
+  },
+  {
+    id: 596,
+    name: "cuenca",
+    displayName: "Cuenca",
+    message_count: "72",
+    path: "/area596"
+  }
+];
+
+export const AREAS: Area[] = [
+  {
+    id: 693,
+    name: "municipality_of_valencia",
+    displayName: "Valencia",
+    message_count: "285",
+    path: "/area693"
+  },
+  {
+    id: 640,
+    name: "el_barcelon%C3%A8s",
+    displayName: "Barcelona",
+    message_count: "76",
+    path: "/area640"
+  },
+];
+
 
 export const RECORDINGS: Message[] = [
 {
@@ -25,8 +124,11 @@ export const RECORDINGS: Message[] = [
       visible: "1"
     },
     currentArea: {
-      id: "1",
-      name: "Barcelona"
+      id: 640,
+      name: "el_barcelon%C3%A8s",
+      displayName: "Barcelona",
+      message_count: "76",
+      path: "/area640"
     },
     activation_status: "active"
   },
@@ -58,8 +160,11 @@ export const RECORDINGS: Message[] = [
       visible: "1"
     },
     currentArea: {
-      id: "2",
-      name: "Madrid"
+      id: 693,
+      name: "municipality_of_valencia",
+      displayName: "Valencia",
+      message_count: "285",
+      path: "/area693"
     },
     activation_status: "active"
   },
@@ -85,8 +190,11 @@ export const RECORDINGS: Message[] = [
           visible: "1"
         },
         currentArea: {
-          id: "2",
-          name: "Madrid"
+          id: 693,
+          name: "municipality_of_valencia",
+          displayName: "Valencia",
+          message_count: "285",
+          path: "/area693"
         },
         activation_status: "active"
       },
@@ -109,8 +217,11 @@ export const RECORDINGS: Message[] = [
           visible: "1"
         },
         currentArea: {
-          id: "2", 
-          name: "Madrid"
+          id: 693,
+          name: "municipality_of_valencia",
+          displayName: "Valencia",
+          message_count: "285",
+          path: "/area693"
         },
         activation_status: "active"
       },
@@ -140,8 +251,11 @@ export const RECORDINGS: Message[] = [
       visible: "1"
     },
     currentArea: {
-      id: "1",
-      name: "Barcelona"
+      id: 640,
+      name: "el_barcelon%C3%A8s",
+      displayName: "Barcelona",
+      message_count: "76",
+      path: "/area640"
     },
     activation_status: "active"
   },
@@ -168,8 +282,11 @@ export const RECORDINGS: Message[] = [
           visible: "1"
         },
         currentArea: {
-          id: "1",
-          name: "Barcelona"
+          id: 640,
+          name: "el_barcelon%C3%A8s",
+          displayName: "Barcelona",
+          message_count: "76",
+          path: "/area640"
         },
         activation_status: "active"
       },

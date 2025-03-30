@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { InstructionsText } from "./StyledText";
-import { TAGS } from "../data/dummy-data";
 import MessageComponent from "./MessageView";
 import { Tag } from "@/models/tag";
-import Recording from "@/models/recording";
 import Colors from "@/constants/Colors";
 import { Message } from "@/models/message";
 
@@ -45,7 +43,7 @@ export function TagsList({
         <TagBox
           key={tag.id}
           tag={tag}
-          selected={selectedTags.includes(tag)}
+          selected={selectedTags.some(t => t.id === tag.id)}
           onPress={onTagPress}
         />
       ))}
@@ -55,25 +53,31 @@ export function TagsList({
 
 // Parent component: tracks the selected tags in one state.
 export default function TagsView({
-  messages: messages,
+  messages,
 }: {
   messages: Message[];
 }) {
   const availableTags = messages.reduce((acc, message) => {
     return [...acc, ...message.tags];
   }, [] as Tag[]);
+
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+
   const handleTagPress = (tag: Tag) => {
     setSelectedTags((prev) =>
-      prev.find(t => t.id === tag.id)
+      prev.some(t => t.id === tag.id)
         ? prev.filter((t) => t.id !== tag.id)
         : [...prev, tag]
     );
   };
 
-  const filteredRecordings = messages.filter((m) =>
-    m.tags.some((id) => selectedTags.includes(id))
-  );
+  const filteredMessages = selectedTags.length > 0
+    ? messages.filter((message) =>
+        message.tags.some((messageTag) =>
+          selectedTags.some((selectedTag) => selectedTag.id === messageTag.id)
+        )
+      )
+    : [];
 
   return (
     <>
@@ -86,22 +90,22 @@ export default function TagsView({
         tags={availableTags}
         selectedTags={selectedTags}
         onTagPress={handleTagPress}
-        />
+      />
 
       <View style={styles.separator} />
 
-      {/* Filtered recordings */}
-      {filteredRecordings.map((recording) => (
+      {/* Filtered messages */}
+      {filteredMessages.map((message) => (
         <MessageComponent
-        key={recording.id}
-        m={recording}
-        actions={{
-          onListen: () => console.log("Listen"),
-          onEditTags: undefined,
-          onDelete: undefined,
-          onViewComments: () => console.log("View Comments"),
-          onDirection: () => console.log("Direction"),
-        }}
+          key={message.id}
+          m={message}
+          actions={{
+            onListen: () => console.log("Listen"),
+            onEditTags: undefined,
+            onDelete: undefined,
+            onViewComments: () => console.log("View Comments"),
+            onDirection: () => console.log("Direction"),
+          }}
         />
       ))}
     </>
