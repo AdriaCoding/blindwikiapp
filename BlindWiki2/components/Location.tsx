@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Pressable,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
@@ -12,7 +13,7 @@ import { useTranslation } from "react-i18next";
 export default function LocationComponent() {
   const { t } = useTranslation();
   const [location, setLocation] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Platform.OS !== 'web');
   const [error, setError] = useState<string | null>(null);
 
   const parseLocationText = (
@@ -73,9 +74,11 @@ export default function LocationComponent() {
     }
   };
 
-  // Get location when component mounts
+  // Get location when component mounts (solo en móvil)
   useEffect(() => {
-    getCurrentLocation();
+    if (Platform.OS !== 'web') {
+      getCurrentLocation();
+    }
   }, []);
 
   // Handle press on location box
@@ -100,8 +103,14 @@ export default function LocationComponent() {
         </View>
       ) : error ? (
         <Text style={styles.errorText}>{error}</Text>
+      ) : location ? (
+        <Text style={styles.locationText}>{location}</Text>
       ) : (
-        <Text style={styles.text}>{location}</Text>
+        <Text style={styles.locationText}>
+          {Platform.OS === 'web' 
+            ? t("location.clickToGetLocation") 
+            : t("location.loading")}
+        </Text>
       )}
     </Pressable>
   );
@@ -137,5 +146,9 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
+  },
+  locationText: {
+    textAlign: "center",
+    fontSize: 17,
   },
 });
