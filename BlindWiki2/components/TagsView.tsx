@@ -3,9 +3,10 @@ import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { InstructionsText } from "./StyledText";
 import { TAGS } from "../data/dummy-data";
 import MessageComponent from "./MessageView";
-import Tag from "@/models/tag";
+import { Tag } from "@/models/tag";
 import Recording from "@/models/recording";
 import Colors from "@/constants/Colors";
+import { Message } from "@/models/message";
 
 function TagBox({
   tag,
@@ -14,12 +15,12 @@ function TagBox({
 }: {
   tag: Tag;
   selected: boolean;
-  onPress: (id: number) => void;
+  onPress: (tag: Tag) => void;
 }) {
   return (
     <TouchableOpacity
       style={[styles.tag, selected && styles.tagSelected]}
-      onPress={() => onPress(tag.id)}
+      onPress={() => onPress(tag)}
     >
       <Text style={[styles.tagText, selected && styles.tagTextSelected]}>
         {tag.name}
@@ -35,8 +36,8 @@ export function TagsList({
   onTagPress,
 }: {
   tags: Tag[];
-  selectedTags: number[];
-  onTagPress: (id: number) => void;
+  selectedTags: Tag[];
+  onTagPress: (tag: Tag) => void;
 }) {
   return (
     <View style={styles.container}>
@@ -44,7 +45,7 @@ export function TagsList({
         <TagBox
           key={tag.id}
           tag={tag}
-          selected={selectedTags.includes(tag.id)}
+          selected={selectedTags.includes(tag)}
           onPress={onTagPress}
         />
       ))}
@@ -54,23 +55,24 @@ export function TagsList({
 
 // Parent component: tracks the selected tags in one state.
 export default function TagsView({
-  recordings,
+  messages: messages,
 }: {
-  recordings: Recording[];
+  messages: Message[];
 }) {
-  const availableTags = TAGS.filter((tag) =>
-    recordings.some((rec) => rec.tags.includes(tag.id))
-  );
-  const [selectedTags, setSelectedTags] = useState<number[]>([]);
-
-  const handleTagPress = (id: number) => {
+  const availableTags = messages.reduce((acc, message) => {
+    return [...acc, ...message.tags];
+  }, [] as Tag[]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const handleTagPress = (tag: Tag) => {
     setSelectedTags((prev) =>
-      prev.includes(id) ? prev.filter((tagId) => tagId !== id) : [...prev, id]
+      prev.find(t => t.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag]
     );
   };
 
-  const filteredRecordings = recordings.filter((rec) =>
-    rec.tags.some((tagId) => selectedTags.includes(tagId))
+  const filteredRecordings = messages.filter((m) =>
+    m.tags.some((id) => selectedTags.includes(id))
   );
 
   return (
@@ -92,7 +94,7 @@ export default function TagsView({
       {filteredRecordings.map((recording) => (
         <MessageComponent
         key={recording.id}
-        r={recording}
+        m={recording}
         actions={{
           onListen: () => console.log("Listen"),
           onEditTags: undefined,
