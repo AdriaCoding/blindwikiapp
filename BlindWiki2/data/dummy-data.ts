@@ -82,7 +82,7 @@ export const ALL_AREAS: Area[] = [
     message_count: "72",
     path: "/area596"
   }
-];
+]; 
 
 export const AREAS: Area[] = [
   {

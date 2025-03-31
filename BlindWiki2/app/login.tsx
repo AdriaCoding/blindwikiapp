@@ -98,7 +98,7 @@ export default function LogInScreen() {
       </View>
       
       <Pressable
-        onPress={() => router.push("/(tabs)/settings/signup")}
+        onPress={() => router.push("/signup")}
         style={styles.signUpContainer}
       >
         <View style={styles.signUpRow}>

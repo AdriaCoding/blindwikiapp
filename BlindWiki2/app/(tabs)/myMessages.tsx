@@ -77,7 +77,7 @@ export default function MyMessages() {
         <Text style={styles.errorText}>{error || actionError}</Text>
         <StyledButton
           title="Log In"
-          onPress={() => router.push("/(tabs)/settings/login")}
+          onPress={() => router.push("/login")}
         />
       </View>
     );

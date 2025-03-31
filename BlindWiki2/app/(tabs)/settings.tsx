@@ -17,24 +17,28 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
-  
+
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
   const languages = createLanguageItems(t);
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage);
   }, [selectedLanguage, i18n]);
-  
-  const { unit, setUnit, showInstructions, setShowInstructions } = useSettings();
+
+  const { unit, setUnit, showInstructions, setShowInstructions } =
+    useSettings();
   const units = createUnitItems(t);
-  
+
   const { user, logout, isLoggedIn, isLoading } = useAuth();
   const handleLogout = async () => {
     const response = await logout();
-    
+
     if (response.success) {
-      Alert.alert('You have been logged out');
+      Alert.alert("You have been logged out");
     } else {
-      Alert.alert('Logout Error', response.errorMessage || 'Failed to logout properly');
+      Alert.alert(
+        "Logout Error",
+        response.errorMessage || "Failed to logout properly"
+      );
     }
   };
 
@@ -89,15 +93,10 @@ export default function SettingsScreen() {
         {!isLoggedIn() ? (
           <StyledButton
             title={"Log In"}
-            onPress={() => router.push("/(tabs)/settings/login")}
+            onPress={() => router.push("/login")}
           />
         ) : (
-          <>
-            <StyledButton 
-              title={"Log Out"}
-              onPress={handleLogout}
-            />
-          </>
+          <StyledButton title={"Log Out"} onPress={handleLogout} />
         )}
       </View>
     </View>
@@ -134,6 +133,6 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 16,
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
