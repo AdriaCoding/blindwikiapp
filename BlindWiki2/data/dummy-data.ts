@@ -101,6 +101,78 @@ export const AREAS: Area[] = [
   },
 ];
 
+export const LANGUAGES: Language[] =[
+  {
+    code: "ca",
+    extended_code: "ca-ES",
+    id: "5",
+    name: "Català",
+    visible: "1"
+  },
+  {
+    code: "de",
+    extended_code: "de_DE",
+    id: "11",
+    name: "Deutsch",
+    visible: "1"
+  },
+  {
+    code: "en",
+    extended_code: "en-US",
+    id: "1",
+    name: "English",
+    visible: "1"
+  },
+  {
+    code: "es",
+    extended_code: "es-ES",
+    id: "2",
+    name: "Español",
+    visible: "1"
+  },
+  {
+    code: "gl",
+    extended_code: "",
+    id: "15",
+    name: "Galego",
+    visible: "1"
+  },
+  {
+    code: "it",
+    extended_code: "it-IT",
+    id: "10",
+    name: "Italiano",
+    visible: "1"
+  },
+  {
+    code: "pl",
+    extended_code: "",
+    id: "7",
+    name: "Polski",
+    visible: "1"
+  },
+  {
+    code: "pt",
+    extended_code: "pt-BR",
+    id: "8",
+    name: "Português",
+    visible: "1"
+  },
+  {
+    code: "ja",
+    extended_code: "",
+    id: "12",
+    name: "日本語",
+    visible: "1"
+  },
+  {
+    code: "ko",
+    extended_code: "",
+    id: "6",
+    name: "한국어",
+    visible: "1"
+  }
+]
 
 export const RECORDINGS: Message[] = [
 {
