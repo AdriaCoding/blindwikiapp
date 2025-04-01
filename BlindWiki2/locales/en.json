@@ -55,7 +55,12 @@
     "title": "My Recordings",
     "tabLabel": "My audios",
     "loading": "Loading your messages...",
-    "noMessages": "You haven't created any messages yet."
+    "noMessages": "You haven't created any messages yet.",
+    "error": {
+      "notLoggedIn": "You must be logged in to view your messages.",
+      "fetchFailed": "Failed to fetch messages",
+      "unexpected": "An unexpected error occurred. Please try again."
+    }
   },
   "login":{
     "title": "Log In",

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -21,14 +21,14 @@ export default function MyMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(true);
 
   // Function to fetch user messages
-  const fetchUserMessages = async () => {
+  const fetchUserMessages = useCallback(async () => {
     if (!user) {
-      return (
-        setError("You must be logged in to view your messages."),
-        setIsLoading(false)
-      );
+      setError(t("myMessages.error.notLoggedIn"));
+      setIsLoading(false);
+      return;
     }
 
     setIsLoading(true);
@@ -37,18 +37,23 @@ export default function MyMessages() {
     try {
       const response = await getMessagesFromUser(user.id);
 
+      if (!isMounted) return;
+
       if (response.success) {
         setMessages(response.messages);
       } else {
-        setError(response.errorMessage || "Failed to fetch messages");
+        setError(response.errorMessage || t("myMessages.error.fetchFailed"));
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      if (!isMounted) return;
+      setError(t("myMessages.error.unexpected"));
       console.error("Error fetching messages:", err);
     } finally {
-      setIsLoading(false);
+      if (isMounted) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, [user, t, isMounted]);
 
   // Use our shared message actions hook
   const {
@@ -59,8 +64,13 @@ export default function MyMessages() {
 
   // Fetch messages when component mounts
   useEffect(() => {
+    setIsMounted(true);
     fetchUserMessages();
-  }, [user]);
+
+    return () => {
+      setIsMounted(false);
+    };
+  }, [fetchUserMessages]);
 
   // Render loading, error or empty states
   if (isLoading) {
@@ -77,7 +87,7 @@ export default function MyMessages() {
       <View style={styles.centerContainer}>
         <Text style={styles.errorText}>{error || actionError}</Text>
         <StyledButton
-          title="Log In"
+          title={t("login.title")}
           onPress={() => router.push("/login")}
         />
       </View>
