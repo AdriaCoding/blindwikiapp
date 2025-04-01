@@ -33,11 +33,11 @@ export default function SettingsScreen() {
     const response = await logout();
 
     if (response.success) {
-      Alert.alert("You have been logged out");
+      Alert.alert(t("settings.logout.alert.success"));
     } else {
       Alert.alert(
-        "Logout Error",
-        response.errorMessage || "Failed to logout properly"
+        t("settings.logout.alert.error.title"),
+        response.errorMessage || t("settings.logout.alert.error.message")
       );
     }
   };
@@ -92,11 +92,11 @@ export default function SettingsScreen() {
       <View style={styles.settingContainer}>
         {!isLoggedIn() ? (
           <StyledButton
-            title={"Log In"}
+            title={t("login.title")}
             onPress={() => router.push("/login")}
           />
         ) : (
-          <StyledButton title={"Log Out"} onPress={handleLogout} />
+          <StyledButton title={t("settings.logout")} onPress={handleLogout} />
         )}
       </View>
     </View>

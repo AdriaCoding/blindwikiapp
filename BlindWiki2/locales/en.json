@@ -21,6 +21,16 @@
       "modalTitle": "Select Unit of Measure",
       "meters": "Meters",
       "miles": "Miles"
+    },
+    "logout":{
+      "title": "Log Out",
+      "alert": {
+        "success": "You have been logged out",
+        "error": {
+          "title":"Log Out Error",
+          "message": "Failed to logout properly"
+        } 
+      }
     }
   },
   "explore": {
@@ -34,6 +44,51 @@
   },
   "myMessages": {
     "title": "My Recordings",
-    "tabLabel": "My audios"
+    "tabLabel": "My audios",
+    "loading": "Loading your messages...",
+    "noMessages": "You haven't created any messages yet."
+  },
+  "login":{
+    "title": "Log In",
+    "error":{
+      "input": "Please enter both username and password",
+      "credentials": "The username or password you entered is incorrect. Please try again.",
+      "default": "An error occurred during login"
+    },
+    "username": "Username",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": {
+      "text":"You do not have an account?",
+      "link":"Sign up now"
+    }
+  },
+  "not-found":{
+    "title": "Oops!",
+    "text": "This screen doesn't exist.",
+    "Link": "Go to home screen!"
+  },
+  "register": {
+    "title": "Join the BlindWiki community by filling the following form",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "repeatPassword": "Repeat Password",
+    "button": "Register",
+    "terms": "By Signing up, you agree to our Terms of Service and Privacy Policy",
+    "success": {
+      "title": "Registration Successful",
+      "emailSent": "A confirmation link has been sent to your email address. Please check your inbox and click the link to activate your account.",
+      "ok": "OK"
+    },
+    "error": {
+      "title": "Registration Error",
+      "emptyUsername": "Please enter a username",
+      "invalidEmail": "Please enter a valid email address",
+      "passwordTooShort": "Password must be at least 4 characters long",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "defaultError": "An error occurred during registration",
+      "networkError": "Network error occurred. Please try again."
+    }
   }
 }

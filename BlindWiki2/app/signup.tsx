@@ -87,17 +87,17 @@ export default function SignUpScreen() {
     <View style={styles.container}>
         
         <Text style={styles.text}>
-          Join the BlindWiki community by filling the following form
+          {t('register.title')}
         </Text>
-        <StyledInput value={email} onChangeText={setEmail} placeholder="Email"/>
-        <StyledInput value={username} onChangeText={setUsername} placeholder="Username"/>
-        <StyledInput value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry={true} />
-        <StyledInput value={repeatPassword} onChangeText={setRepeatPassword} placeholder="Repeat Password" secureTextEntry={true} />
+        <StyledInput value={email} onChangeText={setEmail} placeholder={t('register.email')}/>
+        <StyledInput value={username} onChangeText={setUsername} placeholder={t('register.username')}/>
+        <StyledInput value={password} onChangeText={setPassword} placeholder={t('register.password')} secureTextEntry={true} />
+        <StyledInput value={repeatPassword} onChangeText={setRepeatPassword} placeholder={t('register.repeatPassword')} secureTextEntry={true} />
         
-          <StyledButton title="Register" onPress={handleRegister} />
+          <StyledButton title={t('register.button')} onPress={handleRegister} />
 
         <TextLink url='www.blind.wiki/terms' style={styles.text}>
-          By Signing up, you agree to our Terms of Service and Privacy Policy
+          {t('register.terms')}
         </TextLink>
 
     </View>

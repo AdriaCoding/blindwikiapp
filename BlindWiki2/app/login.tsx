@@ -12,6 +12,8 @@ import StyledButton from "@/components/StyledButton";
 import Colors from "@/constants/Colors";
 import StyledInput from "@/components/StyledInput";
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from "react-i18next";
+import { t } from "i18next";
 
 export default function LogInScreen() {
   const [username, setUsername] = useState("");
@@ -21,12 +23,13 @@ export default function LogInScreen() {
   const { login } = useAuth();
 
   const handleLogin = async () => {
+    const { t } = useTranslation();
     // Reset error state
     setErrorMessage(null);
     
     // Input validation
     if (!username || !password) {
-      setErrorMessage("Please enter both username and password");
+      setErrorMessage(t("login.error.input"));
       return;
     }
    
@@ -37,7 +40,7 @@ export default function LogInScreen() {
       if (response.errorMessage === "Incorrect username or password.") {
         console.log("Credential error from login");
         // Credential error - stay on page with message, clear password
-        setErrorMessage("The username or password you entered is incorrect. Please try again.");
+        setErrorMessage(t("login.error.credentials"));
         setPassword(""); // Clear password for security and to indicate a retry is needed
       }
       else if (response.success) {
@@ -46,7 +49,7 @@ export default function LogInScreen() {
       }
       else {
         // Other error - stay on page with message
-        setErrorMessage(response.errorMessage || "An error occurred during login");
+        setErrorMessage(response.errorMessage || t("login.error.default"));
       }
     } catch (error) {
       // Unexpected error
@@ -71,7 +74,7 @@ export default function LogInScreen() {
           setUsername(text);
           if (errorMessage) setErrorMessage(null); // Clear error when user types
         }}
-        placeholder="Username"
+        placeholder={t("login.username")}
         autoFocus={true}
       />
       
@@ -81,7 +84,7 @@ export default function LogInScreen() {
           setPassword(text);
           if (errorMessage) setErrorMessage(null); // Clear error when user types
         }}
-        placeholder="Password"
+        placeholder={t("login.password")}
         secureTextEntry={true}
       />
 
@@ -89,10 +92,10 @@ export default function LogInScreen() {
         {isLoading ? (
           <ActivityIndicator size="small" color={Colors.light.primary} />
         ) : (
-          <StyledButton title="Log In" onPress={handleLogin} />
+          <StyledButton title={t("login.title")} onPress={handleLogin} />
         )}
         <StyledButton
-          title="Forgot your password?"
+          title={t("login.forgotPassword")}
           onPress={() => router.push("/(tabs)/settings")}
         />
       </View>
@@ -102,8 +105,8 @@ export default function LogInScreen() {
         style={styles.signUpContainer}
       >
         <View style={styles.signUpRow}>
-          <Text style={styles.signUpText}>You do not have an account? </Text>
-          <Text style={styles.signUpNowText}>Sign up now</Text>
+          <Text style={styles.signUpText}>{t("login.noAccount.text")} </Text>
+          <Text style={styles.signUpNowText}>{t("login.noAccount.link")}</Text>
         </View>
       </Pressable>
     </View>

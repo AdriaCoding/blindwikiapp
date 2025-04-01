@@ -13,9 +13,10 @@ import { Message } from "@/models/message";
 import { getMessagesFromUser } from "@/services/messageService";
 import StyledButton from "@/components/StyledButton";
 import { router } from "expo-router";
-
+import { useTranslation } from "react-i18next";
 
 export default function MyMessages() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +67,7 @@ export default function MyMessages() {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={Colors.light.primary} />
-        <Text>Loading your messages...</Text>
+        <Text>{t("myMessages.loading")}</Text>
       </View>
     );
   }
@@ -86,7 +87,7 @@ export default function MyMessages() {
   if (messages.length === 0) {
     return (
       <View style={styles.centerContainer}>
-        <Text>You haven't created any messages yet.</Text>
+        <Text>{t("myMessages.noMessages")}</Text>
       </View>
     );
   }

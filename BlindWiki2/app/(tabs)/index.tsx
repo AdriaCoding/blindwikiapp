@@ -5,9 +5,11 @@ import { useTranslation } from 'react-i18next';
 import Colors from '@/constants/Colors';
 import { Text, View } from 'react-native';
 import StyledButton from '@/components/StyledButton';
+import { router } from 'expo-router';
 
 function record() {
   console.log('Recording...');
+  router.push('/edit');
 }
 
 
