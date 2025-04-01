@@ -1,5 +1,14 @@
 {
   "hello": "Hello",
+  "location": {
+    "highAccuracy": "High accuracy",
+    "normalAccuracy": "Normal accuracy",
+    "permissionDenied": "Location permission denied",
+    "error": "Error getting location",
+    "loading": "Getting location...",
+    "currentLocation": "Current location: ",
+    "clickToGetLocation": "Click to get your location"
+  },
   "home": {
     "title": "Record",
     "info-gps": "Press the following button to update your GPS location",

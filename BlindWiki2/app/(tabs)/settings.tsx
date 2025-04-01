@@ -96,7 +96,7 @@ export default function SettingsScreen() {
             onPress={() => router.push("/login")}
           />
         ) : (
-          <StyledButton title={t("settings.logout")} onPress={handleLogout} />
+          <StyledButton title={t("settings.logout.title")} onPress={handleLogout} />
         )}
       </View>
     </View>
