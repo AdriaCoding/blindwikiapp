@@ -21,9 +21,9 @@ export default function LogInScreen() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { t } = useTranslation();
 
   const handleLogin = async () => {
-    const { t } = useTranslation();
     // Reset error state
     setErrorMessage(null);
     
@@ -32,7 +32,6 @@ export default function LogInScreen() {
       setErrorMessage(t("login.error.input"));
       return;
     }
-   
     setIsLoading(true);
     
     try {
