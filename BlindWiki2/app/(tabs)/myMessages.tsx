@@ -5,6 +5,7 @@ import {
   Text,
   ActivityIndicator,
   View,
+  RefreshControl,
 } from "react-native";
 import MessageComponent, { useMessageActions } from "@/components/MessageView";
 import Colors from "@/constants/Colors";
@@ -22,16 +23,20 @@ export default function MyMessages() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Function to fetch user messages
   const fetchUserMessages = useCallback(async () => {
     if (!user) {
       setError(t("myMessages.error.notLoggedIn"));
       setIsLoading(false);
+      setRefreshing(false);
       return;
     }
 
-    setIsLoading(true);
+    if (!refreshing) {
+      setIsLoading(true);
+    }
     setError(null);
 
     try {
@@ -51,9 +56,16 @@ export default function MyMessages() {
     } finally {
       if (isMounted) {
         setIsLoading(false);
+        setRefreshing(false);
       }
     }
-  }, [user, t, isMounted]);
+  }, [user, t, isMounted, refreshing]);
+
+  // Pull-to-refresh handler
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchUserMessages();
+  }, [fetchUserMessages]);
 
   // Use our shared message actions hook
   const {
@@ -73,7 +85,7 @@ export default function MyMessages() {
   }, [fetchUserMessages]);
 
   // Render loading, error or empty states
-  if (isLoading) {
+  if (isLoading && !refreshing) {
     return (
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={Colors.light.primary} />
@@ -96,14 +108,35 @@ export default function MyMessages() {
 
   if (messages.length === 0) {
     return (
-      <View style={styles.centerContainer}>
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={styles.centerContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.light.primary]}
+            tintColor={Colors.light.primary}
+          />
+        }
+      >
         <Text>{t("myMessages.noMessages")}</Text>
-      </View>
+      </ScrollView>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[Colors.light.primary]}
+          tintColor={Colors.light.primary}
+        />
+      }
+    >
       {isProcessing && (
         <ActivityIndicator size="small" color={Colors.light.primary} />
       )}
