@@ -61,12 +61,41 @@ export default function HomeScreen() {
         playsInSilentModeIOS: true,
       });
       
+      // Custom recording options for mp3 format if possible
+      const recordingOptions = {
+        ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
+        android: {
+          ...Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
+          extension: '.mp3',
+          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+          audioEncoder: Audio.AndroidAudioEncoder.AAC,
+        },
+        ios: {
+          ...Audio.RecordingOptionsPresets.HIGH_QUALITY.ios,
+          extension: '.mp3',
+          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
+          audioQuality: Audio.IOSAudioQuality.MAX,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+          linearPCMBitDepth: 16,
+          linearPCMIsBigEndian: false,
+          linearPCMIsFloat: false,
+        },
+      };
+      
       const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
+        recordingOptions,
+        (status) => {
+          console.log('Recording status:', status);
+        },
+        100
       );
       
       setRecordingInstance(recording);
       setIsRecording(true);
+      
+      console.log('Recording started');
     } catch (err) {
       console.error('Failed to start recording', err);
       Alert.alert(
@@ -82,21 +111,69 @@ export default function HomeScreen() {
     
     try {
       await recordingInstance.stopAndUnloadAsync();
-      const uri = recordingInstance.getURI();
-      setRecordingUri(uri);
-      setRecordingInstance(null);
-      setIsRecording(false);
+      const originalUri = recordingInstance.getURI();
       
-      // Navigate to edit screen with recording data
-      if (uri) {
-        router.push({
-          pathname: '/edit',
-          params: { 
-            recordingUri: uri,
-            latitude: location?.coords.latitude?.toString() || '',
-            longitude: location?.coords.longitude?.toString() || ''
+      if (originalUri) {
+        // Ensure the file exists before proceeding
+        const fileInfo = await FileSystem.getInfoAsync(originalUri);
+        console.log('Recording file info:', fileInfo);
+        
+        if (fileInfo.exists) {
+          // Create a new file in app's documents directory with a simple name
+          const timestamp = Date.now();
+          const newFilename = `recording-${timestamp}.mp3`;
+          const newUri = `${FileSystem.documentDirectory}${newFilename}`;
+          
+          console.log(`Copying recording from ${originalUri} to ${newUri}`);
+          
+          try {
+            // Copy the file to a location with a simpler path
+            await FileSystem.copyAsync({
+              from: originalUri,
+              to: newUri
+            });
+            
+            // Verify the new file exists
+            const newFileInfo = await FileSystem.getInfoAsync(newUri);
+            console.log('New file info:', newFileInfo);
+            
+            if (newFileInfo.exists) {
+              setRecordingUri(newUri);
+              setRecordingInstance(null);
+              setIsRecording(false);
+              
+              // Navigate to edit screen with the new recording URI
+              router.push({
+                pathname: '/edit',
+                params: { 
+                  recordingUri: newUri,
+                  latitude: location?.coords.latitude?.toString() || '',
+                  longitude: location?.coords.longitude?.toString() || ''
+                }
+              });
+            } else {
+              throw new Error('Copied file not found');
+            }
+          } catch (copyError) {
+            console.error('Failed to copy recording:', copyError);
+            
+            // Fall back to using the original URI if copy failed
+            setRecordingUri(originalUri);
+            setRecordingInstance(null);
+            setIsRecording(false);
+            
+            router.push({
+              pathname: '/edit',
+              params: { 
+                recordingUri: originalUri,
+                latitude: location?.coords.latitude?.toString() || '',
+                longitude: location?.coords.longitude?.toString() || ''
+              }
+            });
           }
-        });
+        } else {
+          throw new Error('Recording file not found');
+        }
       }
     } catch (err) {
       console.error('Failed to stop recording', err);

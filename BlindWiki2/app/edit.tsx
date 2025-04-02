@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { publishMessage } from "@/services/messageService";
 import Colors from "@/constants/Colors";
 import { useLocation } from "@/contexts/LocationContext";
+import * as FileSystem from "expo-file-system";
 
 export default function EditScreen() {
   const { t } = useTranslation();
@@ -18,7 +19,9 @@ export default function EditScreen() {
     longitude: string;
   }>();
 
+  // Store recording URI directly - we're no longer using encoding/decoding
   const [recordingUri] = useState<string>(params.recordingUri || "");
+  
   // Use params for latitude/longitude if provided, otherwise use context
   const [latitude] = useState<string>(
     params.latitude || location?.coords.latitude?.toString() || ""
@@ -49,28 +52,50 @@ export default function EditScreen() {
   // Function to play the recorded audio
   const playRecording = async () => {
     try {
+      console.log(`Attempting to play recording from: ${recordingUri}`);
+      
       // Unload previous sound if it exists
       if (sound) {
         await sound.unloadAsync();
       }
 
+      // Check if the recording file exists
+      const fileInfo = await FileSystem.getInfoAsync(recordingUri);
+      console.log('Playback file info:', fileInfo);
+      
+      if (!fileInfo.exists) {
+        throw new Error('Recording file not found');
+      }
+
       // Load the recording
+      console.log('Creating sound object...');
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: recordingUri },
-        { shouldPlay: true }
+        { shouldPlay: true },
+        (status) => console.log('Playback status:', status)
       );
+      
+      console.log('Sound created successfully');
       setSound(newSound);
       setIsPlaying(true);
 
       // Listen for playback status updates
       newSound.setOnPlaybackStatusUpdate((status) => {
+        console.log('Playback status update:', status);
         if (status.isLoaded && !status.isPlaying && status.didJustFinish) {
           setIsPlaying(false);
         }
       });
     } catch (error) {
       console.error("Failed to play recording", error);
-      Alert.alert(t("edit.playbackError"));
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Unknown error occurred";
+        
+      Alert.alert(
+        t("edit.playbackError"),
+        t("edit.playbackErrorMessage") + `: ${errorMessage}`
+      );
     }
   };
 

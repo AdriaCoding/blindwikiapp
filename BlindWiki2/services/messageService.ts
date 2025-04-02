@@ -288,14 +288,38 @@ export async function publishMessage(
       };
     }
 
+    // Ensure the audioFilePath is properly decoded for file operations
+    const decodedAudioPath = audioFilePath.includes('%') 
+      ? decodeURIComponent(audioFilePath) 
+      : audioFilePath;
+      
+    console.log(`Publishing audio from path: ${decodedAudioPath}`);
+
+    // Check if the audio file exists
+    const fileInfo = await FileSystem.getInfoAsync(decodedAudioPath);
+    console.log("File info before upload:", fileInfo);
+    
+    if (!fileInfo.exists) {
+      return {
+        success: false,
+        errorMessage: "Audio file not found at the specified path",
+      };
+    }
+
     const formData = new FormData();
     
+    // Extract filename and determine MIME type
+    const filename = decodedAudioPath.split('/').pop() || 'audio.mp3';
+    const extension = filename.split('.').pop()?.toLowerCase() || 'mp3';
+    const mimeType = getMimeTypeForExtension(extension);
+    
+    console.log(`Uploading file: ${filename}, type: ${mimeType}`);
+    
     // Add the audio file
-    // Note: This is a simplified example - in a real app, you would need to get the file's mime type and proper name
     formData.append("PublishForm[files][0]", {
-      uri: audioFilePath,
-      name: "audio.mp3",
-      type: "audio/mpeg",
+      uri: decodedAudioPath,
+      name: filename,
+      type: mimeType,
     } as any);
     
     formData.append("PublishForm[longitude]", longitude);
@@ -303,8 +327,10 @@ export async function publishMessage(
     formData.append("PublishForm[address]", address);
     formData.append("PublishForm[text]", "");
     formData.append("PublishForm[newtags]", tags);
-    formData.append("PublishForm[device]", deviceInfo);
+    formData.append("PublishForm[device]", deviceInfo || "BlindWiki2 App");
     formData.append("PHPSESSID", sessionId);
+    
+    console.log("Form data prepared for upload");
     
     // Since this is a special case with FormData, we need to use fetch directly
     // In a real implementation, you might want to refactor apiRequest to handle FormData
@@ -319,11 +345,13 @@ export async function publishMessage(
     const serverResponse = await response.json() as MessageResponse;
     
     if (serverResponse.status === "ok") {
+      console.log("Message published successfully");
       return {
         success: true,
         message: serverResponse.data,
       };
     } else {
+      console.error("Server error:", serverResponse.error);
       return {
         success: false,
         errorMessage: serverResponse.error?.message || "Failed to publish message",
