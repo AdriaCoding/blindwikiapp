@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, GestureResponderEvent, Alert } from "react-native";
 import StyledButton from "./StyledButton";
+import AudioButton from "./AudioButton";
 import { Message } from "@/models/message";
 import Colors from "@/constants/Colors";
-import { deleteMessage, updateMessageTags } from '@/services/messageService';
+import { deleteMessage, updateMessageTags, audioPlayed } from '@/services/messageService';
+import { useTranslation } from "react-i18next";
 // Message Actions Interface
 export interface MessageActions {
   onListen?: (event: GestureResponderEvent) => void;
@@ -23,6 +25,7 @@ export function useMessageActions(
 ) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
 
   /**
    * Handle message deletion
@@ -59,13 +62,43 @@ export function useMessageActions(
   };
 
   /**
+   * Handle audio playback and notify the server
+   */
+  const handleAudioPlayback = async (message: Message, isPlaying: boolean) => {
+    if (isPlaying) {
+      setPlayingMessageId(message.id);
+      
+      // Notify server that audio was played if there's an audio attachment
+      const audioAttachment = message.attachments?.find(att => att.type === 'audio');
+      if (audioAttachment && audioAttachment.id) {
+        try {
+          await audioPlayed(audioAttachment.id);
+        } catch (error) {
+          console.error("Failed to notify server about audio playback:", error);
+        }
+      }
+    } else {
+      setPlayingMessageId(null);
+    }
+  };
+
+  /**
+   * Get audio URL from message attachments
+   */
+  const getAudioUrl = (message: Message): string | null => {
+    const audioAttachment = message.attachments?.find(att => att.type === 'audio');
+    return audioAttachment?.url || audioAttachment?.externalUrl || null;
+  };
+
+  /**
    * Create MessageActions object for a specific message
    */
   const getActionsForMessage = (message: Message) => {
     return {
       onListen: (event: GestureResponderEvent) => {
         console.log("Clicked on Listen to message:", message.id);
-        // Implement audio playback logic
+        // This is kept for backward compatibility but actual audio
+        // playback is now handled by AudioButton directly
       },
       onEditTags: (event: GestureResponderEvent) => {
         console.log("Clicked on Edit tags for message:", message.id);
@@ -100,6 +133,9 @@ export function useMessageActions(
     handleDelete,
     handleEditTags,
     getActionsForMessage,
+    handleAudioPlayback,
+    getAudioUrl,
+    playingMessageId,
     isProcessing,
     error,
   };
@@ -115,6 +151,29 @@ export default function MessageComponent({
   m: Message;
   actions: MessageActions;
 }) {
+  const { t } = useTranslation();
+  
+  // Extract audio URL from message attachments
+  const audioUrl = m.attachments?.find(att => att.type === 'audio')?.url || 
+                  m.attachments?.find(att => att.type === 'audio')?.externalUrl || 
+                  null;
+  
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
+  // Event handler for audio playback status changes
+  const handlePlaybackStatusChange = (isPlaying: boolean) => {
+    setIsPlayingAudio(isPlaying);
+    // Notify the server about playback if there's an audio attachment
+    if (isPlaying && m.attachments?.some(att => att.type === 'audio')) {
+      const audioAttachment = m.attachments.find(att => att.type === 'audio');
+      if (audioAttachment?.id) {
+        audioPlayed(audioAttachment.id).catch(err => {
+          console.error("Failed to notify server about audio playback:", err);
+        });
+      }
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* First line: tags */}
@@ -128,21 +187,49 @@ export default function MessageComponent({
         <Text style={styles.user}>{m.authorUser.displayName}</Text>. {m.address}
       </Text>
 
-      {/* Black buttons for actions */}
-      {actions.onListen && (
-        <StyledButton title="Listen" onPress={actions.onListen} />
+      {/* Action buttons */}
+      {audioUrl ? (
+        <AudioButton 
+          audioUri={audioUrl}
+          onPlaybackStatusChange={handlePlaybackStatusChange}
+          style={styles.actionButton}
+          context="message"
+        />
+      ) : actions.onListen && (
+        <StyledButton 
+          title={t("message.listen")} 
+          onPress={actions.onListen}
+          style={styles.actionButton}
+        />
       )}
+      
       {actions.onViewComments && (
-        <StyledButton title="Comments" onPress={actions.onViewComments} />
+        <StyledButton 
+          title={t("message.comments")} 
+          onPress={actions.onViewComments}
+          style={styles.actionButton}
+        />
       )}
       {actions.onEditTags && (
-        <StyledButton title="Edit Tags" onPress={actions.onEditTags} />
+        <StyledButton 
+          title={t("message.editTags")} 
+          onPress={actions.onEditTags}
+          style={styles.actionButton}
+        />
       )}
       {actions.onDelete && (
-        <StyledButton title="Delete" onPress={actions.onDelete} />
+        <StyledButton 
+          title={t("message.delete")} 
+          onPress={actions.onDelete}
+          style={styles.actionButton}
+        />
       )}
       {actions.onDirection && (
-        <StyledButton title="Direction" onPress={actions.onDirection} />
+        <StyledButton 
+          title={t("message.directions")} 
+          onPress={actions.onDirection}
+          style={styles.actionButton}
+        />
       )}
     </View>
   );
@@ -162,5 +249,8 @@ const styles = StyleSheet.create({
   },
   user: {
     fontWeight: "bold",
+  },
+  actionButton: {
+    marginBottom: 4,
   },
 });

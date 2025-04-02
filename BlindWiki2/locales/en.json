@@ -17,6 +17,16 @@
     "info-record": "Press the 'Record' button to start recording audio. Press it again to stop recording.",
     "record": "Record"
   },
+  "message": {
+    "listen": "Listen",
+    "stopPlayback": "Stop",
+    "comments": "Comments",
+    "editTags": "Edit Tags",
+    "delete": "Delete",
+    "directions": "Directions",
+    "playbackError": "Playback Error",
+    "playbackErrorMessage": "Unable to play this audio."
+  },
   "settings": {
     "showInstructions": "Show instructions",
     "title": "Settings",

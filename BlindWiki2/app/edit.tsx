@@ -1,14 +1,13 @@
 import { StyleSheet, View, TextInput, Text, Alert } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import StyledInput from "@/components/StyledInput";
 import { useLocalSearchParams, router } from "expo-router";
-import { Audio } from "expo-av";
 import StyledButton from "@/components/StyledButton";
 import { useTranslation } from "react-i18next";
 import { publishMessage } from "@/services/messageService";
 import Colors from "@/constants/Colors";
 import { useLocation } from "@/contexts/LocationContext";
-import * as FileSystem from "expo-file-system";
+import AudioButton from "@/components/AudioButton";
 
 export default function EditScreen() {
   const { t } = useTranslation();
@@ -19,8 +18,14 @@ export default function EditScreen() {
     longitude: string;
   }>();
 
-  // Store recording URI directly - we're no longer using encoding/decoding
+  // Store recording URI directly
   const [recordingUri] = useState<string>(params.recordingUri || "");
+  
+  // Reference to the AudioButton component for controlling playback externally
+  const audioButtonRef = useRef(null);
+  
+  // Playback state tracking
+  const [isPlaying, setIsPlaying] = useState(false);
   
   // Use params for latitude/longitude if provided, otherwise use context
   const [latitude] = useState<string>(
@@ -29,9 +34,8 @@ export default function EditScreen() {
   const [longitude] = useState<string>(
     params.longitude || location?.coords.longitude?.toString() || ""
   );
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [tags, setTags] = useState("");
+  
   // Pre-fill address if available from context
   const [addressText, setAddressText] = useState(
     address ? 
@@ -40,80 +44,8 @@ export default function EditScreen() {
   );
   const [isUploading, setIsUploading] = useState(false);
 
-  // Clean up sound resources when component unmounts
-  useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
-
-  // Auto-play recording when the screen loads
-  useEffect(() => {
-    if (recordingUri) {
-      playRecording();
-    }
-  }, [recordingUri]);
-
-  // Toggle between playing and stopping the recording
-  const playRecording = async () => {
-    // If already playing, stop playback
-    if (isPlaying && sound) {
-      await sound.stopAsync();
-      setIsPlaying(false);
-      return;
-    }
-
-    try {
-      // Unload previous sound if it exists
-      if (sound) {
-        await sound.unloadAsync();
-      }
-
-      // Check if the recording file exists
-      const fileInfo = await FileSystem.getInfoAsync(recordingUri);
-      
-      if (!fileInfo.exists) {
-        throw new Error('Recording file not found');
-      }
-
-      // Load the recording
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: recordingUri },
-        { shouldPlay: true }
-      );
-      
-      setSound(newSound);
-      setIsPlaying(true);
-
-      // Listen for playback status updates
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && !status.isPlaying && status.didJustFinish) {
-          setIsPlaying(false);
-        }
-      });
-    } catch (error) {
-      console.error("Failed to play recording", error);
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : "Unknown error occurred";
-        
-      Alert.alert(
-        t("edit.playbackError"),
-        t("edit.playbackErrorMessage")
-      );
-    }
-  };
-
   // Handle publish button press
   const handlePublish = async () => {
-    // Stop playback if it's playing before publishing
-    if (isPlaying && sound) {
-      await sound.stopAsync();
-      setIsPlaying(false);
-    }
-
     if (!recordingUri || !latitude || !longitude) {
       Alert.alert(t("edit.missingData"));
       return;
@@ -153,12 +85,6 @@ export default function EditScreen() {
   };
 
   const handleCancel = () => {
-    // Stop playback if it's playing before canceling
-    if (isPlaying && sound) {
-      sound.stopAsync();
-      setIsPlaying(false);
-    }
-
     Alert.alert(
       t("edit.cancelConfirmTitle"),
       t("edit.cancelConfirmMessage"),
@@ -180,9 +106,10 @@ export default function EditScreen() {
     <View style={styles.container}>
       <Text style={styles.label}>{t("edit.recordingLabel")}</Text>
       
-      <StyledButton
-        title={isPlaying ? t("edit.stopPlayback") : t("edit.playRecording")}
-        onPress={playRecording}
+      <AudioButton 
+        audioUri={recordingUri}
+        autoPlay={true}
+        onPlaybackStatusChange={setIsPlaying}
       />
       
       <Text style={styles.label}>{t("edit.tagsLabel")}</Text>
@@ -259,6 +186,7 @@ const styles = StyleSheet.create({
   publishButton: {
     flex: 1,
     marginLeft: 8,
+    backgroundColor: Colors.light.primary,
   },
   publishButtonText: {
     color: Colors.light.button.text,
