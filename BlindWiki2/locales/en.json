@@ -7,7 +7,9 @@
     "error": "Error getting location",
     "loading": "Getting location...",
     "currentLocation": "Current location: ",
-    "clickToGetLocation": "Click to get your location"
+    "clickToGetLocation": "Click to get your location",
+    "permissionTitle": "Location Permission",
+    "permissionRequired": "Location permission is required to record with GPS information."
   },
   "home": {
     "title": "Record",
@@ -62,8 +64,37 @@
       "unexpected": "An unexpected error occurred. Please try again."
     }
   },
-  "login":{
+  "recording": {
+    "errorTitle": "Recording Error",
+    "startError": "Failed to start recording. Please try again.",
+    "stopError": "Failed to stop recording. Please try again.",
+    "permissionTitle": "Microphone Permission",
+    "permissionRequired": "Microphone permission is required to record audio."
+  },
+  "edit": {
+    "recordingLabel": "Recording",
+    "playRecording": "Play Recording",
+    "stopPlayback": "Stop Playback",
+    "tagsLabel": "Tags (comma separated)",
+    "tagsPlaceholder": "E.g., street, obstacle, landmark",
+    "addressLabel": "Address or Description",
+    "addressPlaceholder": "Add a description or address for this location",
+    "cancelButton": "Cancel",
+    "publishButton": "Publish",
+    "uploading": "Uploading...",
+    "playbackError": "Failed to play recording",
+    "missingData": "Missing recording data",
+    "publishSuccess": "Success",
+    "publishSuccessMessage": "Your recording has been published successfully",
+    "publishFailed": "Publish Failed",
+    "networkError": "Network error. Please try again.",
+    "cancelConfirmTitle": "Discard Recording?",
+    "cancelConfirmMessage": "Are you sure you want to discard this recording?"
+  },
+  "login": {
     "title": "Log In",
+    "required": "Login Required",
+    "recordingMessage": "You need to be logged in to record audio. Would you like to log in now?",
     "error":{
       "input": "Please enter both username and password",
       "credentials": "The username or password you entered is incorrect. Please try again.",
@@ -104,5 +135,11 @@
       "defaultError": "An error occurred during registration",
       "networkError": "Network error occurred. Please try again."
     }
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "cancel": "Cancel"
   }
 }

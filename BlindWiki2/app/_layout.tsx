@@ -8,6 +8,7 @@ import i18n from "../locales/i18n";
 import "react-native-reanimated";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { LocationProvider } from "@/contexts/LocationContext";
 import Colors from "@/constants/Colors";
 
 // Only enable in development
@@ -60,9 +61,11 @@ export default function RootLayout() {
   return (
     <SettingsProvider>
       <AuthProvider>
-        <I18nextProvider i18n={i18n}>
-          <RootLayoutNav />
-        </I18nextProvider>
+        <LocationProvider>
+          <I18nextProvider i18n={i18n}>
+            <RootLayoutNav />
+          </I18nextProvider>
+        </LocationProvider>
       </AuthProvider>
     </SettingsProvider>
   );

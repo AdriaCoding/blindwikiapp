@@ -9,12 +9,16 @@ import {
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "@/contexts/LocationContext";
 
 export default function LocationComponent() {
   const { t } = useTranslation();
-  const [location, setLocation] = useState<string | null>(null);
+  const [locationText, setLocationText] = useState<string | null>(null);
   const [loading, setLoading] = useState(Platform.OS !== 'web');
   const [error, setError] = useState<string | null>(null);
+  
+  // Get access to the location context
+  const locationContext = useLocation();
 
   const parseLocationText = (
     address: Location.LocationGeocodedAddress,
@@ -28,6 +32,7 @@ export default function LocationComponent() {
       isHighAccuracy ? t("location.highAccuracy") : t("location.normalAccuracy")
     }`;
   };
+  
   // Function to get the current location
   const getCurrentLocation = async () => {
     setLoading(true);
@@ -57,14 +62,20 @@ export default function LocationComponent() {
       if (addressResponse && addressResponse.length > 0) {
         const address = addressResponse[0];
         const locationText = parseLocationText(address, position);
-        setLocation(locationText);
+        setLocationText(locationText);
+        
+        // Update the location context
+        locationContext.updateLocation(position, address);
       } else {
         // Fallback to coordinates if geocoding fails
-        setLocation(
+        setLocationText(
           `${position.coords.latitude.toFixed(
             6
           )}, ${position.coords.longitude.toFixed(6)}`
         );
+        
+        // Update the location context with position only
+        locationContext.updateLocation(position);
       }
     } catch (err) {
       setError(t("location.error"));
@@ -91,8 +102,8 @@ export default function LocationComponent() {
       style={[styles.outerBox, error ? styles.errorBox : {}]}
       onPress={pressLocationHandler}
       accessibilityLabel={
-        location
-          ? t("location.currentLocation") + location
+        locationText
+          ? t("location.currentLocation") + locationText
           : error || t("location.loading")
       }
     >
@@ -103,8 +114,8 @@ export default function LocationComponent() {
         </View>
       ) : error ? (
         <Text style={styles.errorText}>{error}</Text>
-      ) : location ? (
-        <Text style={styles.locationText}>{location}</Text>
+      ) : locationText ? (
+        <Text style={styles.locationText}>{locationText}</Text>
       ) : (
         <Text style={styles.locationText}>
           {Platform.OS === 'web' 
