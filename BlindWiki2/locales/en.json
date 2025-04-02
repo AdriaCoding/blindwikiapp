@@ -83,6 +83,7 @@
     "publishButton": "Publish",
     "uploading": "Uploading...",
     "playbackError": "Failed to play recording",
+    "playbackErrorMessage": "Could not play the recording. The file may be missing or corrupted",
     "missingData": "Missing recording data",
     "publishSuccess": "Success",
     "publishSuccessMessage": "Your recording has been published successfully",

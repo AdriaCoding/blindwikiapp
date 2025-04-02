@@ -288,16 +288,8 @@ export async function publishMessage(
       };
     }
 
-    // Ensure the audioFilePath is properly decoded for file operations
-    const decodedAudioPath = audioFilePath.includes('%') 
-      ? decodeURIComponent(audioFilePath) 
-      : audioFilePath;
-      
-    console.log(`Publishing audio from path: ${decodedAudioPath}`);
-
     // Check if the audio file exists
-    const fileInfo = await FileSystem.getInfoAsync(decodedAudioPath);
-    console.log("File info before upload:", fileInfo);
+    const fileInfo = await FileSystem.getInfoAsync(audioFilePath);
     
     if (!fileInfo.exists) {
       return {
@@ -309,15 +301,13 @@ export async function publishMessage(
     const formData = new FormData();
     
     // Extract filename and determine MIME type
-    const filename = decodedAudioPath.split('/').pop() || 'audio.mp3';
+    const filename = audioFilePath.split('/').pop() || 'audio.mp3';
     const extension = filename.split('.').pop()?.toLowerCase() || 'mp3';
     const mimeType = getMimeTypeForExtension(extension);
     
-    console.log(`Uploading file: ${filename}, type: ${mimeType}`);
-    
     // Add the audio file
     formData.append("PublishForm[files][0]", {
-      uri: decodedAudioPath,
+      uri: audioFilePath,
       name: filename,
       type: mimeType,
     } as any);
@@ -329,8 +319,6 @@ export async function publishMessage(
     formData.append("PublishForm[newtags]", tags);
     formData.append("PublishForm[device]", deviceInfo || "BlindWiki2 App");
     formData.append("PHPSESSID", sessionId);
-    
-    console.log("Form data prepared for upload");
     
     // Since this is a special case with FormData, we need to use fetch directly
     // In a real implementation, you might want to refactor apiRequest to handle FormData
@@ -345,13 +333,11 @@ export async function publishMessage(
     const serverResponse = await response.json() as MessageResponse;
     
     if (serverResponse.status === "ok") {
-      console.log("Message published successfully");
       return {
         success: true,
         message: serverResponse.data,
       };
     } else {
-      console.error("Server error:", serverResponse.error);
       return {
         success: false,
         errorMessage: serverResponse.error?.message || "Failed to publish message",

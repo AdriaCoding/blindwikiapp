@@ -4,51 +4,46 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  withSequence,
   withTiming,
-  withRepeat,
 } from 'react-native-reanimated';
 import Colors from '@/constants/Colors';
 
 interface RecordingAnimationProps {
   onPress: (event: GestureResponderEvent) => void;
+  audioLevel: number;
 }
 
-export default function RecordingAnimation({ onPress }: RecordingAnimationProps) {
+export default function RecordingAnimation({ onPress, audioLevel }: RecordingAnimationProps) {
   // Animation values for different aspects of the animation
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
   const borderWidth = useSharedValue(2);
   const rotation = useSharedValue(0);
 
-  // Simulate voice input reaction (you can replace this with actual voice level detection)
+  // React to audio level changes
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Randomly generate a voice level between 0 and 1
-      const voiceLevel = Math.random();
-      
-      // React to voice level with different animations
-      scale.value = withSpring(1 + voiceLevel * 0.2, {
-        damping: 8,
-        stiffness: 100,
-      });
-      
-      borderWidth.value = withSpring(2 + voiceLevel * 4, {
-        damping: 8,
-        stiffness: 100,
-      });
-      
-      opacity.value = withTiming(0.5 + voiceLevel * 0.5, {
-        duration: 200,
-      });
-      
-      rotation.value = withTiming(rotation.value + 5, {
-        duration: 100,
-      });
-    }, 100); // Update every 100ms
-
-    return () => clearInterval(interval);
-  }, []);
+    // Scale animation based on audio level
+    scale.value = withSpring(1 + audioLevel * 0.5, {
+      damping: 4,
+      stiffness: 120,
+    });
+    
+    // Border width animation based on audio level
+    borderWidth.value = withSpring(2 + audioLevel * 8, {
+      damping: 3,
+      stiffness: 90,
+    });
+    
+    // Opacity based on audio level
+    opacity.value = withTiming(0.6 + audioLevel * 0.4, {
+      duration: 100,
+    });
+    
+    // Continuous rotation regardless of audio level
+    rotation.value = withTiming(rotation.value + 5, {
+      duration: 100,
+    });
+  }, [audioLevel]);
 
   // Animated styles
   const animatedStyle = useAnimatedStyle(() => {
@@ -62,11 +57,24 @@ export default function RecordingAnimation({ onPress }: RecordingAnimationProps)
     };
   });
 
+  // Compute colors based on audio level for more visual feedback
+  const innerRingStyle = useAnimatedStyle(() => {
+    return {
+      borderColor: `rgba(0, 0, 0, ${0.7 + audioLevel * 0.3})`,
+    };
+  });
+
+  const centerCircleStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: `rgba(0, 0, 0, ${0.7 + audioLevel * 0.3})`,
+    };
+  });
+
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.outerRing, animatedStyle]} />
-      <Animated.View style={[styles.innerRing, animatedStyle]} />
-      <Animated.View style={[styles.centerCircle, animatedStyle]} />
+      <Animated.View style={[styles.innerRing, animatedStyle, innerRingStyle]} />
+      <Animated.View style={[styles.centerCircle, animatedStyle, centerCircleStyle]} />
     </View>
   );
 }

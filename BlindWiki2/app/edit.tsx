@@ -49,11 +49,23 @@ export default function EditScreen() {
       : undefined;
   }, [sound]);
 
-  // Function to play the recorded audio
+  // Auto-play recording when the screen loads
+  useEffect(() => {
+    if (recordingUri) {
+      playRecording();
+    }
+  }, [recordingUri]);
+
+  // Toggle between playing and stopping the recording
   const playRecording = async () => {
+    // If already playing, stop playback
+    if (isPlaying && sound) {
+      await sound.stopAsync();
+      setIsPlaying(false);
+      return;
+    }
+
     try {
-      console.log(`Attempting to play recording from: ${recordingUri}`);
-      
       // Unload previous sound if it exists
       if (sound) {
         await sound.unloadAsync();
@@ -61,27 +73,22 @@ export default function EditScreen() {
 
       // Check if the recording file exists
       const fileInfo = await FileSystem.getInfoAsync(recordingUri);
-      console.log('Playback file info:', fileInfo);
       
       if (!fileInfo.exists) {
         throw new Error('Recording file not found');
       }
 
       // Load the recording
-      console.log('Creating sound object...');
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: recordingUri },
-        { shouldPlay: true },
-        (status) => console.log('Playback status:', status)
+        { shouldPlay: true }
       );
       
-      console.log('Sound created successfully');
       setSound(newSound);
       setIsPlaying(true);
 
       // Listen for playback status updates
       newSound.setOnPlaybackStatusUpdate((status) => {
-        console.log('Playback status update:', status);
         if (status.isLoaded && !status.isPlaying && status.didJustFinish) {
           setIsPlaying(false);
         }
@@ -94,13 +101,19 @@ export default function EditScreen() {
         
       Alert.alert(
         t("edit.playbackError"),
-        t("edit.playbackErrorMessage") + `: ${errorMessage}`
+        t("edit.playbackErrorMessage")
       );
     }
   };
 
   // Handle publish button press
   const handlePublish = async () => {
+    // Stop playback if it's playing before publishing
+    if (isPlaying && sound) {
+      await sound.stopAsync();
+      setIsPlaying(false);
+    }
+
     if (!recordingUri || !latitude || !longitude) {
       Alert.alert(t("edit.missingData"));
       return;
@@ -140,6 +153,12 @@ export default function EditScreen() {
   };
 
   const handleCancel = () => {
+    // Stop playback if it's playing before canceling
+    if (isPlaying && sound) {
+      sound.stopAsync();
+      setIsPlaying(false);
+    }
+
     Alert.alert(
       t("edit.cancelConfirmTitle"),
       t("edit.cancelConfirmMessage"),
@@ -164,7 +183,6 @@ export default function EditScreen() {
       <StyledButton
         title={isPlaying ? t("edit.stopPlayback") : t("edit.playRecording")}
         onPress={playRecording}
-        style={styles.playButton}
       />
       
       <Text style={styles.label}>{t("edit.tagsLabel")}</Text>
@@ -223,10 +241,6 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 12,
   },
-  playButton: {
-    marginVertical: 12,
-    backgroundColor: Colors.light.primary,
-  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -245,7 +259,6 @@ const styles = StyleSheet.create({
   publishButton: {
     flex: 1,
     marginLeft: 8,
-    backgroundColor: Colors.light.primary,
   },
   publishButtonText: {
     color: Colors.light.button.text,

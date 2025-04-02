@@ -16,6 +16,7 @@ interface StyledButtonProps {
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   isRecording?: boolean;
+  audioLevel?: number;
 }
 
 export default function StyledButton({
@@ -24,11 +25,12 @@ export default function StyledButton({
   style,
   textStyle,
   isRecording = false,
+  audioLevel = 0,
 }: StyledButtonProps) {
   if (isRecording) {
     return (
       <TouchableOpacity onPress={onPress} style={[styles.recordingContainer, style]}>
-        <RecordingAnimation onPress={onPress} />
+        <RecordingAnimation onPress={onPress} audioLevel={audioLevel} />
       </TouchableOpacity>
     );
   }
@@ -56,6 +58,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 20,
+    backgroundColor: Colors.light.button.background,
   },
   text: {
     color: Colors.light.button.text,

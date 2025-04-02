@@ -20,6 +20,7 @@ export default function HomeScreen() {
   const [recordingInstance, setRecordingInstance] = useState<Audio.Recording | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
+  const [audioLevel, setAudioLevel] = useState(0);
   
   // Request recording permissions on component mount
   useEffect(() => {
@@ -69,6 +70,7 @@ export default function HomeScreen() {
           extension: '.mp3',
           outputFormat: Audio.AndroidOutputFormat.MPEG_4,
           audioEncoder: Audio.AndroidAudioEncoder.AAC,
+          enableAudioMetering: true,
         },
         ios: {
           ...Audio.RecordingOptionsPresets.HIGH_QUALITY.ios,
@@ -81,21 +83,27 @@ export default function HomeScreen() {
           linearPCMBitDepth: 16,
           linearPCMIsBigEndian: false,
           linearPCMIsFloat: false,
-        },
+          meteringEnabled: true,
+        }
       };
       
       const { recording } = await Audio.Recording.createAsync(
         recordingOptions,
         (status) => {
-          console.log('Recording status:', status);
+          // Extract audio level data from the status object
+          if (status.isRecording && status.metering !== undefined) {
+            // Convert dB metering value to a normalized value between 0 and 1
+            // Typical metering values range from -160 (silence) to 0 (max volume)
+            const dB = status.metering || -160;
+            const normalized = Math.max(0, (dB + 160) / 160); // Normalize to 0-1 range
+            setAudioLevel(normalized);
+          }
         },
-        100
+        100 // Update every 100ms
       );
       
       setRecordingInstance(recording);
       setIsRecording(true);
-      
-      console.log('Recording started');
     } catch (err) {
       console.error('Failed to start recording', err);
       Alert.alert(
@@ -116,15 +124,12 @@ export default function HomeScreen() {
       if (originalUri) {
         // Ensure the file exists before proceeding
         const fileInfo = await FileSystem.getInfoAsync(originalUri);
-        console.log('Recording file info:', fileInfo);
         
         if (fileInfo.exists) {
           // Create a new file in app's documents directory with a simple name
           const timestamp = Date.now();
           const newFilename = `recording-${timestamp}.mp3`;
           const newUri = `${FileSystem.documentDirectory}${newFilename}`;
-          
-          console.log(`Copying recording from ${originalUri} to ${newUri}`);
           
           try {
             // Copy the file to a location with a simpler path
@@ -135,12 +140,12 @@ export default function HomeScreen() {
             
             // Verify the new file exists
             const newFileInfo = await FileSystem.getInfoAsync(newUri);
-            console.log('New file info:', newFileInfo);
             
             if (newFileInfo.exists) {
               setRecordingUri(newUri);
               setRecordingInstance(null);
               setIsRecording(false);
+              setAudioLevel(0);
               
               // Navigate to edit screen with the new recording URI
               router.push({
@@ -161,6 +166,7 @@ export default function HomeScreen() {
             setRecordingUri(originalUri);
             setRecordingInstance(null);
             setIsRecording(false);
+            setAudioLevel(0);
             
             router.push({
               pathname: '/edit',
@@ -179,6 +185,7 @@ export default function HomeScreen() {
       console.error('Failed to stop recording', err);
       setIsRecording(false);
       setRecordingInstance(null);
+      setAudioLevel(0);
       Alert.alert(
         t('recording.errorTitle'),
         t('recording.stopError')
@@ -246,6 +253,7 @@ export default function HomeScreen() {
         style={styles.recordButton}
         textStyle={styles.recordButtonText}
         isRecording={isRecording}
+        audioLevel={audioLevel}
       />
     </View>
   );
