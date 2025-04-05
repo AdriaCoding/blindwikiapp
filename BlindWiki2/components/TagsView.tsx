@@ -31,7 +31,6 @@ export function TagsList({
   onTagPress,
 }: {
   tags: Tag[];
-  selectedTags?: Tag[]; // Mantenemos para compatibilidad con código existente
   onTagPress: (tag: Tag) => void;
 }) {
   return (

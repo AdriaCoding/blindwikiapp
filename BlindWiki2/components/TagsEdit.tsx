@@ -20,37 +20,37 @@ export default function TagsEdit({
   allTags,
 }: TagsEditProps) {
   const { t } = useTranslation();
-  const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
   const [newTagInput, setNewTagInput] = useState("");
 
   // Seleccionar todas las etiquetas propuestas por defecto
   useEffect(() => {
     if (allTags.length > 0) {
-      setSelectedTagIds(new Set(allTags.map(tag => tag.id)));
+      // Verificar si hay alguna etiqueta seleccionada
+      const hasSelectedTags = allTags.some(tag => tag.selected);
+      
+      // Si no hay etiquetas seleccionadas, seleccionar todas por defecto
+      if (!hasSelectedTags) {
+        // Actualizar las etiquetas en el componente padre
+        const updatedTags = allTags.map(tag => ({
+          ...tag,
+          selected: true
+        }));
+        onTagsChange(updatedTags);
+      }
     }
   }, [allTags]);
 
-  // Actualizar las etiquetas en el componente padre cuando cambian las seleccionadas
-  useEffect(() => {
-    // Crear una copia de las etiquetas con la propiedad selected
-    const updatedTags = allTags.map(tag => ({
-      ...tag,
-      selected: selectedTagIds.has(tag.id)
-    }));
-    
-    onTagsChange(updatedTags);
-  }, [selectedTagIds, allTags, onTagsChange]);
-
   const handleTagSelect = (tag: Tag) => {
-    setSelectedTagIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(tag.id)) {
-        newSet.delete(tag.id);
-      } else {
-        newSet.add(tag.id);
+    // Invertir el estado de selección de la etiqueta
+    const updatedTags = allTags.map(t => {
+      if (t.id === tag.id) {
+        return { ...t, selected: !t.selected };
       }
-      return newSet;
+      return t;
     });
+    
+    // Actualizar el componente padre
+    onTagsChange(updatedTags);
   };
 
   const handleAddCustomTag = () => {
@@ -60,20 +60,14 @@ export default function TagsEdit({
     const newCustomTags: Tag[] = customTags.map(tagName => ({
       id: `custom-${tagName}-${Date.now()}`,
       name: tagName,
-      asString: tagName
+      asString: tagName,
+      selected: true
     }));
 
-    // Añadir nuevas etiquetas al conjunto
+    // Añadir nuevas etiquetas y actualizar el padre
     const updatedTags = [...allTags, ...newCustomTags];
     onTagsChange(updatedTags);
     
-    // Seleccionar automáticamente las nuevas etiquetas
-    setSelectedTagIds(prev => {
-      const newSet = new Set(prev);
-      newCustomTags.forEach(tag => newSet.add(tag.id));
-      return newSet;
-    });
-
     setNewTagInput("");
   };
 
@@ -88,7 +82,6 @@ export default function TagsEdit({
             <InstructionsText>{t("edit.proposedTagsInstructions")}</InstructionsText>
             <TagsList
               tags={allTags}
-              selectedTags={allTags.filter(tag => selectedTagIds.has(tag.id))}
               onTagPress={handleTagSelect}
             />
           </View>
