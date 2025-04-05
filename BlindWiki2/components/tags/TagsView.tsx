@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { InstructionsText } from "../StyledText";
 import MessageComponent from "../MessageView";
 import { Tag } from "@/models/tag";
@@ -8,19 +8,15 @@ import { Message } from "@/models/message";
 import { TagsList } from "@/components/tags/TagsList";
 
 // Parent component: tracks the selected tags in one state.
-export default function TagsView({
-  messages,
-}: {
-  messages: Message[];
-}) {
+export default function TagsView({ messages }: { messages: Message[] }) {
   // Asegurar que las etiquetas sean únicas por ID y prepararlas con selected = false
   const [availableTags, setAvailableTags] = useState<Tag[]>(() => {
     return messages.reduce((acc, message) => {
-      message.tags.forEach(tag => {
-        if (!acc.some(t => t.id === tag.id)) {
+      message.tags.forEach((tag) => {
+        if (!acc.some((t) => t.id === tag.id)) {
           acc.push({
             ...tag,
-            selected: false
+            selected: false,
           });
         }
       });
@@ -29,22 +25,23 @@ export default function TagsView({
   });
 
   const handleTagPress = (pressedTag: Tag) => {
-    setAvailableTags(prev => prev.map(tag => 
-      tag.id === pressedTag.id 
-        ? { ...tag, selected: !tag.selected } 
-        : tag
-    ));
+    setAvailableTags((prev) =>
+      prev.map((tag) =>
+        tag.id === pressedTag.id ? { ...tag, selected: !tag.selected } : tag
+      )
+    );
   };
 
   // Filtramos mensajes basados en etiquetas con selected = true
-  const selectedTags = availableTags.filter(tag => tag.selected);
-  const filteredMessages = selectedTags.length > 0
-    ? messages.filter((message) =>
-        message.tags.some((messageTag) =>
-          selectedTags.some((selectedTag) => selectedTag.id === messageTag.id)
+  const selectedTags = availableTags.filter((tag) => tag.selected);
+  const filteredMessages =
+    selectedTags.length > 0
+      ? messages.filter((message) =>
+          message.tags.some((messageTag) =>
+            selectedTags.some((selectedTag) => selectedTag.id === messageTag.id)
+          )
         )
-      )
-    : [];
+      : [];
 
   return (
     <>
@@ -53,10 +50,7 @@ export default function TagsView({
       </InstructionsText>
 
       {/* Tag display */}
-      <TagsList
-        tags={availableTags}
-        onTagPress={handleTagPress}
-      />
+      <TagsList tags={availableTags} onTagPress={handleTagPress} />
 
       <View style={styles.separator} />
 
