@@ -1,9 +1,20 @@
+import { Platform } from 'react-native';
+
+// Configuración de la API
 const API_BASE_URL = 'https://api.blind.wiki';
+const PROXY_URL = 'http://localhost:3000'; // URL del proxy local
+
+// Determinar si estamos en desarrollo web
+const isWebDevelopment = Platform.OS === 'web' && process.env.NODE_ENV === 'development';
+
+// URL base que usaremos para las peticiones
+export const BASE_URL = isWebDevelopment ? PROXY_URL : API_BASE_URL;
 
 // Default options for fetch calls
 const defaultOptions = {
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
+    
   },
   timeout: 5000,
 };
@@ -76,7 +87,7 @@ export async function apiRequest<T extends ServerResponse, C extends CleanRespon
   customOptions?: RequestInit
 ): Promise<C> {
   try {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${BASE_URL}${endpoint}`;
     
     const options: RequestInit = {
       ...defaultOptions,
