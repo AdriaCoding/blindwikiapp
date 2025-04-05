@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Modal, View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { Tag } from "@/models/tag";
-import TagsEdit from "./TagsEdit";
+import TagsEdit from "@/components/tags/TagsEdit";
 import { useTranslation } from "react-i18next";
 import Colors from "@/constants/Colors";
-import StyledButton from "./StyledButton";
+import StyledButton from "../StyledButton";
 import { getProposedTags } from "@/services/tagService";
 
 interface TagsEditModalProps {

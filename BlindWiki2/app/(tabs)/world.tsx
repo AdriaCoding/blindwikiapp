@@ -1,6 +1,13 @@
 import React from "react";
-import { StyleSheet, ScrollView, View, Text, ActivityIndicator } from "react-native";
-import TagsView, { TagsList } from "@/components/TagsView";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  ActivityIndicator,
+} from "react-native";
+import TagsView from "@/components/tags/TagsView";
+import { TagsList } from "@/components/tags/TagsList";
 import { useState, useEffect } from "react";
 import { Area } from "@/models/area";
 import { Tag } from "@/models/tag";
@@ -41,15 +48,15 @@ export default function World() {
 
     loadAreas();
   }, []);
-  
+
   function areaToTag(area: Area): Tag {
     return {
       id: area.id.toString(),
       name: area.displayName,
-      asString: area.name
+      asString: area.name,
     };
   }
-  
+
   const areasAsTags = areas.map((a) => areaToTag(a));
 
   useEffect(() => {
@@ -69,14 +76,17 @@ export default function World() {
 
         if (response.success) {
           // Asegurar que cada mensaje tenga un ID único
-          const uniqueMessages = response.messages.reduce((acc: Message[], message) => {
-            const existingIndex = acc.findIndex(m => m.id === message.id);
-            if (existingIndex === -1) {
-              acc.push(message);
-            }
-            return acc;
-          }, []);
-          
+          const uniqueMessages = response.messages.reduce(
+            (acc: Message[], message) => {
+              const existingIndex = acc.findIndex((m) => m.id === message.id);
+              if (existingIndex === -1) {
+                acc.push(message);
+              }
+              return acc;
+            },
+            []
+          );
+
           setMessages(uniqueMessages);
         } else {
           setError(response.errorMessage || t("world.error"));
@@ -93,25 +103,25 @@ export default function World() {
   }, [selectedArea]);
 
   function chosenAreaHandler(area: Tag) {
-    setSelectedArea(prev => {
+    setSelectedArea((prev) => {
       // Si el área ya estaba seleccionada, la deseleccionamos
       if (prev?.id === area.id) {
         // Actualizar la propiedad selected del área actual
-        const updatedArea = areasAsTags.find(a => a.id === area.id);
+        const updatedArea = areasAsTags.find((a) => a.id === area.id);
         if (updatedArea) {
           updatedArea.selected = false;
         }
         return null;
-      } 
+      }
       // Si hay un área seleccionada, la deseleccionamos primero
       if (prev) {
-        const previousArea = areasAsTags.find(a => a.id === prev.id);
+        const previousArea = areasAsTags.find((a) => a.id === prev.id);
         if (previousArea) {
           previousArea.selected = false;
         }
       }
       // Seleccionamos la nueva área
-      const updatedArea = areasAsTags.find(a => a.id === area.id);
+      const updatedArea = areasAsTags.find((a) => a.id === area.id);
       if (updatedArea) {
         updatedArea.selected = true;
       }
@@ -129,10 +139,7 @@ export default function World() {
         <Text style={styles.errorText}>{error}</Text>
       ) : (
         <>
-          <TagsList
-            tags={areasAsTags}
-            onTagPress={chosenAreaHandler}
-          />
+          <TagsList tags={areasAsTags} onTagPress={chosenAreaHandler} />
           {isLoading ? (
             <View style={styles.centerContainer}>
               <ActivityIndicator size="large" color={Colors.light.primary} />

@@ -1,7 +1,7 @@
 import { StyleSheet, ScrollView, View, Text, ActivityIndicator } from "react-native";
 import { useState, useEffect } from "react";
 import Location from "@/components/Location";
-import TagsView from "@/components/TagsView";
+import TagsView from "@/components/tags/TagsView";
 import { getMessages } from "@/services/messageService";
 import { Message } from "@/models/message";
 import { useTranslation } from "react-i18next";

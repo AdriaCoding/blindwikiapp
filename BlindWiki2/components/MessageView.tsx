@@ -6,7 +6,7 @@ import { Message } from "@/models/message";
 import Colors from "@/constants/Colors";
 import { deleteMessage, updateMessageTags, audioPlayed } from '@/services/messageService';
 import { useTranslation } from "react-i18next";
-import TagsEditModal from "./TagsEditModal";
+import TagsEditModal from "./tags/TagsEditModal";
 import { Tag } from "@/models/tag";
 
 // Message Actions Interface

@@ -1,50 +1,11 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import { InstructionsText } from "./StyledText";
-import MessageComponent from "./MessageView";
+import { InstructionsText } from "../StyledText";
+import MessageComponent from "../MessageView";
 import { Tag } from "@/models/tag";
 import Colors from "@/constants/Colors";
 import { Message } from "@/models/message";
-
-function TagBox({
-  tag,
-  onPress,
-}: {
-  tag: Tag;
-  onPress: (tag: Tag) => void;
-}) {
-  return (
-    <TouchableOpacity
-      style={[styles.tag, tag.selected && styles.tagSelected]}
-      onPress={() => onPress(tag)}
-    >
-      <Text style={[styles.tagText, tag.selected && styles.tagTextSelected]}>
-        {tag.name}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
-// TagsList component: lays out tags in a row; passes 'selected' state and onPress handler to each tag.
-export function TagsList({
-  tags,
-  onTagPress,
-}: {
-  tags: Tag[];
-  onTagPress: (tag: Tag) => void;
-}) {
-  return (
-    <View style={styles.container}>
-      {tags.map((tag) => (
-        <TagBox
-          key={tag.id}
-          tag={tag}
-          onPress={onTagPress}
-        />
-      ))}
-    </View>
-  );
-}
+import { TagsList } from "@/components/tags/TagsList";
 
 // Parent component: tracks the selected tags in one state.
 export default function TagsView({

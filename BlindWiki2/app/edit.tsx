@@ -1,6 +1,10 @@
-import { StyleSheet, View, TextInput, Text, Alert, ScrollView, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Alert,
+} from "react-native";
 import { useState, useEffect, useRef } from "react";
-import StyledInput from "@/components/StyledInput";
 import { useLocalSearchParams, router } from "expo-router";
 import StyledButton from "@/components/StyledButton";
 import { useTranslation } from "react-i18next";
@@ -8,11 +12,9 @@ import { publishMessage } from "@/services/messageService";
 import Colors from "@/constants/Colors";
 import { useLocation } from "@/contexts/LocationContext";
 import AudioButton from "@/components/AudioButton";
-import { InstructionsText } from "@/components/StyledText";
 import { getProposedTags } from "@/services/tagService";
 import { Tag } from "@/models/tag";
-import { TagsList } from "@/components/TagsView";
-import TagsEdit from "@/components/TagsEdit";
+import TagsEdit from "@/components/tags/TagsEdit";
 
 export default function EditScreen() {
   const { t } = useTranslation();
@@ -25,13 +27,13 @@ export default function EditScreen() {
 
   // Store recording URI directly
   const [recordingUri] = useState<string>(params.recordingUri || "");
-  
+
   // Reference to the AudioButton component for controlling playback externally
   const audioButtonRef = useRef(null);
-  
+
   // Playback state tracking
   const [isPlaying, setIsPlaying] = useState(false);
-  
+
   // Use params for latitude/longitude if provided, otherwise use context
   const [latitude] = useState<string>(
     params.latitude || location?.coords.latitude?.toString() || ""
@@ -39,39 +41,36 @@ export default function EditScreen() {
   const [longitude] = useState<string>(
     params.longitude || location?.coords.longitude?.toString() || ""
   );
-  
+
   // Tags state
   const [allTags, setAllTags] = useState<Tag[]>([]);
   const [isLoadingTags, setIsLoadingTags] = useState(false);
-  
+
   // Pre-fill address if available from context
-  const addressText = 
-    address ? 
-    `${address.street || ""} ${address.city || ""}, ${address.country || ""}`.trim() : 
-    ""
+  const addressText = address
+    ? `${address.street || ""} ${address.city || ""}, ${
+        address.country || ""
+      }`.trim()
+    : "";
   const [isUploading, setIsUploading] = useState(false);
 
   // Show quick publish alert on mount
   useEffect(() => {
-    Alert.alert(
-      t("edit.quickPublishTitle"),
-      "",
-      [
-        {
-          text: t("edit.quickPublishChangeTags"),
-          style: "cancel"
-        },
-        {
-          text: t("common.cancel"),
-          style: "cancel",
-          onPress: () => router.back()
-        },
-        {
-          text: t("edit.publishButton"),
-          onPress: handlePublish
-        }
-      ]
-    );
+    Alert.alert(t("edit.quickPublishTitle"), "", [
+      {
+        text: t("edit.quickPublishChangeTags"),
+        style: "cancel",
+      },
+      {
+        text: t("common.cancel"),
+        style: "cancel",
+        onPress: () => router.back(),
+      },
+      {
+        text: t("edit.publishButton"),
+        onPress: handlePublish,
+      },
+    ]);
   }, []);
 
   // Load proposed tags on component mount
@@ -96,8 +95,8 @@ export default function EditScreen() {
   }, []);
 
   const getSelectedTagsString = () => {
-    const selectedTags = allTags.filter(tag => tag.selected === true);
-    return selectedTags.map(tag => tag.name).join(", ");
+    const selectedTags = allTags.filter((tag) => tag.selected === true);
+    return selectedTags.map((tag) => tag.name).join(", ");
   };
 
   // Handle publish button press
@@ -111,24 +110,20 @@ export default function EditScreen() {
 
     try {
       const response = await publishMessage(
-        recordingUri, 
-        latitude, 
-        longitude, 
+        recordingUri,
+        latitude,
+        longitude,
         addressText,
         getSelectedTagsString()
       );
 
       if (response.success) {
-        Alert.alert(
-          t("edit.publishSuccess"),
-          t("edit.publishSuccessMessage"),
-          [
-            {
-              text: "OK",
-              onPress: () => router.replace("/(tabs)"),
-            },
-          ]
-        );
+        Alert.alert(t("edit.publishSuccess"), t("edit.publishSuccessMessage"), [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(tabs)"),
+          },
+        ]);
       } else {
         Alert.alert(t("edit.publishFailed"), response.errorMessage);
       }
@@ -141,38 +136,34 @@ export default function EditScreen() {
   };
 
   const handleCancel = () => {
-    Alert.alert(
-      t("edit.cancelConfirmTitle"),
-      t("edit.cancelConfirmMessage"),
-      [
-        {
-          text: t("common.no"),
-          style: "cancel",
-        },
-        {
-          text: t("common.yes"),
-          onPress: () => router.back(),
-          style: "destructive",
-        },
-      ]
-    );
+    Alert.alert(t("edit.cancelConfirmTitle"), t("edit.cancelConfirmMessage"), [
+      {
+        text: t("common.no"),
+        style: "cancel",
+      },
+      {
+        text: t("common.yes"),
+        onPress: () => router.back(),
+        style: "destructive",
+      },
+    ]);
   };
 
   return (
-    <View style={styles.container}>      
-      <AudioButton 
+    <View style={styles.container}>
+      <AudioButton
         audioUri={recordingUri}
         autoPlay={true}
         onPlaybackStatusChange={setIsPlaying}
       />
-      
+
       <Text style={styles.title}>{t("edit.tagsLabel")}</Text>
       <TagsEdit
         allTags={allTags}
         onTagsChange={setAllTags}
         isLoadingTags={isLoadingTags}
       />
-      
+
       <View style={styles.buttonContainer}>
         <StyledButton
           title={t("edit.cancelButton")}
@@ -180,7 +171,7 @@ export default function EditScreen() {
           style={styles.cancelButton}
           textStyle={styles.cancelButtonText}
         />
-        
+
         <StyledButton
           title={isUploading ? t("edit.uploading") : t("edit.publishButton")}
           onPress={handlePublish}

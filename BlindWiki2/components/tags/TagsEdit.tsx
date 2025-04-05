@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, ScrollView, Text } from "react-native";
 import { Tag } from "@/models/tag";
-import { TagsList } from "@/components/TagsView";
+import { TagsList } from "@/components/tags/TagsList";
 import StyledInput from "@/components/StyledInput";
 import StyledButton from "@/components/StyledButton";
 import { InstructionsText } from "@/components/StyledText";

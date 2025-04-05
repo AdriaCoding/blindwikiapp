@@ -15,7 +15,7 @@ import { getMessagesFromUser } from "@/services/messageService";
 import StyledButton from "@/components/StyledButton";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import TagsEditModal from "@/components/TagsEditModal";
+import TagsEditModal from "@/components/tags/TagsEditModal";
 
 export default function MyMessages() {
   const { t } = useTranslation();
