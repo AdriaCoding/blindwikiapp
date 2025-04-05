@@ -88,7 +88,7 @@
     "playRecording": "Play Recording",
     "stopPlayback": "Stop Playback",
     "tagsLabel": "Tags",
-    "proposedTagsInstructions": "Tap on a tag to deselect it.",
+    "proposedTagsInstructions": "Tap on a tag to select or deselect it.",
     "additionalTagsInstructions": "Enter new tags separated by commas.",
     "addTags": "Add Tags",
     "tagsPlaceholder": "E.g., street, obstacle, landmark",
@@ -158,6 +158,7 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "save": "Save"
   }
 }

@@ -6,6 +6,9 @@ import { Message } from "@/models/message";
 import Colors from "@/constants/Colors";
 import { deleteMessage, updateMessageTags, audioPlayed } from '@/services/messageService';
 import { useTranslation } from "react-i18next";
+import TagsEditModal from "./TagsEditModal";
+import { Tag } from "@/models/tag";
+
 // Message Actions Interface
 export interface MessageActions {
   onListen?: (event: GestureResponderEvent) => void;
@@ -23,9 +26,12 @@ export function useMessageActions(
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   onRefresh?: () => Promise<void>
 ) {
+  const { t } = useTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+  const [isTagsModalVisible, setIsTagsModalVisible] = useState(false);
 
   /**
    * Handle message deletion
@@ -55,10 +61,53 @@ export function useMessageActions(
   };
 
   /**
+   * Open the tags edit modal for a message
+   */
+  const openTagsEditModal = (message: Message) => {
+    setEditingMessage(message);
+    setIsTagsModalVisible(true);
+  };
+
+  /**
    * Handle updating message tags
    */
-  const handleEditTags = async (messageId: string, tags: string) => {
-    console.log("Clicked on Updating tags for message:", messageId, tags);
+  const handleSaveTags = async (tags: Tag[]) => {
+    if (!editingMessage) return;
+    
+    setIsProcessing(true);
+    setError(null);
+    
+    try {
+      // Convertir etiquetas a cadena separada por comas para la API
+      const tagsString = tags.map(tag => tag.name).join(", ");
+      
+      const response = await updateMessageTags(editingMessage.id, tagsString);
+      
+      if (response.success) {
+        // Actualizar el mensaje localmente con las nuevas etiquetas
+        setMessages(prev => prev.map(message => 
+          message.id === editingMessage.id 
+            ? { ...message, tags: tags, tagsText: tagsString } 
+            : message
+        ));
+        
+        if (onRefresh) {
+          await onRefresh();
+        }
+        
+        return true;
+      } else {
+        setError(response.errorMessage || t("message.failedToUpdateTags"));
+        return false;
+      }
+    } catch (err) {
+      setError(t("message.unexpectedError"));
+      console.error("Error updating message tags:", err);
+      return false;
+    } finally {
+      setIsProcessing(false);
+      setEditingMessage(null);
+    }
   };
 
   /**
@@ -101,8 +150,7 @@ export function useMessageActions(
         // playback is now handled by AudioButton directly
       },
       onEditTags: (event: GestureResponderEvent) => {
-        console.log("Clicked on Edit tags for message:", message.id);
-        // You would show a modal or navigate to edit tags screen, then call handleEditTags
+        openTagsEditModal(message);
       },
       onDelete: (event: GestureResponderEvent) => {
         Alert.alert(
@@ -131,13 +179,16 @@ export function useMessageActions(
 
   return {
     handleDelete,
-    handleEditTags,
     getActionsForMessage,
     handleAudioPlayback,
     getAudioUrl,
     playingMessageId,
     isProcessing,
     error,
+    editingMessage,
+    isTagsModalVisible,
+    setIsTagsModalVisible,
+    handleSaveTags
   };
 }
 

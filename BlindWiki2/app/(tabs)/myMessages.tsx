@@ -15,6 +15,7 @@ import { getMessagesFromUser } from "@/services/messageService";
 import StyledButton from "@/components/StyledButton";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
+import TagsEditModal from "@/components/TagsEditModal";
 
 export default function MyMessages() {
   const { t } = useTranslation();
@@ -72,6 +73,10 @@ export default function MyMessages() {
     getActionsForMessage,
     isProcessing,
     error: actionError,
+    editingMessage,
+    isTagsModalVisible,
+    setIsTagsModalVisible,
+    handleSaveTags
   } = useMessageActions(messages, setMessages, fetchUserMessages);
 
   // Fetch messages when component mounts
@@ -148,6 +153,16 @@ export default function MyMessages() {
           actions={getActionsForMessage(message)}
         />
       ))}
+
+      {/* Modal para editar etiquetas */}
+      {editingMessage && (
+        <TagsEditModal
+          visible={isTagsModalVisible}
+          onClose={() => setIsTagsModalVisible(false)}
+          onSave={handleSaveTags}
+          initialTags={editingMessage.tags}
+        />
+      )}
     </ScrollView>
   );
 }
