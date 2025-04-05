@@ -8,14 +8,18 @@ import { Message } from "@/models/message";
 declare global {
   interface Window {
     debugMessage: typeof MessageService & {
-      // POST endpoint to search for messages
-      testSearchPosts: (
-        lat?: string,
-        long?: string,
-        searchTerm?: string
-      ) => Promise<void>;
+      testSearchMessages: (lat?: string, long?: string, searchTerm?: string) => Promise<void>;
       testDeleteMessage: (messageId?: string) => Promise<void>;
-      // GET endpoint for filtering messages & filters
+      testUpdateMessageTags: (messageId?: string, tags?: string) => Promise<void>;
+      testPublishMessage: (
+        audioFilePath?: string,
+        latitude?: string,
+        longitude?: string,
+        address?: string,
+        tags?: string
+      ) => Promise<void>;
+      testPostComment: (messageId?: string, text?: string) => Promise<void>;
+      testAudioPlayed: (attachmentId?: string) => Promise<void>;
       testGetMessages: (options?: {
         lat?: string;
         long?: string;
@@ -26,28 +30,6 @@ declare global {
         sort?: string;
         description?: string;
       }) => Promise<void>;
-      testGetMessagesByLocation: () => Promise<void>; //filter
-      testGetMessagesByAuthor: () => Promise<void>; //filter
-      testGetMessagesByTags: () => Promise<void>; //filter
-      testGetMessagesByArea: () => Promise<void>; //filter
-      testGetMessagesByAreaAndTags: () => Promise<void>; //filter
-
-      testUpdateMessage: (
-        messageId?: string,
-        tags?: string
-      ) => Promise<void>;
-      testPublishMessage: (
-        audioFilePath?: string,
-        latitude?: string,
-        longitude?: string,
-        address?: string,
-        tags?: string
-      ) => Promise<void>;
-      testPostComment: (
-        messageId?: string,
-        text?: string
-      ) => Promise<void>;
-      testAudioPlayed: (attachmentId?: string) => Promise<void>;
     };
   }
 }
@@ -168,7 +150,7 @@ function isSortedByDate(messages: Message[], newestFirst: boolean = true): boole
 }
 
 
-// Test function for searching posts
+// Función de prueba para searchMessages
 export async function testSearchMessages(
   lat: string = DEFAULT_LAT,
   long: string = DEFAULT_LONG,
@@ -202,30 +184,7 @@ export async function testSearchMessages(
   }
 }
 
-// Test function for deleting a message
-export async function testDeleteMessage(
-  messageId: string = DEFAULT_MESSAGE_ID
-): Promise<void> {
-  console.log("🧪 Testing deleteMessage...");
-
-  try {
-    console.log(`🗑️ Attempting to delete message with ID: ${messageId}...`);
-    const response = await MessageService.deleteMessage(messageId);
-
-    const responseWithoutMessage = { ...response };
-    console.log("🔍 DeleteMessage response:", responseWithoutMessage);
-
-    if (response.success) {
-      console.log("✅ Message deleted successfully");
-    } else {
-      console.error("❌ Failed to delete message:", response.errorMessage);
-    }
-  } catch (error) {
-    console.error("💥 Test failed with error:", error);
-  }
-}
-
-// Test function for updating a message
+// Función de prueba para updateMessageTags
 export async function testUpdateMessageTags(
   messageId: string = DEFAULT_MESSAGE_ID,
   tags: string = DEFAULT_TAGS
@@ -244,6 +203,29 @@ export async function testUpdateMessageTags(
       console.log("✅ Message updated successfully");
     } else {
       console.error("❌ Failed to update message:", response.errorMessage);
+    }
+  } catch (error) {
+    console.error("💥 Test failed with error:", error);
+  }
+}
+
+// Test function for deleting a message
+export async function testDeleteMessage(
+  messageId: string = DEFAULT_MESSAGE_ID
+): Promise<void> {
+  console.log("🧪 Testing deleteMessage...");
+
+  try {
+    console.log(`🗑️ Attempting to delete message with ID: ${messageId}...`);
+    const response = await MessageService.deleteMessage(messageId);
+
+    const responseWithoutMessage = { ...response };
+    console.log("🔍 DeleteMessage response:", responseWithoutMessage);
+
+    if (response.success) {
+      console.log("✅ Message deleted successfully");
+    } else {
+      console.error("❌ Failed to delete message:", response.errorMessage);
     }
   } catch (error) {
     console.error("💥 Test failed with error:", error);
@@ -344,98 +326,54 @@ export async function testAudioPlayed(
   }
 }
 
-// Add these to the setupDebugMessage function
+// Export function to setup debug message functions
 export function setupDebugMessage(): void {
   // For React Native
   if (global) {
     // @ts-ignore - Add to global scope for console access
     global.debugMessage = {
       ...MessageService,
-      testSearchPosts: testSearchMessages,
+      testSearchMessages,
       testDeleteMessage,
-      testUpdateMessage: testUpdateMessageTags,
+      testUpdateMessageTags,
       testPublishMessage,
       testPostComment,
       testAudioPlayed,
-      // Add the new test functions
-      testGetMessages,
-      testGetMessagesByLocation: () => testGetMessages({
-        lat: DEFAULT_LAT,
-        long: DEFAULT_LONG,
-        dist: "2000",
-        description: "Messages near Barcelona"
-      }),
-      testGetMessagesByAuthor: () => testGetMessages({
-        authorId: USER_ID,
-        description: "My messages"
-      }),
-      testGetMessagesByTags: () => testGetMessages({
-        tags: DEFAULT_TAGS,
-        description: "Messages with specific tags"
-      }),
-      testGetMessagesByArea: () => testGetMessages({
-        area: DEFAULT_AREA,
-        description: "Messages in Barcelona area"
-      }),
-      testGetMessagesByAreaAndTags: () => testGetMessages({
-        area: DEFAULT_AREA,
-        tags: DEFAULT_TAGS,
-        description: "Messages in Barcelona with specific tags"
-      }),
+      testGetMessages
     };
     
     console.log("🔧 Message debug functions initialized!");
-    console.log("📱 Try these new test functions:");
-    console.log("- debugMessage.testGetMessagesByLocation()");
-    console.log("- debugMessage.testGetMessagesByAuthor()");
-    console.log("- debugMessage.testGetMessagesByTags()");
-    console.log("- debugMessage.testGetMessagesByArea()");
-    console.log("- debugMessage.testGetMessagesByAreaAndTags()");
+    console.log("📱 Try these test functions:");
+    console.log("- debugMessage.testSearchMessages()");
+    console.log("- debugMessage.testDeleteMessage()");
+    console.log("- debugMessage.testUpdateMessageTags()");
+    console.log("- debugMessage.testPublishMessage()");
+    console.log("- debugMessage.testPostComment()");
+    console.log("- debugMessage.testAudioPlayed()");
+    console.log("- debugMessage.testGetMessages()");
   }
 
   // For Web (if using Expo Web)
   if (typeof window !== "undefined") {
     window.debugMessage = {
-        ...MessageService,
-        testSearchPosts: testSearchMessages,
-        testDeleteMessage,
-        testUpdateMessage: testUpdateMessageTags,
-        testPublishMessage,
-        testPostComment,
-        testAudioPlayed,
-        // Add the new test functions
-        testGetMessages,
-        testGetMessagesByLocation: () => testGetMessages({
-          lat: DEFAULT_LAT,
-          long: DEFAULT_LONG,
-          dist: "2000",
-          description: "Messages near Barcelona"
-        }),
-        testGetMessagesByAuthor: () => testGetMessages({
-          authorId: USER_ID,
-          description: "My messages"
-        }),
-        testGetMessagesByTags: () => testGetMessages({
-          tags: DEFAULT_TAGS,
-          description: "Messages with specific tags"
-        }),
-        testGetMessagesByArea: () => testGetMessages({
-          area: DEFAULT_AREA,
-          description: "Messages in Barcelona area"
-        }),
-        testGetMessagesByAreaAndTags: () => testGetMessages({
-          area: DEFAULT_AREA,
-          tags: DEFAULT_TAGS,
-          description: "Messages in Barcelona with specific tags"
-        }),
-      };
-      
-      console.log("🔧 Message debug functions initialized!");
-      console.log("📱 Try these new test functions:");
-      console.log("- debugMessage.testGetMessagesByLocation()");
-      console.log("- debugMessage.testGetMessagesByAuthor()");
-      console.log("- debugMessage.testGetMessagesByTags()");
-      console.log("- debugMessage.testGetMessagesByArea()");
-      console.log("- debugMessage.testGetMessagesByAreaAndTags()");
-    }
+      ...MessageService,
+      testSearchMessages,
+      testDeleteMessage,
+      testUpdateMessageTags,
+      testPublishMessage,
+      testPostComment,
+      testAudioPlayed,
+      testGetMessages
+    };
+    
+    console.log("🔧 Message debug functions initialized!");
+    console.log("📱 Try these test functions:");
+    console.log("- debugMessage.testSearchMessages()");
+    console.log("- debugMessage.testDeleteMessage()");
+    console.log("- debugMessage.testUpdateMessageTags()");
+    console.log("- debugMessage.testPublishMessage()");
+    console.log("- debugMessage.testPostComment()");
+    console.log("- debugMessage.testAudioPlayed()");
+    console.log("- debugMessage.testGetMessages()");
+  }
 }

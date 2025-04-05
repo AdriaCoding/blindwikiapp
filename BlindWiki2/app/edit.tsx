@@ -9,6 +9,7 @@ import Colors from "@/constants/Colors";
 import { useLocation } from "@/contexts/LocationContext";
 import AudioButton from "@/components/AudioButton";
 import { InstructionsText } from "@/components/StyledText";
+import { getProposedTags } from "@/services/tagService";
 
 export default function EditScreen() {
   const { t } = useTranslation();
@@ -45,6 +46,8 @@ export default function EditScreen() {
   );
   const [isUploading, setIsUploading] = useState(false);
 
+  const proposedTags = getProposedTags();
+  console.log('proposedTags', proposedTags);
   // Handle publish button press
   const handlePublish = async () => {
     if (!recordingUri || !latitude || !longitude) {

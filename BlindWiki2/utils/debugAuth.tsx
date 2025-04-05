@@ -49,8 +49,8 @@ export async function getAllSecureItems(): Promise<Record<string, string | null>
   }
 }
 
-// Add a function to clear all secure items
-async function clearAllSecureItems(): Promise<void> {
+// Función para limpiar todos los elementos seguros
+export async function clearAllSecureItems(): Promise<void> {
   console.log('🧹 Clearing all secure items...');
   
   try {
@@ -68,8 +68,8 @@ async function clearAllSecureItems(): Promise<void> {
   }
 }
 
-// Add a test helper function to run the full registration flow
-async function testRegisterFlow(
+// Función de prueba para el flujo de registro
+export async function testRegisterFlow(
   username: string,
   email: string, 
   password: string

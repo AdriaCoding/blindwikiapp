@@ -1,3 +1,4 @@
+import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -12,15 +13,11 @@ import { LocationProvider } from "@/contexts/LocationContext";
 import Colors from "@/constants/Colors";
 
 // Only enable in development
-import { setupDebugAuth } from "@/utils/debugAuth";
+import { setupDebug } from "@/utils/debug";
 import LoadingScreen from "./loading";
-import { setupDebugMessage } from "@/utils/debugMessage";
-import { setupDebugTag } from "@/utils/debugTag";
 
 if (__DEV__) {
-  setupDebugAuth();
-  setupDebugMessage();
-  setupDebugTag();
+  setupDebug();
   console.log("🛠️ Debug tools initialized!");
 }
 
