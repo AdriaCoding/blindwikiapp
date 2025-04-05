@@ -19,6 +19,8 @@ export function InstructionsText (props: TextProps) {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 10,
+    paddingHorizontal: 5,
+    width: '100%',
   },
   text: {
     fontSize: 20,

@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { InstructionsText } from "../StyledText";
+import { InstructionsText } from "../InstructionsText";
 import MessageComponent from "../MessageView";
 import { Tag } from "@/models/tag";
 import Colors from "@/constants/Colors";
 import { Message } from "@/models/message";
 import { TagsList } from "@/components/tags/TagsList";
+import { useTranslation } from "react-i18next";
 
 // Parent component: tracks the selected tags in one state.
 export default function TagsView({ messages }: { messages: Message[] }) {
+  const { t } = useTranslation();
+  
   // Asegurar que las etiquetas sean únicas por ID y prepararlas con selected = false
   const [availableTags, setAvailableTags] = useState<Tag[]>(() => {
     return messages.reduce((acc, message) => {
@@ -46,7 +49,7 @@ export default function TagsView({ messages }: { messages: Message[] }) {
   return (
     <>
       <InstructionsText>
-        Select any tags to display recordings that include at least one of them.
+        {t("tags.filterInstructions")}
       </InstructionsText>
 
       {/* Tag display */}

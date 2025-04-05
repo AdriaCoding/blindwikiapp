@@ -4,7 +4,7 @@ import { Tag } from "@/models/tag";
 import { TagsList } from "@/components/tags/TagsList";
 import StyledInput from "@/components/StyledInput";
 import StyledButton from "@/components/StyledButton";
-import { InstructionsText } from "@/components/StyledText";
+import { InstructionsText } from "@/components/InstructionsText";
 import { useTranslation } from "react-i18next";
 import Colors from "@/constants/Colors";
 

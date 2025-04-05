@@ -1,5 +1,4 @@
 {
-  "hello": "Hello",
   "location": {
     "highAccuracy": "High accuracy",
     "normalAccuracy": "Normal accuracy",
@@ -169,5 +168,8 @@
     "ok": "OK",
     "cancel": "Cancel",
     "save": "Save"
+  },
+  "tags": {
+    "filterInstructions": "Select any tags to display recordings that include at least one of them:"
   }
 }

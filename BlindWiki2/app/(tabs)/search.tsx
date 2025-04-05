@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 import Colors from "@/constants/Colors";
 import React from "react";
 import { GOOGLE_MAPS_API_KEY } from "@env";
-import { InstructionsText } from "@/components/StyledText";
+import { InstructionsText } from "@/components/InstructionsText";
 
 // Interfaces para los resultados de Google Places
 interface PlacePrediction {

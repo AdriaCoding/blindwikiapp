@@ -1,6 +1,6 @@
 import { StyleSheet, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
-import { InstructionsText } from '@/components/StyledText';
+import { InstructionsText } from '@/components/InstructionsText';
 import LocationComponent from '@/components/Location';
 import { useTranslation } from 'react-i18next';
 import Colors from '@/constants/Colors';
