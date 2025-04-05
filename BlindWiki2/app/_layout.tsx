@@ -18,7 +18,6 @@ import LoadingScreen from "./loading";
 
 if (__DEV__) {
   setupDebug();
-  console.log("🛠️ Debug tools initialized!");
 }
 
 export {
