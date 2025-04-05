@@ -50,8 +50,8 @@ export default function HomeScreen() {
       // Check if we have location data
       if (!location) {
         Alert.alert(
-          t('location.permissionTitle'),
-          t('location.permissionRequired')
+          t('home.noLocationTitle'),
+          t('home.noLocationMessage')
         );
         return;
       }
