@@ -60,7 +60,16 @@
     "title": "Explore"
   },
   "search": {
-    "title": "Search"
+    "title": "Search",
+    "placeholder": "Enter a location name",
+    "button": "Search",
+    "selectLocation": "Select a location",
+    "searchingPlaces": "Searching places...",
+    "loadingMessages": "Loading messages for this location...",
+    "error": "An error occurred. Please try again.",
+    "locationError": "Could not get details for this location.",
+    "noResults": "No locations found. Try a different search term.",
+    "noMessages": "No messages found at this location."
   },
   "world": {
     "title": "World"

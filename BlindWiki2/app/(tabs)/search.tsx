@@ -1,8 +1,35 @@
-import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
+import { StyleSheet, View, ScrollView, Text, ActivityIndicator, TouchableOpacity, FlatList } from "react-native";
 import { testSearchMessages } from "@/utils/debugMessage";
 import { getSessionToken } from "@/services/secureStorage";
 import { getAllSecureItems } from "@/utils/debugAuth";
+import { useState } from "react";
+import StyledButton from "@/components/StyledButton";
+import StyledInput from "@/components/StyledInput";
+import TagsView from "@/components/tags/TagsView";
+import { getMessages } from "@/services/messageService";
+import { Message } from "@/models/message";
+import { useTranslation } from "react-i18next";
+import Colors from "@/constants/Colors";
+import React from "react";
+import { GOOGLE_MAPS_API_KEY } from "@env";
+
+// Interfaces para los resultados de Google Places
+interface PlacePrediction {
+  description: string;
+  place_id: string;
+}
+
 export default function Search() {
+  const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
+  const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<{lat: string, lng: string, address: string} | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Mantener la función original de prueba
   const testhandler = async () => {
     try {
       const sessionId = await getSessionToken();
@@ -15,43 +42,256 @@ export default function Search() {
     testSearchMessages();
   };
 
+  const searchPlaces = async () => {
+    if (!searchQuery.trim()) {
+      return;
+    }
+
+    setIsLoadingPlaces(true);
+    setError(null);
+    setPredictions([]);
+
+    try {
+      // Llamar a la API de Google Autocomplete
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${GOOGLE_MAPS_API_KEY}`
+      );
+
+      const data = await response.json();
+      console.log("Resultados de la búsqueda:", data);
+
+      if (data.predictions && data.predictions.length > 0) {
+        // Guardar las predicciones para mostrarlas en la lista
+        setPredictions(data.predictions);
+      } else {
+        setError(t("search.noResults"));
+      }
+    } catch (err) {
+      setError(t("search.error"));
+      console.error("Error buscando lugares:", err);
+    } finally {
+      setIsLoadingPlaces(false);
+    }
+  };
+
+  const selectPlace = async (placeId: string, description: string) => {
+    setIsLoadingPlaces(true);
+    
+    try {
+      // Obtener detalles del lugar seleccionado (coordenadas)
+      const detailsResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,formatted_address&key=${GOOGLE_MAPS_API_KEY}`
+      );
+      
+      const detailsData = await detailsResponse.json();
+      console.log("Detalles del lugar:", detailsData);
+      
+      if (detailsData.result && detailsData.result.geometry) {
+        const location = detailsData.result.geometry.location;
+        const address = detailsData.result.formatted_address || description;
+        
+        setSelectedLocation({
+          lat: location.lat.toString(),
+          lng: location.lng.toString(),
+          address
+        });
+        
+        // Limpiar predicciones
+        setPredictions([]);
+        
+        // Cargar mensajes para esta ubicación
+        loadMessages(location.lat.toString(), location.lng.toString());
+      } else {
+        setError(t("search.locationError"));
+      }
+    } catch (err) {
+      setError(t("search.error"));
+      console.error("Error obteniendo detalles del lugar:", err);
+    } finally {
+      setIsLoadingPlaces(false);
+    }
+  };
+
+  const loadMessages = async (lat: string, long: string) => {
+    setIsLoadingMessages(true);
+    setError(null);
+
+    try {
+      const response = await getMessages({
+        lat: lat,
+        long: long,
+        dist: "1000", // 1km radio
+      });
+
+      if (response.success) {
+        // Asegurar que cada mensaje tenga un ID único
+        const uniqueMessages = response.messages.reduce(
+          (acc: Message[], message) => {
+            const existingIndex = acc.findIndex((m) => m.id === message.id);
+            if (existingIndex === -1) {
+              acc.push(message);
+            }
+            return acc;
+          },
+          []
+        );
+
+        setMessages(uniqueMessages);
+      } else {
+        setError(response.errorMessage || t("search.error"));
+      }
+    } catch (err) {
+      setError(t("search.error"));
+      console.error("Error cargando mensajes:", err);
+    } finally {
+      setIsLoadingMessages(false);
+    }
+  };
+
+  const renderPredictionItem = ({ item }: { item: PlacePrediction }) => (
+    <TouchableOpacity 
+      style={styles.predictionItem}
+      onPress={() => selectPlace(item.place_id, item.description)}
+    >
+      <Text style={styles.predictionText}>{item.description}</Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.bigButton}
-        onPress={testhandler}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.buttonText}>TEST</Text>
-      </TouchableOpacity>
-    </View>
+    <ScrollView style={styles.container}>
+      <View style={styles.searchContainer}>
+        <StyledInput
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.input}
+          placeholder={t("search.placeholder")}
+        />
+        <View style={styles.buttonContainer}>
+          <StyledButton
+            onPress={searchPlaces}
+            title={t("search.button")}
+            style={styles.searchButton}
+          />
+          <StyledButton
+            onPress={testhandler}
+            title="TEST"
+            style={styles.testButton}
+          />
+        </View>
+      </View>
+
+      {/* Lista de resultados de búsqueda */}
+      {predictions.length > 0 && (
+        <View style={styles.predictionsContainer}>
+          <Text style={styles.predictionsTitle}>{t("search.selectLocation")}</Text>
+          <FlatList
+            data={predictions}
+            renderItem={renderPredictionItem}
+            keyExtractor={(item) => item.place_id}
+            scrollEnabled={false}
+          />
+        </View>
+      )}
+
+      {selectedLocation && !isLoadingPlaces && predictions.length === 0 && (
+        <Text style={styles.locationText}>
+          {selectedLocation.address}
+        </Text>
+      )}
+
+      {isLoadingPlaces ? (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <Text style={styles.loadingText}>{t("search.searchingPlaces")}</Text>
+        </View>
+      ) : isLoadingMessages ? (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <Text style={styles.loadingText}>{t("search.loadingMessages")}</Text>
+        </View>
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : messages.length > 0 && predictions.length === 0 ? (
+        <TagsView messages={messages} />
+      ) : selectedLocation && predictions.length === 0 ? (
+        <Text style={styles.noMessagesText}>{t("search.noMessages")}</Text>
+      ) : null}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
+    margin: 15,
+  },
+  searchContainer: {
+    flexDirection: "column",
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  input: {
+    marginBottom: 10,
+  },
+  searchButton: {
+    flex: 3,
+    marginRight: 5,
+  },
+  testButton: {
+    flex: 1,
+  },
+  predictionsContainer: {
+    marginBottom: 20,
+    backgroundColor: Colors.light.formBackground,
+    borderRadius: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: Colors.light.border,
+  },
+  predictionsTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: Colors.light.text,
+  },
+  predictionItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.light.border,
+  },
+  predictionText: {
+    fontSize: 14,
+    color: Colors.light.text,
+  },
+  locationText: {
+    marginBottom: 15,
+    fontSize: 16,
+    fontStyle: "italic",
+    color: Colors.light.text,
+  },
+  centerContainer: {
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
-  bigButton: {
-    width: '100%',
-    height: '80%',
-    backgroundColor: '#000000',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+  loadingText: {
+    marginTop: 10,
+    textAlign: "center",
+    color: Colors.light.text,
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 32,
-    fontWeight: 'bold',
-  }
+  errorText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: Colors.light.text,
+  },
+  noMessagesText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: Colors.light.text,
+  },
 });

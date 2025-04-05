@@ -154,7 +154,7 @@ function isSortedByDate(messages: Message[], newestFirst: boolean = true): boole
 export async function testSearchMessages(
   lat: string = DEFAULT_LAT,
   long: string = DEFAULT_LONG,
-  searchTerm: string = "parc"
+  searchTerm: string = "Hospital de Sant Pau"
 ): Promise<void> {
   console.log("🧪 Testing searchPosts...");
 
