@@ -13,8 +13,8 @@
   },
   "home": {
     "title": "Record",
-    "info-gps": "Press the following button to update your GPS location",
-    "info-record": "Press the 'Record' button to start recording audio. Press it again to stop recording.",
+    "info-gps": "Press the following button to update your GPS location:",
+    "info-record": "Press the 'Record' button to start recording audio. Press it again to stop recording:",
     "record": "Record",
     "noLocationTitle": "No Location Data",
     "noLocationMessage": "We need your location before recording. Please check your device's location settings."
@@ -63,7 +63,7 @@
     "title": "Search",
     "placeholder": "Enter a location name",
     "button": "Search",
-    "selectLocation": "Select a location",
+    "selectLocation": "Select the location matching your search:",
     "searchingPlaces": "Searching places...",
     "loadingMessages": "Loading messages for this location...",
     "error": "An error occurred. Please try again.",

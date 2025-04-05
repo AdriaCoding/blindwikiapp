@@ -1,4 +1,12 @@
-import { StyleSheet, View, ScrollView, Text, ActivityIndicator, TouchableOpacity, FlatList } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Text,
+  ActivityIndicator,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { testSearchMessages } from "@/utils/debugMessage";
 import { getSessionToken } from "@/services/secureStorage";
 import { getAllSecureItems } from "@/utils/debugAuth";
@@ -12,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import Colors from "@/constants/Colors";
 import React from "react";
 import { GOOGLE_MAPS_API_KEY } from "@env";
+import { InstructionsText } from "@/components/StyledText";
 
 // Interfaces para los resultados de Google Places
 interface PlacePrediction {
@@ -26,7 +35,11 @@ export default function Search() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<{lat: string, lng: string, address: string} | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{
+    lat: string;
+    lng: string;
+    address: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Mantener la función original de prueba
@@ -34,9 +47,9 @@ export default function Search() {
     try {
       const sessionId = await getSessionToken();
       getAllSecureItems();
-      console.log('🔑 Session ID:', sessionId || 'No session ID found');
+      console.log("🔑 Session ID:", sessionId || "No session ID found");
     } catch (error) {
-      console.error('Error fetching session ID:', error);
+      console.error("Error fetching session ID:", error);
     }
 
     testSearchMessages();
@@ -54,7 +67,9 @@ export default function Search() {
     try {
       // Llamar a la API de Google Autocomplete
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(searchQuery)}&key=${GOOGLE_MAPS_API_KEY}`
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+          searchQuery
+        )}&key=${GOOGLE_MAPS_API_KEY}`
       );
 
       const data = await response.json();
@@ -76,29 +91,29 @@ export default function Search() {
 
   const selectPlace = async (placeId: string, description: string) => {
     setIsLoadingPlaces(true);
-    
+
     try {
       // Obtener detalles del lugar seleccionado (coordenadas)
       const detailsResponse = await fetch(
         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,formatted_address&key=${GOOGLE_MAPS_API_KEY}`
       );
-      
+
       const detailsData = await detailsResponse.json();
       console.log("Detalles del lugar:", detailsData);
-      
+
       if (detailsData.result && detailsData.result.geometry) {
         const location = detailsData.result.geometry.location;
         const address = detailsData.result.formatted_address || description;
-        
+
         setSelectedLocation({
           lat: location.lat.toString(),
           lng: location.lng.toString(),
-          address
+          address,
         });
-        
+
         // Limpiar predicciones
         setPredictions([]);
-        
+
         // Cargar mensajes para esta ubicación
         loadMessages(location.lat.toString(), location.lng.toString());
       } else {
@@ -148,9 +163,18 @@ export default function Search() {
     }
   };
 
-  const renderPredictionItem = ({ item }: { item: PlacePrediction }) => (
-    <TouchableOpacity 
-      style={styles.predictionItem}
+  const renderPredictionItem = ({
+    item,
+    index,
+  }: {
+    item: PlacePrediction;
+    index: number;
+  }) => (
+    <TouchableOpacity
+      style={[
+        styles.predictionItem,
+        index === predictions.length - 1 && { borderBottomWidth: 0 },
+      ]}
       onPress={() => selectPlace(item.place_id, item.description)}
     >
       <Text style={styles.predictionText}>{item.description}</Text>
@@ -182,21 +206,21 @@ export default function Search() {
 
       {/* Lista de resultados de búsqueda */}
       {predictions.length > 0 && (
-        <View style={styles.predictionsContainer}>
-          <Text style={styles.predictionsTitle}>{t("search.selectLocation")}</Text>
-          <FlatList
-            data={predictions}
-            renderItem={renderPredictionItem}
-            keyExtractor={(item) => item.place_id}
-            scrollEnabled={false}
-          />
-        </View>
+        <>
+          <InstructionsText>{t("search.selectLocation")}</InstructionsText>
+          <View style={styles.predictionsContainer}>
+            <FlatList
+              data={predictions}
+              renderItem={renderPredictionItem}
+              keyExtractor={(item) => item.place_id}
+              scrollEnabled={false}
+            />
+          </View>
+        </>
       )}
 
       {selectedLocation && !isLoadingPlaces && predictions.length === 0 && (
-        <Text style={styles.locationText}>
-          {selectedLocation.address}
-        </Text>
+        <Text style={styles.locationText}>{selectedLocation.address}</Text>
       )}
 
       {isLoadingPlaces ? (
@@ -246,16 +270,16 @@ const styles = StyleSheet.create({
   },
   predictionsContainer: {
     marginBottom: 20,
-    backgroundColor: Colors.light.formBackground,
     borderRadius: 8,
-    padding: 10,
     borderWidth: 1,
     borderColor: Colors.light.border,
   },
   predictionsTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
+    marginLeft: 5,
+    marginTop: 5,
     color: Colors.light.text,
   },
   predictionItem: {
