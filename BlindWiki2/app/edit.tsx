@@ -52,6 +52,24 @@ export default function EditScreen() {
     ""
   const [isUploading, setIsUploading] = useState(false);
 
+  // Show quick publish alert on mount
+  useEffect(() => {
+    Alert.alert(
+      t("edit.quickPublishTitle"),
+      t("edit.quickPublishMessage"),
+      [
+        {
+          text: t("common.cancel"),
+          style: "cancel"
+        },
+        {
+          text: t("edit.publishButton"),
+          onPress: handlePublish
+        }
+      ]
+    );
+  }, []);
+
   // Load proposed tags on component mount
   useEffect(() => {
     const loadProposedTags = async () => {
@@ -185,14 +203,15 @@ export default function EditScreen() {
         onPlaybackStatusChange={setIsPlaying}
       />
       
-      <Text style={styles.label}>{t("edit.tagsLabel")}</Text>
-      
+      <Text style={styles.title}>{t("edit.tagsLabel")}</Text>
+      <ScrollView style={styles.tagListContainer}>
+
       {/* Tags Section */}
       {isLoadingTags ? (
         <Text style={styles.loadingText}>{t("edit.loadingTags")}</Text>
       ) : allTags.length > 0 ? (
-        <View style={styles.tagsContainer}>
-          <InstructionsText style={styles.tagsLabel}>{t("edit.proposedTagsInstructions")}</InstructionsText>
+        <View>
+          <InstructionsText>{t("edit.proposedTagsInstructions")}</InstructionsText>
           <TagsList
             tags={allTags}
             selectedTags={allTags.filter(tag => selectedTagIds.has(tag.id))}
@@ -201,6 +220,7 @@ export default function EditScreen() {
         </View>
       ) : null}
       
+      </ScrollView>
       <InstructionsText>{t("edit.additionalTagsInstructions")}</InstructionsText>
       
       {/* Custom Tags Input Section */}
@@ -246,19 +266,14 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: Colors.light.background,
   },
-  label: {
-    fontSize: 16,
+  title: {
+    fontSize: 26,
     fontWeight: "bold",
     marginTop: 12,
     marginBottom: 4,
   },
-  tagsContainer: {
+  tagListContainer: {
     marginBottom: 12,
-  },
-  tagsLabel: {
-    fontSize: 14,
-    color: Colors.light.text,
-    marginBottom: 8,
   },
   loadingText: {
     color: Colors.light.text,
@@ -290,12 +305,10 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     marginRight: 8,
-    backgroundColor: Colors.light.surface,
-    borderWidth: 1,
-    borderColor: Colors.light.border,
+    backgroundColor: Colors.light.button.background,
   },
   cancelButtonText: {
-    color: Colors.light.text,
+    color: Colors.light.button.text,
   },
   publishButton: {
     flex: 1,
