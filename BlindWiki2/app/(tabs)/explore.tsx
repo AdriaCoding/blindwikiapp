@@ -1,4 +1,10 @@
-import { StyleSheet, ScrollView, View, Text, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 import { useState, useEffect } from "react";
 import Location from "@/components/Location";
 import TagsView from "@/components/tags/TagsView";
@@ -7,19 +13,19 @@ import { Message } from "@/models/message";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "@/contexts/LocationContext";
 import Colors from "@/constants/Colors";
-
+import React from "react";
 export default function Explore() {
   const { t } = useTranslation();
   const { location } = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadMessages = async () => {
       if (!location) return;
 
-      setIsLoading(true);
+      setIsLoadingMessages(true);
       setError(null);
 
       try {
@@ -31,14 +37,17 @@ export default function Explore() {
 
         if (response.success) {
           // Asegurar que cada mensaje tenga un ID único
-          const uniqueMessages = response.messages.reduce((acc: Message[], message) => {
-            const existingIndex = acc.findIndex(m => m.id === message.id);
-            if (existingIndex === -1) {
-              acc.push(message);
-            }
-            return acc;
-          }, []);
-          
+          const uniqueMessages = response.messages.reduce(
+            (acc: Message[], message) => {
+              const existingIndex = acc.findIndex((m) => m.id === message.id);
+              if (existingIndex === -1) {
+                acc.push(message);
+              }
+              return acc;
+            },
+            []
+          );
+
           setMessages(uniqueMessages);
         } else {
           setError(response.errorMessage || t("explore.error"));
@@ -47,17 +56,20 @@ export default function Explore() {
         setError(t("explore.error"));
         console.error("Error loading messages:", err);
       } finally {
-        setIsLoading(false);
+        setIsLoadingMessages(false);
       }
     };
 
     loadMessages();
   }, [location]);
 
+
   return (
     <ScrollView style={styles.container}>
       <Location />
-      {isLoading ? (
+      {!location ? (
+        <></>
+      ) : isLoadingMessages ? (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={Colors.light.primary} />
         </View>
