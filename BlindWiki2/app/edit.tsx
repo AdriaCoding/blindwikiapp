@@ -55,11 +55,16 @@ export default function EditScreen() {
   useEffect(() => {
     Alert.alert(
       t("edit.quickPublishTitle"),
-      t("edit.quickPublishMessage"),
+      "",
       [
         {
-          text: t("common.cancel"),
+          text: t("edit.quickPublishChangeTags"),
           style: "cancel"
+        },
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+          onPress: () => router.back()
         },
         {
           text: t("edit.publishButton"),
