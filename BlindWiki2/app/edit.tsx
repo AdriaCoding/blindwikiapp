@@ -1,4 +1,4 @@
-import { StyleSheet, View, TextInput, Text, Alert } from "react-native";
+import { StyleSheet, View, TextInput, Text, Alert, ScrollView, TouchableOpacity } from "react-native";
 import { useState, useEffect, useRef } from "react";
 import StyledInput from "@/components/StyledInput";
 import { useLocalSearchParams, router } from "expo-router";
@@ -10,6 +10,8 @@ import { useLocation } from "@/contexts/LocationContext";
 import AudioButton from "@/components/AudioButton";
 import { InstructionsText } from "@/components/StyledText";
 import { getProposedTags } from "@/services/tagService";
+import { Tag } from "@/models/tag";
+import { TagsList } from "@/components/TagsView";
 
 export default function EditScreen() {
   const { t } = useTranslation();
@@ -36,18 +38,87 @@ export default function EditScreen() {
   const [longitude] = useState<string>(
     params.longitude || location?.coords.longitude?.toString() || ""
   );
-  const [tags, setTags] = useState("");
+  
+  // Tags state
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
+  const [newTagInput, setNewTagInput] = useState("");
+  const [isLoadingTags, setIsLoadingTags] = useState(false);
   
   // Pre-fill address if available from context
-  const [addressText, setAddressText] = useState(
+  const addressText = 
     address ? 
     `${address.street || ""} ${address.city || ""}, ${address.country || ""}`.trim() : 
     ""
-  );
   const [isUploading, setIsUploading] = useState(false);
 
-  const proposedTags = getProposedTags();
-  console.log('proposedTags', proposedTags);
+  // Load proposed tags on component mount
+  useEffect(() => {
+    const loadProposedTags = async () => {
+      setIsLoadingTags(true);
+      try {
+        const response = await getProposedTags();
+        if (response.success) {
+          setAllTags(response.tags);
+          // Select all proposed tags by default
+          setSelectedTagIds(new Set(response.tags.map(tag => tag.id)));
+        } else {
+          console.error("Error loading proposed tags:", response.errorMessage);
+        }
+      } catch (error) {
+        console.error("Error loading proposed tags:", error);
+      } finally {
+        setIsLoadingTags(false);
+      }
+    };
+
+    loadProposedTags();
+  }, []);
+
+  // Handle tag selection/deselection
+  const handleTagSelect = (tag: Tag) => {
+    setSelectedTagIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(tag.id)) {
+        newSet.delete(tag.id);
+      } else {
+        newSet.add(tag.id);
+      }
+      return newSet;
+    });
+  };
+
+  // Handle adding new custom tags
+  const handleAddCustomTag = () => {
+    if (!newTagInput.trim()) return;
+
+    const customTags = newTagInput.split(",").map(t => t.trim()).filter(t => t);
+    const newCustomTags: Tag[] = customTags.map(tagName => ({
+      id: `custom-${tagName}-${Date.now()}`,
+      name: tagName,
+      asString: tagName
+    }));
+
+    // Add to all tags and select them
+    setAllTags(prev => [...prev, ...newCustomTags]);
+    setSelectedTagIds(prev => {
+      const newSet = new Set(prev);
+      newCustomTags.forEach(tag => newSet.add(tag.id));
+      return newSet;
+    });
+
+    // Clear input
+    setNewTagInput("");
+  };
+
+  // Get selected tags as string for API
+  const getSelectedTagsString = () => {
+    return Array.from(selectedTagIds)
+      .map(id => allTags.find(tag => tag.id === id)?.name)
+      .filter((name): name is string => name !== undefined)
+      .join(", ");
+  };
+
   // Handle publish button press
   const handlePublish = async () => {
     if (!recordingUri || !latitude || !longitude) {
@@ -63,7 +134,7 @@ export default function EditScreen() {
         latitude, 
         longitude, 
         addressText,
-        tags
+        getSelectedTagsString()
       );
 
       if (response.success) {
@@ -115,15 +186,40 @@ export default function EditScreen() {
       />
       
       <Text style={styles.label}>{t("edit.tagsLabel")}</Text>
-      <InstructionsText>{t("edit.tagsInstructions")}</InstructionsText>
-      <StyledInput
-        placeholder={t("edit.tagsPlaceholder")}
-        value={tags}
-        onChangeText={setTags}
-        multiline={true}
-        maxLength={200}
-        numberOfLines={2}
-      />
+      
+      {/* Tags Section */}
+      {isLoadingTags ? (
+        <Text style={styles.loadingText}>{t("edit.loadingTags")}</Text>
+      ) : allTags.length > 0 ? (
+        <View style={styles.tagsContainer}>
+          <InstructionsText style={styles.tagsLabel}>{t("edit.proposedTagsInstructions")}</InstructionsText>
+          <TagsList
+            tags={allTags}
+            selectedTags={allTags.filter(tag => selectedTagIds.has(tag.id))}
+            onTagPress={handleTagSelect}
+          />
+        </View>
+      ) : null}
+      
+      <InstructionsText>{t("edit.additionalTagsInstructions")}</InstructionsText>
+      
+      {/* Custom Tags Input Section */}
+      <View style={styles.customTagsContainer}>
+        <StyledInput
+          value={newTagInput}
+          onChangeText={setNewTagInput}
+          multiline={false}
+          maxLength={100}
+          numberOfLines={1}
+          style={styles.customTagInput}
+        />
+        <StyledButton
+          title={t("edit.addTags")}
+          onPress={handleAddCustomTag}
+          style={styles.addTagButton}
+          textStyle={styles.addTagButtonText}
+        />
+      </View>
       
       <View style={styles.buttonContainer}>
         <StyledButton
@@ -155,6 +251,36 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 12,
     marginBottom: 4,
+  },
+  tagsContainer: {
+    marginBottom: 12,
+  },
+  tagsLabel: {
+    fontSize: 14,
+    color: Colors.light.text,
+    marginBottom: 8,
+  },
+  loadingText: {
+    color: Colors.light.text,
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  customTagsContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  customTagInput: {
+    width: "100%",
+  },
+  addTagButton: {
+    paddingHorizontal: 16,
+    height: 40,
+    backgroundColor: Colors.light.button.background,
+  },
+  addTagButtonText: {
+    color: Colors.light.button.text,
+    fontSize: 14,
   },
   buttonContainer: {
     flexDirection: "row",
