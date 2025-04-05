@@ -57,8 +57,14 @@ export default function TagsView({
 }: {
   messages: Message[];
 }) {
+  // Asegurar que las etiquetas sean únicas por ID
   const availableTags = messages.reduce((acc, message) => {
-    return [...acc, ...message.tags];
+    message.tags.forEach(tag => {
+      if (!acc.some(t => t.id === tag.id)) {
+        acc.push(tag);
+      }
+    });
+    return acc;
   }, [] as Tag[]);
 
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
