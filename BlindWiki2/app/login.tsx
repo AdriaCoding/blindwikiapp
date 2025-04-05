@@ -5,6 +5,7 @@ import {
   Alert,
   Pressable,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
@@ -58,6 +59,14 @@ export default function LogInScreen() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    try {
+      await Linking.openURL('https://blind.wiki/user/resetPassword');
+    } catch (error) {
+      console.error('Error opening link:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Error message display */}
@@ -95,7 +104,7 @@ export default function LogInScreen() {
         )}
         <StyledButton
           title={t("login.forgotPassword")}
-          onPress={() => router.push("/(tabs)/settings")}
+          onPress={handleForgotPassword}
         />
       </View>
       
