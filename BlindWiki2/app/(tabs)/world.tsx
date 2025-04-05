@@ -1,3 +1,4 @@
+import React from "react";
 import { StyleSheet, ScrollView, View, Text, ActivityIndicator } from "react-native";
 import TagsView, { TagsList } from "@/components/TagsView";
 import { useState, useEffect } from "react";

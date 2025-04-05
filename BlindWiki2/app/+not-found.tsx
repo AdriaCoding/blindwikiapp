@@ -1,6 +1,7 @@
 import { Link, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
+import React from 'react';
 
 import { Text, View } from 'react-native';
 
