@@ -8,19 +8,17 @@ import { Message } from "@/models/message";
 
 function TagBox({
   tag,
-  selected,
   onPress,
 }: {
   tag: Tag;
-  selected: boolean;
   onPress: (tag: Tag) => void;
 }) {
   return (
     <TouchableOpacity
-      style={[styles.tag, selected && styles.tagSelected]}
+      style={[styles.tag, tag.selected && styles.tagSelected]}
       onPress={() => onPress(tag)}
     >
-      <Text style={[styles.tagText, selected && styles.tagTextSelected]}>
+      <Text style={[styles.tagText, tag.selected && styles.tagTextSelected]}>
         {tag.name}
       </Text>
     </TouchableOpacity>
@@ -30,11 +28,10 @@ function TagBox({
 // TagsList component: lays out tags in a row; passes 'selected' state and onPress handler to each tag.
 export function TagsList({
   tags,
-  selectedTags,
   onTagPress,
 }: {
   tags: Tag[];
-  selectedTags: Tag[];
+  selectedTags?: Tag[]; // Mantenemos para compatibilidad con código existente
   onTagPress: (tag: Tag) => void;
 }) {
   return (
@@ -43,7 +40,6 @@ export function TagsList({
         <TagBox
           key={tag.id}
           tag={tag}
-          selected={selectedTags.some(t => t.id === tag.id)}
           onPress={onTagPress}
         />
       ))}
@@ -57,26 +53,31 @@ export default function TagsView({
 }: {
   messages: Message[];
 }) {
-  // Asegurar que las etiquetas sean únicas por ID
-  const availableTags = messages.reduce((acc, message) => {
-    message.tags.forEach(tag => {
-      if (!acc.some(t => t.id === tag.id)) {
-        acc.push(tag);
-      }
-    });
-    return acc;
-  }, [] as Tag[]);
+  // Asegurar que las etiquetas sean únicas por ID y prepararlas con selected = false
+  const [availableTags, setAvailableTags] = useState<Tag[]>(() => {
+    return messages.reduce((acc, message) => {
+      message.tags.forEach(tag => {
+        if (!acc.some(t => t.id === tag.id)) {
+          acc.push({
+            ...tag,
+            selected: false
+          });
+        }
+      });
+      return acc;
+    }, [] as Tag[]);
+  });
 
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-
-  const handleTagPress = (tag: Tag) => {
-    setSelectedTags((prev) =>
-      prev.some(t => t.id === tag.id)
-        ? prev.filter((t) => t.id !== tag.id)
-        : [...prev, tag]
-    );
+  const handleTagPress = (pressedTag: Tag) => {
+    setAvailableTags(prev => prev.map(tag => 
+      tag.id === pressedTag.id 
+        ? { ...tag, selected: !tag.selected } 
+        : tag
+    ));
   };
 
+  // Filtramos mensajes basados en etiquetas con selected = true
+  const selectedTags = availableTags.filter(tag => tag.selected);
   const filteredMessages = selectedTags.length > 0
     ? messages.filter((message) =>
         message.tags.some((messageTag) =>
@@ -94,7 +95,6 @@ export default function TagsView({
       {/* Tag display */}
       <TagsList
         tags={availableTags}
-        selectedTags={selectedTags}
         onTagPress={handleTagPress}
       />
 

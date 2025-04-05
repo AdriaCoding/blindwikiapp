@@ -93,7 +93,30 @@ export default function World() {
   }, [selectedArea]);
 
   function chosenAreaHandler(area: Tag) {
-    setSelectedArea(prev => prev?.id === area.id ? null : area);
+    setSelectedArea(prev => {
+      // Si el área ya estaba seleccionada, la deseleccionamos
+      if (prev?.id === area.id) {
+        // Actualizar la propiedad selected del área actual
+        const updatedArea = areasAsTags.find(a => a.id === area.id);
+        if (updatedArea) {
+          updatedArea.selected = false;
+        }
+        return null;
+      } 
+      // Si hay un área seleccionada, la deseleccionamos primero
+      if (prev) {
+        const previousArea = areasAsTags.find(a => a.id === prev.id);
+        if (previousArea) {
+          previousArea.selected = false;
+        }
+      }
+      // Seleccionamos la nueva área
+      const updatedArea = areasAsTags.find(a => a.id === area.id);
+      if (updatedArea) {
+        updatedArea.selected = true;
+      }
+      return area;
+    });
   }
 
   return (
@@ -108,7 +131,6 @@ export default function World() {
         <>
           <TagsList
             tags={areasAsTags}
-            selectedTags={selectedArea ? [selectedArea] : []}
             onTagPress={chosenAreaHandler}
           />
           {isLoading ? (

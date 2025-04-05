@@ -12,6 +12,7 @@ import { InstructionsText } from "@/components/StyledText";
 import { getProposedTags } from "@/services/tagService";
 import { Tag } from "@/models/tag";
 import { TagsList } from "@/components/TagsView";
+import TagsEdit from "@/components/TagsEdit";
 
 export default function EditScreen() {
   const { t } = useTranslation();
@@ -41,8 +42,6 @@ export default function EditScreen() {
   
   // Tags state
   const [allTags, setAllTags] = useState<Tag[]>([]);
-  const [selectedTagIds, setSelectedTagIds] = useState<Set<string>>(new Set());
-  const [newTagInput, setNewTagInput] = useState("");
   const [isLoadingTags, setIsLoadingTags] = useState(false);
   
   // Pre-fill address if available from context
@@ -78,8 +77,6 @@ export default function EditScreen() {
         const response = await getProposedTags();
         if (response.success) {
           setAllTags(response.tags);
-          // Select all proposed tags by default
-          setSelectedTagIds(new Set(response.tags.map(tag => tag.id)));
         } else {
           console.error("Error loading proposed tags:", response.errorMessage);
         }
@@ -93,48 +90,9 @@ export default function EditScreen() {
     loadProposedTags();
   }, []);
 
-  // Handle tag selection/deselection
-  const handleTagSelect = (tag: Tag) => {
-    setSelectedTagIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(tag.id)) {
-        newSet.delete(tag.id);
-      } else {
-        newSet.add(tag.id);
-      }
-      return newSet;
-    });
-  };
-
-  // Handle adding new custom tags
-  const handleAddCustomTag = () => {
-    if (!newTagInput.trim()) return;
-
-    const customTags = newTagInput.split(",").map(t => t.trim()).filter(t => t);
-    const newCustomTags: Tag[] = customTags.map(tagName => ({
-      id: `custom-${tagName}-${Date.now()}`,
-      name: tagName,
-      asString: tagName
-    }));
-
-    // Add to all tags and select them
-    setAllTags(prev => [...prev, ...newCustomTags]);
-    setSelectedTagIds(prev => {
-      const newSet = new Set(prev);
-      newCustomTags.forEach(tag => newSet.add(tag.id));
-      return newSet;
-    });
-
-    // Clear input
-    setNewTagInput("");
-  };
-
-  // Get selected tags as string for API
   const getSelectedTagsString = () => {
-    return Array.from(selectedTagIds)
-      .map(id => allTags.find(tag => tag.id === id)?.name)
-      .filter((name): name is string => name !== undefined)
-      .join(", ");
+    const selectedTags = allTags.filter(tag => tag.selected === true);
+    return selectedTags.map(tag => tag.name).join(", ");
   };
 
   // Handle publish button press
@@ -204,42 +162,11 @@ export default function EditScreen() {
       />
       
       <Text style={styles.title}>{t("edit.tagsLabel")}</Text>
-      <ScrollView style={styles.tagListContainer}>
-
-      {/* Tags Section */}
-      {isLoadingTags ? (
-        <Text style={styles.loadingText}>{t("edit.loadingTags")}</Text>
-      ) : allTags.length > 0 ? (
-        <View>
-          <InstructionsText>{t("edit.proposedTagsInstructions")}</InstructionsText>
-          <TagsList
-            tags={allTags}
-            selectedTags={allTags.filter(tag => selectedTagIds.has(tag.id))}
-            onTagPress={handleTagSelect}
-          />
-        </View>
-      ) : null}
-      
-      </ScrollView>
-      <InstructionsText>{t("edit.additionalTagsInstructions")}</InstructionsText>
-      
-      {/* Custom Tags Input Section */}
-      <View style={styles.customTagsContainer}>
-        <StyledInput
-          value={newTagInput}
-          onChangeText={setNewTagInput}
-          multiline={false}
-          maxLength={100}
-          numberOfLines={1}
-          style={styles.customTagInput}
-        />
-        <StyledButton
-          title={t("edit.addTags")}
-          onPress={handleAddCustomTag}
-          style={styles.addTagButton}
-          textStyle={styles.addTagButtonText}
-        />
-      </View>
+      <TagsEdit
+        allTags={allTags}
+        onTagsChange={setAllTags}
+        isLoadingTags={isLoadingTags}
+      />
       
       <View style={styles.buttonContainer}>
         <StyledButton

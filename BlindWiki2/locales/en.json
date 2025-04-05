@@ -105,7 +105,8 @@
     "publishFailed": "Publish Failed",
     "networkError": "Network error. Please try again.",
     "cancelConfirmTitle": "Discard Recording?",
-    "cancelConfirmMessage": "Are you sure you want to discard this recording?"
+    "cancelConfirmMessage": "Are you sure you want to discard this recording?",
+    "quickPublishTitle": "Do you want to publish this recording?"
   },
   "login": {
     "title": "Log In",
