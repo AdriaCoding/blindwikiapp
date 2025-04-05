@@ -8,6 +8,7 @@ import { publishMessage } from "@/services/messageService";
 import Colors from "@/constants/Colors";
 import { useLocation } from "@/contexts/LocationContext";
 import AudioButton from "@/components/AudioButton";
+import { InstructionsText } from "@/components/StyledText";
 
 export default function EditScreen() {
   const { t } = useTranslation();
@@ -103,9 +104,7 @@ export default function EditScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{t("edit.recordingLabel")}</Text>
-      
+    <View style={styles.container}>      
       <AudioButton 
         audioUri={recordingUri}
         autoPlay={true}
@@ -113,24 +112,14 @@ export default function EditScreen() {
       />
       
       <Text style={styles.label}>{t("edit.tagsLabel")}</Text>
+      <InstructionsText>{t("edit.tagsInstructions")}</InstructionsText>
       <StyledInput
         placeholder={t("edit.tagsPlaceholder")}
         value={tags}
         onChangeText={setTags}
-        style={styles.input}
-        multiline={false}
-        maxLength={100}
-      />
-      
-      <Text style={styles.label}>{t("edit.addressLabel")}</Text>
-      <StyledInput
-        placeholder={t("edit.addressPlaceholder")}
-        value={addressText}
-        onChangeText={setAddressText}
-        style={styles.input}
         multiline={true}
-        numberOfLines={3}
         maxLength={200}
+        numberOfLines={2}
       />
       
       <View style={styles.buttonContainer}>
@@ -164,10 +153,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 4,
   },
-  input: {
-    width: "100%",
-    marginBottom: 12,
-  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -186,7 +171,7 @@ const styles = StyleSheet.create({
   publishButton: {
     flex: 1,
     marginLeft: 8,
-    backgroundColor: Colors.light.primary,
+    backgroundColor: Colors.light.button.background,
   },
   publishButtonText: {
     color: Colors.light.button.text,
