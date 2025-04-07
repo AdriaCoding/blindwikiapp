@@ -7,7 +7,7 @@ import {
   View,
   RefreshControl,
 } from "react-native";
-import MessageComponent, { useMessageActions } from "@/components/MessageView";
+import MessageComponent, { useMessageActions, MessageActions } from "@/components/MessageView";
 import Colors from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { Message } from "@/models/message";
@@ -16,6 +16,7 @@ import StyledButton from "@/components/StyledButton";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import TagsEditModal from "@/components/tags/TagsEditModal";
+import CommentsModal from "@/components/CommentsModal";
 
 export default function MyMessages() {
   const { t } = useTranslation();
@@ -76,8 +77,25 @@ export default function MyMessages() {
     editingMessage,
     isTagsModalVisible,
     setIsTagsModalVisible,
-    handleSaveTags
+    handleSaveTags,
+    commentingMessage,
+    isCommentsModalVisible,
+    setIsCommentsModalVisible,
+    refreshMessageComments
   } = useMessageActions(messages, setMessages, fetchUserMessages);
+
+  // Filtrar las acciones para solo incluir onListen, onEditTags, onViewComments y onDelete
+  const getLimitedActionsForMessage = (message: Message): MessageActions => {
+    const allActions = getActionsForMessage(message);
+    return {
+      onListen: allActions.onListen,
+      onEditTags: allActions.onEditTags,
+      onViewComments: allActions.onViewComments,
+      onDelete: allActions.onDelete,
+      // Deshabilitar la acción onDirection
+      onDirection: undefined
+    };
+  };
 
   // Fetch messages when component mounts
   useEffect(() => {
@@ -150,7 +168,7 @@ export default function MyMessages() {
         <MessageComponent
           key={message.id}
           m={message}
-          actions={getActionsForMessage(message)}
+          actions={getLimitedActionsForMessage(message)}
         />
       ))}
 
@@ -163,6 +181,14 @@ export default function MyMessages() {
           initialTags={editingMessage.tags}
         />
       )}
+
+      {/* Modal para ver y añadir comentarios */}
+      <CommentsModal
+        visible={isCommentsModalVisible}
+        onClose={() => setIsCommentsModalVisible(false)}
+        message={commentingMessage}
+        onCommentAdded={refreshMessageComments}
+      />
     </ScrollView>
   );
 }

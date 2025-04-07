@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { InstructionsText } from "../InstructionsText";
-import MessageComponent from "../MessageView";
+import MessageComponent, { useMessageActions, MessageActions } from "../MessageView";
 import { Tag } from "@/models/tag";
 import Colors from "@/constants/Colors";
 import { Message } from "@/models/message";
 import { TagsList } from "@/components/tags/TagsList";
 import { useTranslation } from "react-i18next";
+import CommentsModal from "../CommentsModal";
 
 // Parent component: tracks the selected tags in one state.
 export default function TagsView({ messages }: { messages: Message[] }) {
   const { t } = useTranslation();
+  const [filteredMessages, setFilteredMessages] = useState<Message[]>([]);
   
   // Asegurar que las etiquetas sean únicas por ID y prepararlas con selected = false
   const [availableTags, setAvailableTags] = useState<Tag[]>(() => {
@@ -27,6 +29,31 @@ export default function TagsView({ messages }: { messages: Message[] }) {
     }, [] as Tag[]);
   });
 
+  // Utilizar el hook de acciones compartido
+  const {
+    getActionsForMessage,
+    commentingMessage,
+    isCommentsModalVisible,
+    setIsCommentsModalVisible,
+    refreshMessageComments
+  } = useMessageActions(
+    filteredMessages, 
+    setFilteredMessages
+  );
+
+  // Filtrar las acciones para solo incluir onListen y onViewComments
+  const getLimitedActionsForMessage = (message: Message): MessageActions => {
+    const allActions = getActionsForMessage(message);
+    return {
+      onListen: allActions.onListen,
+      onViewComments: allActions.onViewComments,
+      // Otras acciones se establecen como undefined
+      onEditTags: undefined,
+      onDelete: undefined,
+      onDirection: undefined
+    };
+  };
+
   const handleTagPress = (pressedTag: Tag) => {
     setAvailableTags((prev) =>
       prev.map((tag) =>
@@ -37,14 +64,27 @@ export default function TagsView({ messages }: { messages: Message[] }) {
 
   // Filtramos mensajes basados en etiquetas con selected = true
   const selectedTags = availableTags.filter((tag) => tag.selected);
-  const filteredMessages =
-    selectedTags.length > 0
-      ? messages.filter((message) =>
-          message.tags.some((messageTag) =>
-            selectedTags.some((selectedTag) => selectedTag.id === messageTag.id)
-          )
+  
+  // Actualizar mensajes filtrados cuando cambian las etiquetas seleccionadas
+  const updateFilteredMessages = useCallback(() => {
+    if (selectedTags.length > 0) {
+      const filtered = messages.filter((message) =>
+        message.tags.some((messageTag) =>
+          selectedTags.some((selectedTag) => selectedTag.id === messageTag.id)
         )
-      : [];
+      );
+      setFilteredMessages(filtered);
+      return filtered;
+    } else {
+      setFilteredMessages([]);
+      return [];
+    }
+  }, [messages, selectedTags]);
+
+  // Actualizar mensajes filtrados cuando cambian las etiquetas seleccionadas
+  React.useEffect(() => {
+    updateFilteredMessages();
+  }, [selectedTags, messages, updateFilteredMessages]);
 
   return (
     <>
@@ -62,15 +102,17 @@ export default function TagsView({ messages }: { messages: Message[] }) {
         <MessageComponent
           key={message.id}
           m={message}
-          actions={{
-            onListen: () => console.log("Listen"),
-            onEditTags: undefined,
-            onDelete: undefined,
-            onViewComments: () => console.log("View Comments"),
-            onDirection: () => console.log("Direction"),
-          }}
+          actions={getLimitedActionsForMessage(message)}
         />
       ))}
+
+      {/* Modal para ver y añadir comentarios */}
+      <CommentsModal
+        visible={isCommentsModalVisible}
+        onClose={() => setIsCommentsModalVisible(false)}
+        message={commentingMessage}
+        onCommentAdded={refreshMessageComments}
+      />
     </>
   );
 }

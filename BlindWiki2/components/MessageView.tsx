@@ -4,10 +4,10 @@ import StyledButton from "./StyledButton";
 import AudioButton from "./AudioButton";
 import { Message } from "@/models/message";
 import Colors from "@/constants/Colors";
-import { deleteMessage, updateMessageTags, audioPlayed } from '@/services/messageService';
+import { deleteMessage, updateMessageTags, audioPlayed, getMessages } from '@/services/messageService';
 import { useTranslation } from "react-i18next";
-import TagsEditModal from "./tags/TagsEditModal";
 import { Tag } from "@/models/tag";
+import CommentsModal from "./CommentsModal";
 
 // Message Actions Interface
 export interface MessageActions {
@@ -32,6 +32,10 @@ export function useMessageActions(
   const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [isTagsModalVisible, setIsTagsModalVisible] = useState(false);
+  
+  // Estado para el modal de comentarios
+  const [isCommentsModalVisible, setIsCommentsModalVisible] = useState(false);
+  const [commentingMessage, setCommentingMessage] = useState<Message | null>(null);
 
   /**
    * Handle message deletion
@@ -66,6 +70,56 @@ export function useMessageActions(
   const openTagsEditModal = (message: Message) => {
     setEditingMessage(message);
     setIsTagsModalVisible(true);
+  };
+
+  /**
+   * Open the comments modal for a message
+   */
+  const openCommentsModal = (message: Message) => {
+    setCommentingMessage(message);
+    setIsCommentsModalVisible(true);
+  };
+
+  /**
+   * Handle refreshing a message to get updated comments
+   */
+  const refreshMessageComments = async () => {
+    if (!commentingMessage) return;
+    
+    setIsProcessing(true);
+    setError(null);
+    
+    try {
+      // Obtener mensaje actualizado para obtener comentarios recientes
+      const response = await getMessages({ customParams: { message_id: commentingMessage.id } });
+      
+      if (response.success && response.messages.length > 0) {
+        const updatedMessage = response.messages[0];
+        
+        // Actualizar mensaje en el estado local
+        setMessages(prev => prev.map(message => 
+          message.id === updatedMessage.id ? updatedMessage : message
+        ));
+        
+        // Actualizar mensaje en modal
+        setCommentingMessage(updatedMessage);
+        
+        if (onRefresh) {
+          await onRefresh();
+        }
+        
+        return true;
+      } else {
+        setError(response.errorMessage || t("message.failedToRefreshComments"));
+        return false;
+      }
+    } catch (err) {
+      setError(t("message.unexpectedError"));
+      console.error("Error refreshing message comments:", err);
+      return false;
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   /**
@@ -170,8 +224,7 @@ export function useMessageActions(
         );
       },
       onViewComments: (event: GestureResponderEvent) => {
-        console.log("Clicked on View comments for message:", message.id);
-        // Navigate to comments screen
+        openCommentsModal(message);
       },
       onDirection: undefined, // Implement if needed
     };
@@ -188,7 +241,12 @@ export function useMessageActions(
     editingMessage,
     isTagsModalVisible,
     setIsTagsModalVisible,
-    handleSaveTags
+    handleSaveTags,
+    // Exports for comments modal
+    commentingMessage,
+    isCommentsModalVisible,
+    setIsCommentsModalVisible,
+    refreshMessageComments
   };
 }
 
