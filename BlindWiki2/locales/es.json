@@ -1,39 +1,189 @@
 {
-  "hello": "¡Hola!",
-  "home": {
-    "title": "Grabar",
-    "info-gps": "Presiona el siguiente botón para actualizar tu ubicación GPS",
-    "info-record": "Presiona el botón 'Grabar' para comenzar a grabar audio. Presiónalo nuevamente para detener la grabación.",
-    "record": "Grabar"
+  "comments": {
+    "errorPosting": "Error al publicar comentario",
+    "noComments": "Aún no hay comentarios",
+    "noMessageSelected": "No se ha seleccionado ningún mensaje",
+    "post": "Publicar",
+    "title": "Comentarios",
+    "unexpectedError": "Se ha producido un error inesperado",
+    "writeComment": "Escribe un comentario..."
   },
-  "settings": {
-    "showInstructions": "Mostrar instrucciones",
-    "title": "Configuración",
-    "language": {
-      "title": "Idioma",
-      "modalTitle": "Selecciona el idioma",
-      "ca": "Catalán",
-      "es": "Español",
-      "en": "Inglés"
-    },
-    "measureUnit": {
-      "title": "Unidad de medida",
-      "modalTitle": "Selecciona la unidad de medida",
-      "meters": "Metros",
-      "miles": "Millas"
-    }
+  "common": {
+    "cancel": "Cancelar",
+    "no": "No",
+    "ok": "Aceptar",
+    "save": "Guardar",
+    "yes": "Sí"
+  },
+  "edit": {
+    "additionalTagsInstructions": "Introduce nuevas etiquetas separadas por comas.",
+    "addTags": "Añadir etiquetas",
+    "addressLabel": "Dirección o descripción",
+    "addressPlaceholder": "Añade una descripción o dirección para esta ubicación",
+    "cancelButton": "Cancelar",
+    "cancelConfirmMessage": "¿Estás seguro de que quieres descartar esta grabación?",
+    "cancelConfirmTitle": "¿Descartar grabación?",
+    "missingData": "Faltan datos de grabación",
+    "networkError": "Error de red. Inténtalo de nuevo.",
+    "playbackError": "Error al reproducir grabación",
+    "playbackErrorMessage": "No se ha podido reproducir la grabación. El archivo puede estar ausente o corrupto",
+    "playRecording": "Reproducir grabación",
+    "proposedTagsInstructions": "Toca una etiqueta para seleccionarla o deseleccionarla.",
+    "publishButton": "Publicar",
+    "publishFailed": "Error al publicar",
+    "publishSuccess": "Éxito",
+    "publishSuccessMessage": "Tu grabación se ha publicado con éxito",
+    "quickPublishChangeTags": "Cambiar etiquetas",
+    "quickPublishTitle": "¿Quieres publicar esta grabación?",
+    "recordingLabel": "Grabación",
+    "stopPlayback": "Detener reproducción",
+    "tagsLabel": "Etiquetas",
+    "tagsPlaceholder": "Ej: calle, obstáculo, punto de referencia",
+    "uploading": "Subiendo..."
   },
   "explore": {
+    "error": "Se ha producido un error al cargar los datos de exploración",
     "title": "Explorar"
   },
-  "search": {
-    "title": "Buscar"
+  "home": {
+    "info-gps": "Pulsa el siguiente botón para actualizar tu ubicación GPS:",
+    "info-record": "Pulsa el botón 'Grabar' para comenzar a grabar audio. Púlsalo de nuevo para detener la grabación:",
+    "noLocationMessage": "Necesitamos tu ubicación antes de grabar. Por favor, verifica la configuración de ubicación de tu dispositivo.",
+    "noLocationTitle": "Sin datos de ubicación",
+    "record": "Grabar",
+    "title": "Grabar"
   },
-  "world": {
-    "title": "Mundo"
+  "location": {
+    "clickToGetLocation": "Haz clic para obtener tu ubicación",
+    "currentLocation": "Ubicación actual: ",
+    "error": "Error al obtener la ubicación",
+    "highAccuracy": "Alta precisión",
+    "loading": "Obteniendo ubicación...",
+    "normalAccuracy": "Precisión normal",
+    "permissionDenied": "Permiso de ubicación denegado",
+    "permissionRequired": "Se requiere permiso de ubicación para grabar con información GPS.",
+    "permissionTitle": "Permiso de ubicación"
+  },
+  "login": {
+    "error": {
+      "credentials": "El nombre de usuario o la contraseña que has introducido son incorrectos. Inténtalo de nuevo.",
+      "default": "Se ha producido un error durante el inicio de sesión",
+      "input": "Introduce el nombre de usuario y la contraseña"
+    },
+    "forgotPassword": "¿Has olvidado tu contraseña?",
+    "noAccount": {
+      "link": "Regístrate ahora",
+      "text": "¿No tienes una cuenta?"
+    },
+    "password": "Contraseña",
+    "recordingMessage": "Necesitas iniciar sesión para grabar audio. ¿Quieres iniciar sesión ahora?",
+    "required": "Inicio de sesión requerido",
+    "title": "Iniciar sesión",
+    "username": "Nombre de usuario"
+  },
+  "message": {
+    "comments": "Comentarios",
+    "delete": "Eliminar",
+    "directions": "Direcciones",
+    "editTags": "Editar etiquetas",
+    "failedToRefreshComments": "Error al actualizar comentarios",
+    "failedToUpdateTags": "Error al actualizar etiquetas",
+    "listen": "Escuchar",
+    "playbackError": "Error de reproducción",
+    "playbackErrorMessage": "No se ha podido reproducir este audio.",
+    "stopPlayback": "Detener",
+    "unexpectedError": "Se ha producido un error inesperado"
   },
   "myMessages": {
-    "title": "Mis grabaciones",
-    "tabLabel": "Mis audios"
+    "error": {
+      "fetchFailed": "Error al obtener mensajes",
+      "notLoggedIn": "Debes iniciar sesión para ver tus mensajes.",
+      "unexpected": "Se ha producido un error inesperado. Inténtalo de nuevo."
+    },
+    "loading": "Cargando tus mensajes...",
+    "noMessages": "Aún no has creado ningún mensaje.",
+    "tabLabel": "Mis audios",
+    "title": "Mis grabaciones"
+  },
+  "not-found": {
+    "link": "¡Ir a la pantalla principal!",
+    "text": "Esta pantalla no existe.",
+    "title": "¡Ups!"
+  },
+  "recording": {
+    "errorTitle": "Error de grabación",
+    "permissionRequired": "Se requiere permiso de micrófono para grabar audio.",
+    "permissionTitle": "Permiso de micrófono",
+    "startError": "No se ha podido iniciar la grabación. Inténtalo de nuevo.",
+    "stopError": "No se ha podido detener la grabación. Inténtalo de nuevo."
+  },
+  "register": {
+    "button": "Registrarse",
+    "email": "Correo electrónico",
+    "error": {
+      "defaultError": "Se ha producido un error durante el registro",
+      "emptyUsername": "Introduce un nombre de usuario",
+      "invalidEmail": "Introduce una dirección de correo electrónico válida",
+      "networkError": "Se ha producido un error de red. Inténtalo de nuevo.",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden",
+      "passwordTooShort": "La contraseña debe tener al menos 4 caracteres",
+      "title": "Error de registro"
+    },
+    "password": "Contraseña",
+    "repeatPassword": "Repetir contraseña",
+    "success": {
+      "emailSent": "Se ha enviado un enlace de confirmación a tu dirección de correo electrónico. Por favor, revisa tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.",
+      "ok": "Aceptar",
+      "title": "Registro exitoso"
+    },
+    "terms": "Al registrarte, aceptas nuestros Términos de servicio y Política de privacidad",
+    "title": "Únete a la comunidad BlindWiki completando el siguiente formulario",
+    "username": "Nombre de usuario"
+  },
+  "search": {
+    "button": "Buscar",
+    "error": "Se ha producido un error. Inténtalo de nuevo.",
+    "loadingMessages": "Cargando mensajes para esta ubicación...",
+    "locationError": "No se han podido obtener detalles para esta ubicación.",
+    "noMessages": "No se han encontrado mensajes en esta ubicación.",
+    "noResults": "No se han encontrado ubicaciones. Prueba con otro término de búsqueda.",
+    "placeholder": "Introduce un nombre de ubicación",
+    "searchingPlaces": "Buscando lugares...",
+    "selectLocation": "Selecciona la ubicación que coincida con tu búsqueda:",
+    "title": "Buscar"
+  },
+  "settings": {
+    "language": {
+      "ca": "Catalán",
+      "en": "Inglés",
+      "es": "Español",
+      "modalTitle": "Selecciona el idioma",
+      "title": "Idioma"
+    },
+    "logout": {
+      "alert": {
+        "error": {
+          "message": "No se ha podido cerrar sesión correctamente",
+          "title": "Error al cerrar sesión"
+        },
+        "success": "Has cerrado sesión"
+      },
+      "title": "Cerrar sesión"
+    },
+    "measureUnit": {
+      "meters": "Metros",
+      "miles": "Millas",
+      "modalTitle": "Selecciona la unidad de medida",
+      "title": "Unidad de medida"
+    },
+    "showInstructions": "Mostrar instrucciones",
+    "title": "Configuración"
+  },
+  "tags": {
+    "filterInstructions": "Selecciona etiquetas para mostrar grabaciones que incluyan al menos una de ellas:"
+  },
+  "world": {
+    "error": "Se ha producido un error al cargar los datos del mundo",
+    "title": "Mundo"
   }
 }

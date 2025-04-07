@@ -1,40 +1,189 @@
 {
-  "hello": "Hola!",
-  "home": {
-    "title": "Gravar",
-    "info-gps": "Prem el següent botó per actualitzar la teva ubicació GPS",
-    "info-record": "Prem el següent botó 'Gravar' per iniciar la gravació de so. Prem-lo novament per acabar la gravació.",
-    "record": "Gravar"
+  "comments": {
+    "errorPosting": "Error en publicar comentari",
+    "noComments": "Encara no hi ha comentaris",
+    "noMessageSelected": "Cap missatge seleccionat",
+    "post": "Publicar",
+    "title": "Comentaris",
+    "unexpectedError": "S'ha produït un error inesperat",
+    "writeComment": "Escriu un comentari..."
   },
-  "settings": {
-    "showInstructions": "Mostrar instruccions",
-    "title": "Configuració",
-    "language":{
-      "title": "Idioma",
-      "modalTitle": "Selecciona l'idioma",
-      "ca": "Català",
-      "es": "Espanyol",
-      "en": "Anglès"
-    },
-    "measureUnit": {
-      "title": "Unitat de mesura",
-      "modalTitle": "Selecciona la unitat de mesura",
-      "meters": "Metres",
-      "miles": "Milles"
-    }
+  "common": {
+    "cancel": "Cancel·lar",
+    "no": "No",
+    "ok": "Acceptar",
+    "save": "Desar",
+    "yes": "Sí"
+  },
+  "edit": {
+    "additionalTagsInstructions": "Introdueix noves etiquetes separades per comes.",
+    "addTags": "Afegir etiquetes",
+    "addressLabel": "Adreça o descripció",
+    "addressPlaceholder": "Afegeix una descripció o adreça per a aquesta ubicació",
+    "cancelButton": "Cancel·lar",
+    "cancelConfirmMessage": "Estàs segur que vols descartar aquesta gravació?",
+    "cancelConfirmTitle": "Descartar gravació?",
+    "missingData": "Falten dades de gravació",
+    "networkError": "Error de xarxa. Torna-ho a provar.",
+    "playbackError": "Error en reproduir gravació",
+    "playbackErrorMessage": "No s'ha pogut reproduir la gravació. L'arxiu pot estar absent o corrupte",
+    "playRecording": "Reproduir gravació",
+    "proposedTagsInstructions": "Toca una etiqueta per seleccionar-la o deseleccionar-la.",
+    "publishButton": "Publicar",
+    "publishFailed": "Error en publicar",
+    "publishSuccess": "Èxit",
+    "publishSuccessMessage": "La teva gravació s'ha publicat amb èxit",
+    "quickPublishChangeTags": "Canviar etiquetes",
+    "quickPublishTitle": "Vols publicar aquesta gravació?",
+    "recordingLabel": "Gravació",
+    "stopPlayback": "Aturar reproducció",
+    "tagsLabel": "Etiquetes",
+    "tagsPlaceholder": "Ex: carrer, obstacle, punt de referència",
+    "uploading": "Pujant..."
   },
   "explore": {
+    "error": "S'ha produït un error en carregar les dades d'exploració",
     "title": "Explorar"
   },
-  "search": {
-    "title": "Cercar"
+  "home": {
+    "info-gps": "Prem el següent botó per actualitzar la teva ubicació GPS:",
+    "info-record": "Prem el botó 'Gravar' per començar a gravar àudio. Prem-lo de nou per aturar la gravació:",
+    "noLocationMessage": "Necessitem la teva ubicació abans de gravar. Si us plau, verifica la configuració d'ubicació del teu dispositiu.",
+    "noLocationTitle": "Sense dades d'ubicació",
+    "record": "Gravar",
+    "title": "Gravar"
   },
-  "world": {
-    "title": "Món"
+  "location": {
+    "clickToGetLocation": "Fes clic per obtenir la teva ubicació",
+    "currentLocation": "Ubicació actual: ",
+    "error": "Error en obtenir la ubicació",
+    "highAccuracy": "Alta precisió",
+    "loading": "Obtenint ubicació...",
+    "normalAccuracy": "Precisió normal",
+    "permissionDenied": "Permís d'ubicació denegat",
+    "permissionRequired": "Es requereix permís d'ubicació per gravar amb informació GPS.",
+    "permissionTitle": "Permís d'ubicació"
+  },
+  "login": {
+    "error": {
+      "credentials": "El nom d'usuari o la contrasenya que has introduït són incorrectes. Torna-ho a provar.",
+      "default": "S'ha produït un error durant l'inici de sessió",
+      "input": "Introdueix el nom d'usuari i la contrasenya"
+    },
+    "forgotPassword": "Has oblidat la teva contrasenya?",
+    "noAccount": {
+      "link": "Registra't ara",
+      "text": "No tens un compte?"
+    },
+    "password": "Contrasenya",
+    "recordingMessage": "Necessites iniciar sessió per gravar àudio. Vols iniciar sessió ara?",
+    "required": "Inici de sessió requerit",
+    "title": "Iniciar sessió",
+    "username": "Nom d'usuari"
+  },
+  "message": {
+    "comments": "Comentaris",
+    "delete": "Eliminar",
+    "directions": "Direccions",
+    "editTags": "Editar etiquetes",
+    "failedToRefreshComments": "Error en actualitzar comentaris",
+    "failedToUpdateTags": "Error en actualitzar etiquetes",
+    "listen": "Escoltar",
+    "playbackError": "Error de reproducció",
+    "playbackErrorMessage": "No s'ha pogut reproduir aquest àudio.",
+    "stopPlayback": "Aturar",
+    "unexpectedError": "S'ha produït un error inesperat"
   },
   "myMessages": {
-    "title": "Les meves gravacions",
-    "tabLabel": "Gravacions"
-
+    "error": {
+      "fetchFailed": "Error en obtenir missatges",
+      "notLoggedIn": "Has d'iniciar sessió per veure els teus missatges.",
+      "unexpected": "S'ha produït un error inesperat. Torna-ho a provar."
+    },
+    "loading": "Carregant els teus missatges...",
+    "noMessages": "Encara no has creat cap missatge.",
+    "tabLabel": "Els meus àudios",
+    "title": "Les meves gravacions"
+  },
+  "not-found": {
+    "link": "Anar a la pantalla principal!",
+    "text": "Aquesta pantalla no existeix.",
+    "title": "Ups!"
+  },
+  "recording": {
+    "errorTitle": "Error de gravació",
+    "permissionRequired": "Es requereix permís de micròfon per gravar àudio.",
+    "permissionTitle": "Permís de micròfon",
+    "startError": "No s'ha pogut iniciar la gravació. Torna-ho a provar.",
+    "stopError": "No s'ha pogut aturar la gravació. Torna-ho a provar."
+  },
+  "register": {
+    "button": "Registrar-se",
+    "email": "Correu electrònic",
+    "error": {
+      "defaultError": "S'ha produït un error durant el registre",
+      "emptyUsername": "Introdueix un nom d'usuari",
+      "invalidEmail": "Introdueix una adreça de correu electrònic vàlida",
+      "networkError": "S'ha produït un error de xarxa. Torna-ho a provar.",
+      "passwordsDoNotMatch": "Les contrasenyes no coincideixen",
+      "passwordTooShort": "La contrasenya ha de tenir almenys 4 caràcters",
+      "title": "Error de registre"
+    },
+    "password": "Contrasenya",
+    "repeatPassword": "Repetir contrasenya",
+    "success": {
+      "emailSent": "S'ha enviat un enllaç de confirmació a la teva adreça de correu electrònic. Si us plau, revisa la teva safata d'entrada i fes clic a l'enllaç per activar el teu compte.",
+      "ok": "Acceptar",
+      "title": "Registre exitós"
+    },
+    "terms": "En registrar-te, acceptes els nostres Termes de servei i Política de privadesa",
+    "title": "Uneix-te a la comunitat BlindWiki completant el següent formulari",
+    "username": "Nom d'usuari"
+  },
+  "search": {
+    "button": "Cercar",
+    "error": "S'ha produït un error. Torna-ho a provar.",
+    "loadingMessages": "Carregant missatges per a aquesta ubicació...",
+    "locationError": "No s'han pogut obtenir detalls per a aquesta ubicació.",
+    "noMessages": "No s'han trobat missatges en aquesta ubicació.",
+    "noResults": "No s'han trobat ubicacions. Prova amb un altre terme de cerca.",
+    "placeholder": "Introdueix un nom d'ubicació",
+    "searchingPlaces": "Cercant llocs...",
+    "selectLocation": "Selecciona la ubicació que coincideixi amb la teva cerca:",
+    "title": "Cercar"
+  },
+  "settings": {
+    "language": {
+      "ca": "Català",
+      "en": "Anglès",
+      "es": "Espanyol",
+      "modalTitle": "Selecciona l'idioma",
+      "title": "Idioma"
+    },
+    "logout": {
+      "alert": {
+        "error": {
+          "message": "No s'ha pogut tancar la sessió correctament",
+          "title": "Error en tancar sessió"
+        },
+        "success": "Has tancat la sessió"
+      },
+      "title": "Tancar sessió"
+    },
+    "measureUnit": {
+      "meters": "Metres",
+      "miles": "Milles",
+      "modalTitle": "Selecciona la unitat de mesura",
+      "title": "Unitat de mesura"
+    },
+    "showInstructions": "Mostrar instruccions",
+    "title": "Configuració"
+  },
+  "tags": {
+    "filterInstructions": "Selecciona etiquetes per mostrar gravacions que incloguin almenys una d'elles:"
+  },
+  "world": {
+    "error": "S'ha produït un error en carregar les dades del món",
+    "title": "Món"
   }
 }

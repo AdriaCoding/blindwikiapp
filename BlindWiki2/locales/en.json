@@ -1,175 +1,189 @@
 {
-  "location": {
-    "highAccuracy": "High accuracy",
-    "normalAccuracy": "Normal accuracy",
-    "permissionDenied": "Location permission denied",
-    "error": "Error getting location",
-    "loading": "Getting location...",
-    "currentLocation": "Current location: ",
-    "clickToGetLocation": "Click to get your location",
-    "permissionTitle": "Location Permission",
-    "permissionRequired": "Location permission is required to record with GPS information."
+  "comments": {
+    "errorPosting": "Error posting comment",
+    "noComments": "No comments yet",
+    "noMessageSelected": "No message selected",
+    "post": "Post",
+    "title": "Comments",
+    "unexpectedError": "An unexpected error occurred",
+    "writeComment": "Write a comment..."
   },
-  "home": {
-    "title": "Record",
-    "info-gps": "Press the following button to update your GPS location:",
-    "info-record": "Press the 'Record' button to start recording audio. Press it again to stop recording:",
-    "record": "Record",
-    "noLocationTitle": "No Location Data",
-    "noLocationMessage": "We need your location before recording. Please check your device's location settings."
-  },
-  "message": {
-    "listen": "Listen",
-    "stopPlayback": "Stop",
-    "comments": "Comments",
-    "editTags": "Edit Tags",
-    "delete": "Delete",
-    "directions": "Directions",
-    "playbackError": "Playback Error",
-    "playbackErrorMessage": "Unable to play this audio."
-  },
-  "settings": {
-    "showInstructions": "Show instructions",
-    "title": "Settings",
-    "language": {
-      "title": "Language",
-      "modalTitle": "Select Language",
-      "ca": "Catalan",
-      "es": "Spanish",
-      "en": "English"
-    },
-    "measureUnit": {
-      "title": "Unit of Measure",
-      "modalTitle": "Select Unit of Measure",
-      "meters": "Meters",
-      "miles": "Miles"
-    },
-    "logout":{
-      "title": "Log Out",
-      "alert": {
-        "success": "You have been logged out",
-        "error": {
-          "title":"Log Out Error",
-          "message": "Failed to logout properly"
-        } 
-      }
-    }
-  },
-  "explore": {
-    "title": "Explore"
-  },
-  "search": {
-    "title": "Search",
-    "placeholder": "Enter a location name",
-    "button": "Search",
-    "selectLocation": "Select the location matching your search:",
-    "searchingPlaces": "Searching places...",
-    "loadingMessages": "Loading messages for this location...",
-    "error": "An error occurred. Please try again.",
-    "locationError": "Could not get details for this location.",
-    "noResults": "No locations found. Try a different search term.",
-    "noMessages": "No messages found at this location."
-  },
-  "world": {
-    "title": "World"
-  },
-  "myMessages": {
-    "title": "My Recordings",
-    "tabLabel": "My audios",
-    "loading": "Loading your messages...",
-    "noMessages": "You haven't created any messages yet.",
-    "error": {
-      "notLoggedIn": "You must be logged in to view your messages.",
-      "fetchFailed": "Failed to fetch messages",
-      "unexpected": "An unexpected error occurred. Please try again."
-    }
-  },
-  "recording": {
-    "errorTitle": "Recording Error",
-    "startError": "Failed to start recording. Please try again.",
-    "stopError": "Failed to stop recording. Please try again.",
-    "permissionTitle": "Microphone Permission",
-    "permissionRequired": "Microphone permission is required to record audio."
+  "common": {
+    "cancel": "Cancel",
+    "no": "No",
+    "ok": "OK",
+    "save": "Save",
+    "yes": "Yes"
   },
   "edit": {
-    "recordingLabel": "Recording",
-    "playRecording": "Play Recording",
-    "stopPlayback": "Stop Playback",
-    "tagsLabel": "Tags",
-    "proposedTagsInstructions": "Tap on a tag to select or deselect it.",
     "additionalTagsInstructions": "Enter new tags separated by commas.",
     "addTags": "Add Tags",
-    "tagsPlaceholder": "E.g., street, obstacle, landmark",
     "addressLabel": "Address or Description",
     "addressPlaceholder": "Add a description or address for this location",
     "cancelButton": "Cancel",
-    "publishButton": "Publish",
-    "uploading": "Uploading...",
+    "cancelConfirmMessage": "Are you sure you want to discard this recording?",
+    "cancelConfirmTitle": "Discard Recording?",
+    "missingData": "Missing recording data",
+    "networkError": "Network error. Please try again.",
     "playbackError": "Failed to play recording",
     "playbackErrorMessage": "Could not play the recording. The file may be missing or corrupted",
-    "missingData": "Missing recording data",
+    "playRecording": "Play Recording",
+    "proposedTagsInstructions": "Tap on a tag to select or deselect it.",
+    "publishButton": "Publish",
+    "publishFailed": "Publish Failed",
     "publishSuccess": "Success",
     "publishSuccessMessage": "Your recording has been published successfully",
-    "publishFailed": "Publish Failed",
-    "networkError": "Network error. Please try again.",
-    "cancelConfirmTitle": "Discard Recording?",
-    "cancelConfirmMessage": "Are you sure you want to discard this recording?",
+    "quickPublishChangeTags": "Change tags",
     "quickPublishTitle": "Do you want to publish this recording?",
-    "quickPublishChangeTags": "Change tags"
+    "recordingLabel": "Recording",
+    "stopPlayback": "Stop Playback",
+    "tagsLabel": "Tags",
+    "tagsPlaceholder": "E.g., street, obstacle, landmark",
+    "uploading": "Uploading..."
+  },
+  "explore": {
+    "error": "An error occurred loading exploration data",
+    "title": "Explore"
+  },
+  "home": {
+    "info-gps": "Press the following button to update your GPS location:",
+    "info-record": "Press the 'Record' button to start recording audio. Press it again to stop recording:",
+    "noLocationMessage": "We need your location before recording. Please check your device's location settings.",
+    "noLocationTitle": "No Location Data",
+    "record": "Record",
+    "title": "Record"
+  },
+  "location": {
+    "clickToGetLocation": "Click to get your location",
+    "currentLocation": "Current location: ",
+    "error": "Error getting location",
+    "highAccuracy": "High accuracy",
+    "loading": "Getting location...",
+    "normalAccuracy": "Normal accuracy",
+    "permissionDenied": "Location permission denied",
+    "permissionRequired": "Location permission is required to record with GPS information.",
+    "permissionTitle": "Location Permission"
   },
   "login": {
-    "title": "Log In",
-    "required": "Login Required",
-    "recordingMessage": "You need to be logged in to record audio. Would you like to log in now?",
-    "error":{
-      "input": "Please enter both username and password",
+    "error": {
       "credentials": "The username or password you entered is incorrect. Please try again.",
-      "default": "An error occurred during login"
+      "default": "An error occurred during login",
+      "input": "Please enter both username and password"
     },
-    "username": "Username",
-    "password": "Password",
     "forgotPassword": "Forgot your password?",
     "noAccount": {
-      "text":"You do not have an account?",
-      "link":"Sign up now"
-    }
+      "link": "Sign up now",
+      "text": "You do not have an account?"
+    },
+    "password": "Password",
+    "recordingMessage": "You need to be logged in to record audio. Would you like to log in now?",
+    "required": "Login Required",
+    "title": "Log In",
+    "username": "Username"
   },
-  "not-found":{
-    "title": "Oops!",
+  "message": {
+    "comments": "Comments",
+    "delete": "Delete",
+    "directions": "Directions",
+    "editTags": "Edit Tags",
+    "failedToRefreshComments": "Failed to refresh comments",
+    "failedToUpdateTags": "Failed to update tags",
+    "listen": "Listen",
+    "playbackError": "Playback Error",
+    "playbackErrorMessage": "Unable to play this audio.",
+    "stopPlayback": "Stop",
+    "unexpectedError": "An unexpected error occurred"
+  },
+  "myMessages": {
+    "error": {
+      "fetchFailed": "Failed to fetch messages",
+      "notLoggedIn": "You must be logged in to view your messages.",
+      "unexpected": "An unexpected error occurred. Please try again."
+    },
+    "loading": "Loading your messages...",
+    "noMessages": "You haven't created any messages yet.",
+    "tabLabel": "My audios",
+    "title": "My Recordings"
+  },
+  "not-found": {
+    "link": "Go to home screen!",
     "text": "This screen doesn't exist.",
-    "Link": "Go to home screen!"
+    "title": "Oops!"
+  },
+  "recording": {
+    "errorTitle": "Recording Error",
+    "permissionRequired": "Microphone permission is required to record audio.",
+    "permissionTitle": "Microphone Permission",
+    "startError": "Failed to start recording. Please try again.",
+    "stopError": "Failed to stop recording. Please try again."
   },
   "register": {
-    "title": "Join the BlindWiki community by filling the following form",
-    "email": "Email",
-    "username": "Username",
-    "password": "Password",
-    "repeatPassword": "Repeat Password",
     "button": "Register",
-    "terms": "By Signing up, you agree to our Terms of Service and Privacy Policy",
-    "success": {
-      "title": "Registration Successful",
-      "emailSent": "A confirmation link has been sent to your email address. Please check your inbox and click the link to activate your account.",
-      "ok": "OK"
-    },
+    "email": "Email",
     "error": {
-      "title": "Registration Error",
+      "defaultError": "An error occurred during registration",
       "emptyUsername": "Please enter a username",
       "invalidEmail": "Please enter a valid email address",
-      "passwordTooShort": "Password must be at least 4 characters long",
+      "networkError": "Network error occurred. Please try again.",
       "passwordsDoNotMatch": "Passwords do not match",
-      "defaultError": "An error occurred during registration",
-      "networkError": "Network error occurred. Please try again."
-    }
+      "passwordTooShort": "Password must be at least 4 characters long",
+      "title": "Registration Error"
+    },
+    "password": "Password",
+    "repeatPassword": "Repeat Password",
+    "success": {
+      "emailSent": "A confirmation link has been sent to your email address. Please check your inbox and click the link to activate your account.",
+      "ok": "OK",
+      "title": "Registration Successful"
+    },
+    "terms": "By Signing up, you agree to our Terms of Service and Privacy Policy",
+    "title": "Join the BlindWiki community by filling the following form",
+    "username": "Username"
   },
-  "common": {
-    "yes": "Yes",
-    "no": "No",
-    "ok": "OK",
-    "cancel": "Cancel",
-    "save": "Save"
+  "search": {
+    "button": "Search",
+    "error": "An error occurred. Please try again.",
+    "loadingMessages": "Loading messages for this location...",
+    "locationError": "Could not get details for this location.",
+    "noMessages": "No messages found at this location.",
+    "noResults": "No locations found. Try a different search term.",
+    "placeholder": "Enter a location name",
+    "searchingPlaces": "Searching places...",
+    "selectLocation": "Select the location matching your search:",
+    "title": "Search"
+  },
+  "settings": {
+    "language": {
+      "ca": "Catalan",
+      "en": "English",
+      "es": "Spanish",
+      "modalTitle": "Select Language",
+      "title": "Language"
+    },
+    "logout": {
+      "alert": {
+        "error": {
+          "message": "Failed to logout properly",
+          "title": "Log Out Error"
+        },
+        "success": "You have been logged out"
+      },
+      "title": "Log Out"
+    },
+    "measureUnit": {
+      "meters": "Meters",
+      "miles": "Miles",
+      "modalTitle": "Select Unit of Measure",
+      "title": "Unit of Measure"
+    },
+    "showInstructions": "Show instructions",
+    "title": "Settings"
   },
   "tags": {
     "filterInstructions": "Select any tags to display recordings that include at least one of them:"
+  },
+  "world": {
+    "error": "An error occurred loading world data",
+    "title": "World"
   }
 }
