@@ -111,7 +111,7 @@ export default function MyMessages() {
   if (isLoading && !refreshing) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={Colors.light.primary} />
+        <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
         <Text>{t("myMessages.loading")}</Text>
       </View>
     );
@@ -161,7 +161,7 @@ export default function MyMessages() {
       }
     >
       {isProcessing && (
-        <ActivityIndicator size="small" color={Colors.light.primary} />
+        <ActivityIndicator size="small" color={Colors.light.activityIndicator} />
       )}
 
       {messages.map((message) => (

@@ -7,7 +7,7 @@ import StyledButton from "@/components/StyledButton";
 import { InstructionsText } from "@/components/InstructionsText";
 import { useTranslation } from "react-i18next";
 import Colors from "@/constants/Colors";
-
+import { ActivityIndicator } from "react-native";
 interface TagsEditProps {
   onTagsChange: (tags: Tag[]) => void;
   isLoadingTags: boolean;
@@ -76,7 +76,7 @@ export default function TagsEdit({
       <ScrollView style={styles.tagListContainer}>
         {/* Tags Section */}
         {isLoadingTags ? (
-          <Text style={styles.loadingText}>{t("edit.loadingTags")}</Text>
+          <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
         ) : allTags.length > 0 ? (
           <View>
             <InstructionsText>{t("edit.proposedTagsInstructions")}</InstructionsText>

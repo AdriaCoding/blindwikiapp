@@ -225,12 +225,12 @@ export default function Search() {
 
       {isLoadingPlaces ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
           <Text style={styles.loadingText}>{t("search.searchingPlaces")}</Text>
         </View>
       ) : isLoadingMessages ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
           <Text style={styles.loadingText}>{t("search.loadingMessages")}</Text>
         </View>
       ) : error ? (

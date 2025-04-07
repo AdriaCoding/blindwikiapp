@@ -163,7 +163,7 @@ export default function CommentsModal({
           
           {isLoading && (
             <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color={Colors.light.primary} />
+              <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
             </View>
           )}
         </View>

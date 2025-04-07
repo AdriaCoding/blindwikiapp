@@ -133,7 +133,7 @@ export default function World() {
     <ScrollView style={styles.container}>
       {isLoadingAreas ? (
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color={Colors.light.primary} />
+          <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
         </View>
       ) : error ? (
         <Text style={styles.errorText}>{error}</Text>
@@ -142,7 +142,7 @@ export default function World() {
           <TagsList tags={areasAsTags} onTagPress={chosenAreaHandler} />
           {isLoading ? (
             <View style={styles.centerContainer}>
-              <ActivityIndicator size="large" color={Colors.light.primary} />
+              <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
             </View>
           ) : error ? (
             <Text style={styles.errorText}>{error}</Text>

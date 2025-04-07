@@ -10,7 +10,7 @@ import * as Location from "expo-location";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "@/contexts/LocationContext";
-
+import Colors from "@/constants/Colors";
 export default function LocationComponent() {
   const { t } = useTranslation();
   const [locationText, setLocationText] = useState<string | null>(null);
@@ -109,7 +109,7 @@ export default function LocationComponent() {
     >
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
           <Text style={styles.loadingText}>{t("location.loading")}</Text>
         </View>
       ) : error ? (

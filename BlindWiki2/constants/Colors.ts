@@ -1,3 +1,4 @@
+import { collectManifestSchemes } from "expo-linking";
 
 // Version: 2.0
 const primaryColor = '#0000ff';
@@ -35,7 +36,8 @@ export default {
       success: '#4CAF50',
       error: '#f44336',
       warning: '#ff9800'
-    }
+    },
+    activityIndicator: secondaryColor
   },
   dark: {
     primary: '#82b1ff',
