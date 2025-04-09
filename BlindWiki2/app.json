@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "BlindWiki 2",
-    "slug": "BW2",
+    "slug": "blind-wiki-2",
     "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -41,14 +41,15 @@
         "origin": false
       },
       "eas": {
-        "projectId": "8ecb86ce-c699-4c08-9cbb-c69695595cb8"
+        "projectId": "1fd04953-c4ae-4c1c-ac28-cd5274e0181b"
       }
     },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/8ecb86ce-c699-4c08-9cbb-c69695595cb8"
-    }
+      "url": "https://u.expo.dev/1fd04953-c4ae-4c1c-ac28-cd5274e0181b"
+    },
+    "owner": "adriacoding"
   }
 }
