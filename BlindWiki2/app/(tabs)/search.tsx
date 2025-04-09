@@ -196,11 +196,13 @@ export default function Search() {
             title={t("search.button")}
             style={styles.searchButton}
           />
+          {/* Botón de prueba para verificar el sessionId y otros datos de depuración 
           <StyledButton
             onPress={testhandler}
             title="TEST"
             style={styles.testButton}
           />
+          */}
         </View>
       </View>
 
