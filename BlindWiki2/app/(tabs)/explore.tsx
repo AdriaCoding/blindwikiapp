@@ -75,6 +75,8 @@ export default function Explore() {
         </View>
       ) : error ? (
         <Text style={styles.errorText}>{error}</Text>
+      ) : messages.length == 0 ? (
+        <Text style={styles.errorText}>{t("explore.noMessages")}</Text>
       ) : (
         <TagsView messages={messages} />
       )}
@@ -94,7 +96,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     textAlign: "center",
-    marginTop: 20,
+    marginTop: 40,
+    fontSize: 20,
     color: Colors.light.text,
   },
 });

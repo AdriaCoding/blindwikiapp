@@ -43,6 +43,7 @@
   },
   "explore": {
     "error": "S'ha produït un error en carregar les dades d'exploració",
+    "noMessages": "Encara no hi ha missatges a prop de la teva ubicació.",
     "title": "Explorar"
   },
   "home": {

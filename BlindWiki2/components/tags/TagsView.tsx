@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { InstructionsText } from "../InstructionsText";
 import MessageComponent, { useMessageActions, MessageActions } from "../MessageView";
@@ -55,18 +55,13 @@ export default function TagsView({ messages }: { messages: Message[] }) {
   };
 
   const handleTagPress = (pressedTag: Tag) => {
-    setAvailableTags((prev) =>
-      prev.map((tag) =>
-        tag.id === pressedTag.id ? { ...tag, selected: !tag.selected } : tag
-      )
+    const updatedTags = availableTags.map((tag) =>
+      tag.id === pressedTag.id ? { ...tag, selected: !tag.selected } : tag
     );
-  };
+    setAvailableTags(updatedTags);
 
-  // Filtramos mensajes basados en etiquetas con selected = true
-  const selectedTags = availableTags.filter((tag) => tag.selected);
-  
-  // Actualizar mensajes filtrados cuando cambian las etiquetas seleccionadas
-  const updateFilteredMessages = useCallback(() => {
+    // Filtrar mensajes basados en etiquetas seleccionadas
+    const selectedTags = updatedTags.filter((tag) => tag.selected);
     if (selectedTags.length > 0) {
       const filtered = messages.filter((message) =>
         message.tags.some((messageTag) =>
@@ -74,17 +69,10 @@ export default function TagsView({ messages }: { messages: Message[] }) {
         )
       );
       setFilteredMessages(filtered);
-      return filtered;
     } else {
       setFilteredMessages([]);
-      return [];
     }
-  }, [messages, selectedTags]);
-
-  // Actualizar mensajes filtrados cuando cambian las etiquetas seleccionadas
-  React.useEffect(() => {
-    updateFilteredMessages();
-  }, [selectedTags, messages, updateFilteredMessages]);
+  };
 
   return (
     <>

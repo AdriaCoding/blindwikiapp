@@ -43,6 +43,7 @@
   },
   "explore": {
     "error": "An error occurred loading exploration data",
+    "noMessages": "No messages found nearby your location.",
     "title": "Explore"
   },
   "home": {

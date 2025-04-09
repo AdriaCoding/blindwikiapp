@@ -43,6 +43,7 @@
   },
   "explore": {
     "error": "Se ha producido un error al cargar los datos de exploración",
+    "noMessages": "No se han encontrado mensajes cerca de tu ubicación.",
     "title": "Explorar"
   },
   "home": {
