@@ -3,7 +3,7 @@ import { getSessionToken } from "./secureStorage";
 import { Message, Attachment, Comment } from "@/models/message";
 import * as FileSystem from 'expo-file-system';
 import { useAuth } from "@/contexts/AuthContext"; // Add this import
-
+import axios from 'axios'; // Import axios for HTTP requests
 
 // Server response interfaces
 export interface MessagesResponse extends ServerResponse {
@@ -298,20 +298,31 @@ export async function publishMessage(
       };
     }
 
-    const formData = new FormData();
-    
     // Extract filename and determine MIME type
     const filename = audioFilePath.split('/').pop() || 'audio.mp3';
     const extension = filename.split('.').pop()?.toLowerCase() || 'mp3';
     const mimeType = getMimeTypeForExtension(extension);
     
-    // Add the audio file
-    formData.append("PublishForm[files][0]", {
-      uri: audioFilePath,
+    // Create form data object
+    const formData = new FormData();
+    
+    // Read the file data and create a blob
+    const fileUri = audioFilePath;
+    const fileBase64 = await FileSystem.readAsStringAsync(fileUri, {
+      encoding: FileSystem.EncodingType.Base64
+    });
+    
+    // Create a Blob from the base64 data
+    const fileBlob = {
+      uri: fileUri,
       name: filename,
       type: mimeType,
-    } as any);
+    };
     
+    // Add the audio file to the form data
+    formData.append("PublishForm[files][0]", fileBlob as any);
+    
+    // Add other required form data
     formData.append("PublishForm[longitude]", longitude);
     formData.append("PublishForm[latitude]", latitude);
     formData.append("PublishForm[address]", address);
@@ -320,17 +331,18 @@ export async function publishMessage(
     formData.append("PublishForm[device]", deviceInfo || "BlindWiki2 App");
     formData.append("PHPSESSID", sessionId);
     
-    // Since this is a special case with FormData, we need to use fetch directly
-    // In a real implementation, you might want to refactor apiRequest to handle FormData
-    const response = await fetch("https://api.blind.wiki/message/publish", {
-      method: "POST",
-      body: formData,
+    // Using axios to upload the file
+    const response = await axios({
+      method: 'post',
+      url: 'https://api.blind.wiki/message/publish',
+      data: formData,
       headers: {
-        Accept: "application/json",
-      },
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+      }
     });
     
-    const serverResponse = await response.json() as MessageResponse;
+    const serverResponse = response.data as MessageResponse;
     
     if (serverResponse.status === "ok") {
       return {
