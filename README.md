@@ -3,8 +3,9 @@
 <div align="center">
   <img src="https://github.com/adriacoding/blindwikiapp/blob/master/BlindWiki2/assets/images/icon.png?raw=true" alt="BlindWiki Logo" width="180">
   <br>
-  <h3>Unveiling the Unseen</h3>
 </div>
+
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=30&pause=1000&color=FEE300&center=true&vCenter=true&width=435&lines=Unveiling+the+Unseen)](https://git.io/typing-svg)
 
 ## 📋 Overview
 
