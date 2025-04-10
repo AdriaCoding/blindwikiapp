@@ -1,9 +1,9 @@
 # BlindWiki
 
 <div align="center">
-  <img src="https://github.com/adriacoding/blindwikiapp/blob/main/BlindWiki2/assets/images/icon.png?raw=true" alt="BlindWiki Logo" width="180">
+  <img src="https://github.com/adriacoding/blindwikiapp/blob/master/BlindWiki2/assets/images/icon.png?raw=true" alt="BlindWiki Logo" width="180">
   <br>
-  <h3>Collaborative Voice-Based Platform for Accessible Mapping</h3>
+  <h3>Unveiling the Unseen</h3>
 </div>
 
 ## 📋 Overview
