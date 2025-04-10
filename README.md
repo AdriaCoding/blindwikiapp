@@ -3,10 +3,8 @@
 <div align="center">
   <img src="https://github.com/adriacoding/blindwikiapp/blob/master/BlindWiki2/assets/images/icon.png?raw=true" alt="BlindWiki Logo" width="180">
   <br>
+  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=30&pause=1000&color=EFFF00&center=true&vCenter=true&width=435&lines=Unveiling+the+Unseen" alt="Typing SVG" /></a>
 </div>
-
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=30&pause=1000&color=FEE300&center=true&vCenter=true&width=435&lines=Unveiling+the+Unseen)](https://git.io/typing-svg)
-
 ## 📋 Overview
 
 BlindWiki is an innovative mobile application that allows users to record audio notes associated with specific locations, creating a collaborative, accessible map of user experiences. The platform is particularly designed to improve accessibility for visually impaired users by providing an audio-based interface to navigate and understand urban environments.
