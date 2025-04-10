@@ -8,23 +8,25 @@
 
 ## 📋 Overview
 
-BlindWiki is an innovative mobile application that allows users to record audio notes associated with specific locations, creating a collaborative, accessible map of user experiences. The platform is particularly designed to improve accessibility for visually impaired users by providing an audio-based interface to navigate and understand urban environments.
+BlindWiki is a collaborative, location-based audio network that invites citizens who are blind or partially sighted to share their experiences of urban environments. The platform serves as a sensorial and locative map of the unseen, holding not just information about barriers and accommodations, but also a repository for storytelling about places and people.
+
+Originally created by Antoni Abad in 2014, the project has expanded to multiple cities worldwide, including Venice, São Paulo, Valencia, Berlin, Rome, Sydney, and Wrocław, creating an international network where participants can share, analyze, discuss, and compare accessibility in their cities.
 
 ### Key Features:
 
-- 🔊 **Geo-Located Audio Recording**: Capture voice notes with automatic location tagging
-- 🌍 **Multi-Language Support**: Record in your native language with automatic language detection
-- 🔍 **AI-Powered Processing**: Automatic transcription, translation, and content tagging
-- 🧩 **Content Discovery**: Explore recordings by location, tags, or areas
-- 👥 **Community Collaboration**: Build a shared knowledge base of accessible places and experiences
+- 🔊 **Geo-Located Audio Recording**: Record site-specific audio and immediately publish it to the BlindWiki platform
+- 🌍 **Multi-Language Support**: Access content in multiple languages to serve diverse international communities
+- 🧭 **Location-Based Exploration**: Discover audio notes about nearby places while navigating through the city
+- 🔍 **Content Discovery**: Explore recordings by location, tags, or areas of interest
+- 👥 **Community Collaboration**: Connect with local and international participants to build a shared knowledge base
 
 ## 🔧 Repository Structure
 
 This repository contains three main components:
 
-1. **BlindWiki2**: Frontend mobile application built with React Native and Expo
-2. **BlindWikiPhoneGap**: Previous version of the application (legacy code)
-3. **Notebooks**: Jupyter notebooks for AI processing pipeline development
+1. **BlindWiki2**: Frontend mobile application built with React Native and Expo (new version in development)
+2. **BlindWikiPhoneGap**: Previous version of the application currently available on app stores
+3. **Notebooks**: Jupyter notebooks for AI processing pipeline development (new feature)
 
 ## 🚀 Getting Started
 
@@ -48,12 +50,6 @@ This repository contains three main components:
 2. Install Python dependencies:
    ```bash
    pip install -r requirements.txt
-   ```
-
-3. For the frontend application, navigate to the BlindWiki2 directory:
-   ```bash
-   cd BlindWiki2
-   npm install
    ```
 
 ## 🔬 AI Processing Pipeline
