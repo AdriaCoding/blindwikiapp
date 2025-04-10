@@ -1,4 +1,5 @@
 /blindwikiphonegap
 BlindWiki2/services/backend_reference_files/main.php
 /uploads
-/notebooks/blindwiki_env
+.venv
+*.pyc
