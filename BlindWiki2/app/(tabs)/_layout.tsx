@@ -27,8 +27,9 @@ export default function TabLayout() {
         headerShown: useClientOnlyValue(false, true),
         sceneStyle: {
           backgroundColor: Colors.light.background,
-        }
-        
+        },
+        // Colocar texto debajo de los iconos
+        tabBarLabelPosition: 'below-icon',
       }}
     >
       <Tabs.Screen
