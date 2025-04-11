@@ -5,7 +5,7 @@ node_modules/
 
 # Expo
 .expo/
-dist/
+# dist/  # Commented out to allow dist directory to be committed for GitHub Pages
 web-build/
 expo-env.d.ts
 

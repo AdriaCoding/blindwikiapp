@@ -41,7 +41,8 @@
       "expo-secure-store"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "baseUrl": "/BlindWiki2"
     },
     "extra": {
       "router": {
