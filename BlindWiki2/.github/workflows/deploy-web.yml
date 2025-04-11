@@ -20,15 +20,20 @@ jobs:
         with:
           node-version: 18
 
+      - name: Change to BlindWiki2 directory
+        run: cd BlindWiki2
+
       - name: Install dependencies
+        working-directory: ./BlindWiki2
         run: npm ci
 
       - name: Build website
+        working-directory: ./BlindWiki2
         run: npm run predeploy
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist
+          folder: BlindWiki2/dist
           branch: gh-pages
           clean: true 
