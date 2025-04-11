@@ -6,13 +6,15 @@ on:
       - web
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -21,9 +23,10 @@ jobs:
         working-directory: ./BlindWiki2
         run: npm ci
 
-      - name: Deploy to GitHub Pages
+      - name: Build and deploy
         working-directory: ./BlindWiki2
         run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-          npm run deploy
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          npm run predeploy
+          npx gh-pages --dist dist --no-history --repo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" --user "GitHub Actions <actions@github.com>" --message "Deploy: ${GITHUB_SHA}"
