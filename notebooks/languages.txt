@@ -1,0 +1,3 @@
+English 	eng_Latn
+Spanish 	spa_Latn
+Catalan 	cat_Latn
