@@ -1,4 +1,6 @@
-{
+const isProduction = process.env.NODE_ENV === 'production';
+
+module.exports = {
   "expo": {
     "name": "BlindWiki 2",
     "slug": "blind-wiki-2",
@@ -42,7 +44,7 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "baseUrl": "/blindwikiapp"
+      ...(isProduction ? { baseUrl: "/blindwikiapp" } : {})
     },
     "extra": {
       "router": {
