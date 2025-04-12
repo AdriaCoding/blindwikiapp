@@ -1,0 +1,133 @@
+\documentclass[12,twoside]{TFG-GM}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[active]{srcltx}
+\usepackage{amsthm,amsmath,amssymb,amsfonts,amscd}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{subcaption}
+\usepackage{enumerate}
+\usepackage[all]{xy}
+\usepackage{booktabs}
+\usepackage{titlesec}
+\usepackage{comment}
+\usepackage{enumitem}   
+%\usepackage[usenames]{xcolor}
+\usepackage{xparse}
+\usepackage{float}
+\usepackage[ruled]{algorithm2e}
+\usepackage{pdfpages}
+\usepackage{minted}
+\usepackage{hyperref}
+\usepackage{epigraph} 
+
+%% Theorem Environments: add extra ones at the end if you need it.
+\newtheorem*{theoremA}{Theorem A}
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem*{remarknonumber}{Remark}
+\newtheorem{observation}[theorem]{Observation}
+
+%% macros/abbreviations: Include here your own.
+
+\newcommand{\TODO}{
+\large
+\textcolor{red}{TO DO.}
+\normalsize
+}
+\newcommand{\N}{\ensuremath{
+    \mathcal{N}
+}}
+\newcommand{\C}{\ensuremath{
+    \mathcal{C}
+}}
+\newcommand{\R}{\ensuremath{
+    \mathbb{R}
+}}
+\newcommand{\A}{\ensuremath{
+    \mathcal{A}
+}}
+\newcommand{\loss}{\ensuremath{
+    L
+}}
+\newcommand{\lgr}{\ensuremath{
+    \mathcal{L}
+}}
+
+\newcommand{\F}{\ensuremath{
+    \mathcal{F}
+}}
+\newcommand{\G}{\ensuremath{
+    \mathcal{G}
+}}
+\newcommand{\der}[2][]{\ensuremath{
+    \frac{d#1}{d#2}
+}}
+\newcommand{\prt}[2][]{\ensuremath{
+    \frac{\partial#1}{\partial#2}
+}}
+\newcommand{\br}[2]{
+    #1^{[#2]}
+}
+
+%%%%%%%%%%%%%%%%%%%
+%   BODY OF THE DOCUMENT
+%%%%%%%%%%%%%%%%%%%
+
+\titol{BlindWiki 2.0: an intelligent version}
+\titolcurt{BlindWiki 2.0}
+\authorStudent{Adrià Lisa Bou}
+\supervisors{\textbf{Karina Gibert Oliveras} and \textbf{Xavier Angerri Torredeflot}\\ Department of Statistics and Operations Resarch \& IDEAI }
+\monthYear{June, 2025}
+\paraulesclau{\TODO}
+\agraiments{
+\TODO
+}
+\abstracteng{
+\cite{jia2022cvss}
+\TODO
+}
+\author{Adrià Lisa}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%
+%   BEGIN DOCUMENT  %
+%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+%------------------------------------------
+
+\input{text/intro.tex}
+\input{text/stateOfTheArt}
+\input{text/design}
+\input{text/development}
+\input{text/evaluation}
+\input{text/sustainability}
+\input{text/conclusion}
+
+%------------------------------------------
+\bibliographystyle{plain}
+\bibliography{export}
+
+\appendix
+\end{document}
+
