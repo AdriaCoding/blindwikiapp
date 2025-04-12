@@ -5,11 +5,10 @@ node_modules/
 
 # Expo
 .expo/
-dist/
 web-build/
 expo-env.d.ts
 
-# Native
+# Native 
 *.orig.*
 *.jks
 *.p8
@@ -35,3 +34,7 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Ensure dist folder is not ignored for GitHub Pages
+!dist/
+!dist/.nojekyll
