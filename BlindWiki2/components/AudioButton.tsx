@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ViewStyle, StyleProp, Alert } from 'react-native';
+import { StyleSheet, ViewStyle, StyleProp, Alert, Platform } from 'react-native';
 import { Audio } from 'expo-av';
 import StyledButton from './StyledButton';
 import * as FileSystem from 'expo-file-system';
@@ -103,12 +103,17 @@ export default function AudioButton({
         await sound.unloadAsync();
       }
 
-      // For local files, check if the file exists
-      if (!isRemoteUri) {
-        const fileInfo = await FileSystem.getInfoAsync(audioUri);
-        
-        if (!fileInfo.exists) {
-          throw new Error('Audio file not found');
+      // Skip file existence check on web platform
+      if (!isRemoteUri && Platform.OS !== 'web') {
+        try {
+          const fileInfo = await FileSystem.getInfoAsync(audioUri);
+          if (!fileInfo.exists) {
+            throw new Error('Audio file not found');
+          }
+        } catch (fileError) {
+          console.error("Error checking file existence:", fileError);
+          // On non-web platforms, rethrow the error
+          throw fileError;
         }
       }
 

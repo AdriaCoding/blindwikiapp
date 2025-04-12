@@ -1,4 +1,4 @@
-import { StyleSheet, Alert } from 'react-native';
+import { StyleSheet, Alert, Platform } from 'react-native';
 import { useState, useEffect } from 'react';
 import { InstructionsText } from '@/components/InstructionsText';
 import LocationComponent from '@/components/Location';
@@ -54,6 +54,45 @@ export default function HomeScreen() {
           t('home.noLocationMessage')
         );
         return;
+      }
+
+      // Web platform handling for recording
+      if (Platform.OS === 'web') {
+        try {
+          // Check if browser supports MediaRecorder
+          if (!window.MediaRecorder) {
+            Alert.alert(
+              t('recording.errorTitle'),
+              'Su navegador no soporta la grabación de audio'
+            );
+            return;
+          }
+
+          // Request microphone permission
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          
+          // Para web, simular niveles de audio ya que la API no proporciona metering
+          // Iniciar un temporizador para simular cambios en el nivel de audio
+          const simulateAudioLevel = () => {
+            // Generar un valor aleatorio entre 0.3 y 0.9 para que sea visible
+            const simulatedLevel = 0.3 + (Math.random() * 0.6);
+            setAudioLevel(simulatedLevel);
+          };
+          
+          // Actualizar cada 200ms para simular cambios en el nivel de audio
+          const intervalId = setInterval(simulateAudioLevel, 200);
+          
+          // Guardar el ID del intervalo para limpiarlo después
+          // @ts-ignore - Almacenar en el objeto window para acceso global
+          window._recordingIntervalId = intervalId;
+        } catch (webError) {
+          console.error('Web: Error accessing microphone', webError);
+          Alert.alert(
+            t('recording.errorTitle'),
+            'Error al acceder al micrófono. Asegúrese de que su navegador tiene permisos para usar el micrófono.'
+          );
+          return;
+        }
       }
 
       // Configure recording
@@ -118,10 +157,36 @@ export default function HomeScreen() {
     if (!recordingInstance) return;
     
     try {
+      // Limpiar intervalo de simulación de audio para web
+      if (Platform.OS === 'web' && (window as any)._recordingIntervalId) {
+        clearInterval((window as any)._recordingIntervalId);
+        (window as any)._recordingIntervalId = null;
+      }
+      
       await recordingInstance.stopAndUnloadAsync();
       const originalUri = recordingInstance.getURI();
       
       if (originalUri) {
+        // Web platform handling
+        if (Platform.OS === 'web') {
+          setRecordingUri(originalUri);
+          setRecordingInstance(null);
+          setIsRecording(false);
+          setAudioLevel(0);
+          
+          // Navigate to edit screen with the recording URI
+          router.push({
+            pathname: '/edit',
+            params: { 
+              recordingUri: originalUri,
+              latitude: location?.coords.latitude?.toString() || '',
+              longitude: location?.coords.longitude?.toString() || ''
+            }
+          });
+          return;
+        }
+        
+        // Native platforms (iOS/Android)
         // Ensure the file exists before proceeding
         const fileInfo = await FileSystem.getInfoAsync(originalUri);
         
