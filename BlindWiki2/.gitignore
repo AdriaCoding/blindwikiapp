@@ -37,3 +37,4 @@ yarn-error.*
 
 # Ensure dist folder is not ignored for GitHub Pages
 !dist/
+!dist/.nojekyll

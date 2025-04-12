@@ -7,6 +7,10 @@ on:
     paths:
       - 'BlindWiki2/**'
 
+# Añadir permisos al workflow
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
