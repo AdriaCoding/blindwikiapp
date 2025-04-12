@@ -42,7 +42,7 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "baseUrl": "/BlindWiki2"
+      "baseUrl": "/blindwikiapp"
     },
     "extra": {
       "router": {
