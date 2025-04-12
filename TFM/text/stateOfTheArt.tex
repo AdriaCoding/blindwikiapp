@@ -1,6 +1,91 @@
 \section{State of the Art}
 
-Vull investigar quins models de traducció hi ha, tant des de la perspectiva acadèmica, com la perspectiva de producte.
+Speech-to-speech (S2S) translation and automatic speech recognition (ASR) have seen transformative advances with multimodal AI models. Below is an analysis of state-of-the-art systems, focusing on noise robustness, language coverage, open-source availability, and benchmark performance.
 
-Veure pros i contras de Speech to Speech, Speech to text to Speech, etc.
+\subsection{Key Models in Speech Translation}
 
+\subsubsection{SeamlessM4T (Meta AI)}
+A unified multimodal model supporting S2S translation, S2T, T2T, T2S, and ASR across 100 languages. Key features:
+
+\begin{itemize}
+    \item \textbf{Noise Robustness:} Outperforms Whisper-Large-v2 by 38\% on background noise (Fleurs benchmark) and 49\% on speaker variation.
+    
+    \item \textbf{Language Coverage:} Handles $100 \rightarrow \text{English}$ and $\text{English} \rightarrow 35$ for S2S, $95 \rightarrow \text{English}$ and $\text{English} \rightarrow 95$ for T2T, and ASR for 96 languages.
+    
+    \item \textbf{Open Source:} Full model weights, training code, and aligned speech dataset (SeamlessAlign) released.
+    
+    \item \textbf{Safety:} Reduces added toxicity by up to 63\% compared to SOTA models.
+\end{itemize}
+
+\subsubsection{Whisper (OpenAI)}
+Primarily an ASR model (speech-to-text) supporting 97 languages:
+
+\begin{itemize}
+    \item \textbf{Noise Robustness:} Less robust than SeamlessM4T; SeamlessM4T reduces WER by 45\% on overlapping languages in noisy conditions.
+    
+    \item \textbf{Limitations:} No native S2S support; cascaded systems required for full translation.
+\end{itemize}
+
+\subsubsection{Coworker-Proposed Models}
+Details unavailable due to inaccessible document (\texttt{estat\_art\_t2\_t3\_blind\_wiki.docx}). Provide the file to incorporate these into the analysis.
+
+\subsection{Benchmarks Explained}
+
+\begin{description}
+    \item[Fleurs:] 
+    \begin{itemize}
+        \item Evaluates multilingual ASR and S2TT across 102 languages.
+        \item Tests robustness to noise/speaker variations.
+        \item Metrics: BLEU (translation), WER (ASR).
+    \end{itemize}
+    
+    \item[CVSS:] 
+    \begin{itemize}
+        \item Focuses on S2ST quality using ASR-BLEU (speech output transcribed and compared to reference text).
+    \end{itemize}
+    
+    \item[CoVoST 2:] 
+    \begin{itemize}
+        \item Measures S2TT from English to 15 languages.
+        \item Metric: BLEU.
+    \end{itemize}
+    
+    \item[Flores:] 
+    \begin{itemize}
+        \item Text-to-text translation benchmark for 204 languages.
+        \item Metric: chrF++ (character-level F-score).
+    \end{itemize}
+    
+    \item[Blaser 2.0:] 
+    \begin{itemize}
+        \item Modality-agnostic metric for translation quality, correlating with human judgments.
+    \end{itemize}
+\end{description}
+
+\subsection{Performance Comparison}
+
+\begin{table}
+    \centering
+    \caption{Comparison of Speech Translation Models}
+    \label{tab:model-comparison}
+    \begin{tabular}{|p{2.5cm}|p{2.5cm}|p{2cm}|p{1cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|}
+        \hline
+        \textbf{Model} & \textbf{Languages Supported (ASR/S2S)} & \textbf{Noise Robustness (Fleurs WER $\downarrow$)} & \textbf{Open Source} & \textbf{Fleurs S2TT (BLEU $\uparrow$)} & \textbf{CVSS S2ST (ASR-BLEU $\uparrow$)} & \textbf{Flores T2T (chrF++ $\uparrow$)} \\
+        \hline
+        SeamlessM4T-Large & 96 / $100\rightarrow35$ & 38\% better than Whisper & Yes & 20.4 (X$\rightarrow$Eng) & 58.7 & 54.3 (Eng$\rightarrow$X) \\
+        \hline
+        Whisper-Large-v2 & 97 / None & Baseline & Yes & 16.2 (X$\rightarrow$Eng) & N/A & N/A \\
+        \hline
+        Coworker Models & Not specified & Not specified & Unknown & Not specified & Not specified & Not specified \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Critical Analysis}
+SeamlessM4T dominates in multitasking capability, supporting direct S2S without cascaded systems. Its 100-language coverage and noise resilience make it ideal for real-world applications.
+
+Whisper remains strong for ASR but lacks native S2S and lags in translation benchmarks.
+
+\textbf{Open-Source Gap:} SeamlessM4T's release of training data and tools sets a new standard for reproducibility, unlike proprietary models like AudioPaLM-2.
+
+For applications requiring robustness to ambient noise and broad language support, SeamlessM4T is the current SOTA. Integrate coworker-proposed models into this framework once their documentation is available.
