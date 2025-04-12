@@ -65,35 +65,74 @@ def find_knn_tags(tag_embeddings, text_embedding, tags, k=5):
 if __name__ == "__main__":
     # Rutas de archivos
     tags_file = "tags_text.txt"
-    mp3_file = "uploads/barcelona_JuanNuez_m70566_a87310_audio_converted.mp3"
     transcriptions_file = "data/transcriptions.csv"
+    output_file = "data/automatic_tags.csv"
     
     # 1. Cargar y preprocesar tags
     print("Cargando y preprocesando etiquetas...")
     tags = load_and_preprocess_tags(tags_file)
     print(f"Se cargaron {len(tags)} etiquetas únicas")
     
-    # 2 y 3. Obtener transcripción
-    print("\nObteniendo transcripción del archivo MP3...")
-    transcription = get_transcription(mp3_file, transcriptions_file)
-    if transcription:
-        print(f"Transcripción: {transcription}")
-    else:
-        print("No se encontró la transcripción para este archivo")
-        exit(1)
+    # Cargar transcripciones
+    print("\nCargando transcripciones...")
+    transcriptions_df = pd.read_csv(transcriptions_file)
+    print(f"Se encontraron {len(transcriptions_df)} transcripciones")
     
-    # 4. Calcular embeddings
-    print("\nCalculando embeddings...")
+    # Inicializar el modelo de embeddings una sola vez
+    print("\nCargando modelo de embeddings...")
     model = SentenceTransformer('all-MiniLM-L6-v2')
+    
+    # Calcular embeddings para todas las etiquetas
+    print("Calculando embeddings para las etiquetas...")
     tag_embeddings = model.encode(tags)
-    transcription_embedding = model.encode(transcription)
     
-    # 5. Encontrar etiquetas usando KNN
-    print("\nEncontrando etiquetas más cercanas (K=5)...")
-    nearest_tags, distances = find_knn_tags(tag_embeddings, transcription_embedding, tags, k=5)
+    # Crear DataFrame para resultados
+    results = []
     
-    # Mostrar resultados
-    print("\nEtiquetas más cercanas a la transcripción:")
-    for i, (tag, distance) in enumerate(zip(nearest_tags, distances)):
-        similarity = 1 - distance  # Convertir distancia coseno a similitud
-        print(f"{i+1}. {tag} (Similitud: {similarity:.4f})")
+    # Procesar cada transcripción
+    print("\nProcesando transcripciones...")
+    for idx, row in transcriptions_df.iterrows():
+        file_name = row['file']
+        transcription = row['transcription']
+        
+        if pd.isna(transcription) or transcription == "":
+            print(f"Transcripción vacía para {file_name}, omitiendo...")
+            continue
+        
+        print(f"Procesando {idx+1}/{len(transcriptions_df)}: {file_name}")
+        
+        # Calcular embedding para esta transcripción
+        transcription_embedding = model.encode(transcription)
+        
+        # Encontrar etiquetas más cercanas
+        nearest_tags, distances = find_knn_tags(tag_embeddings, transcription_embedding, tags, k=5)
+        
+        # Calcular similitudes
+        similarities = [1 - distance for distance in distances]
+        
+        # Crear registro para este archivo
+        result = {
+            'file': file_name,
+            'transcription': transcription,
+        }
+        
+        # Agregar tags y similitudes
+        for i in range(5):
+            result[f'tag_{i+1}'] = nearest_tags[i] if i < len(nearest_tags) else ""
+            result[f'similarity_{i+1}'] = similarities[i] if i < len(similarities) else 0.0
+        
+        # Agregar a resultados
+        results.append(result)
+    
+    # Convertir a DataFrame
+    results_df = pd.DataFrame(results)
+    
+    # Guardar a CSV
+    print(f"\nGuardando resultados en {output_file}...")
+    results_df.to_csv(output_file, index=False)
+    
+    print(f"Proceso completado. Se procesaron {len(results_df)} archivos.")
+    
+    # Mostrar primeros resultados como ejemplo
+    print("\nEjemplo de resultados:")
+    print(results_df.head())
