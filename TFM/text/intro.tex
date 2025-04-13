@@ -12,15 +12,16 @@ La necesidad de rediseñar la aplicación surge de los avances tecnológicos en 
 
 El stack tecnológico de la aplicación original se compone de PhoneGap/Cordova como framework base para el empaquetado, e Ionic 1 con Angular.js para la interfaz de usuario y lógica de la aplicación. Esta arquitectura, aunque permitió un desarrollo multiplataforma eficiente en su momento, ha quedado obsoleta frente a los estándares actuales de desarrollo móvil, lo que dificulta la implementación de nuevas funcionalidades y afecta al rendimiento en dispositivos modernos.
 
-Para abordar estos desafíos, se ha desarrollado BlindWiki 2.0, una aplicación completamente rediseñada utilizando tecnologías modernas y eficientes. El nuevo stack tecnológico se basa en \textbf{React Native} y \textbf{Expo}.
+Para abordar estos desafíos, se ha desarrollado BlindWiki 2.0, una aplicación completamente rediseñada utilizando tecnologías modernas y eficientes. El nuevo stack tecnológico se basa en \textbf{React Native}.
 
 Además, la expansión internacional del proyecto ha llevado a la necesidad de superar las barreras lingüísticas que limitan la comunicación entre participantes de diferentes países. Para lograr este objetivo, es preciso implementar una capa de inteligencia artificial basada en modelos avanzados de procesamiento de lenguaje natural y audio. 
 
-Específicamente, se utilizan tres componentes principales:
+Específicamente, se utilizan cuatro componentes principales:
 \begin{itemize}
     \item \textbf{Identificación automática de idioma:} Mediante el modelo \TODO, que permite detectar el idioma original de cada grabación de audio.
-    \item \textbf{Transcripción de audio a texto:} Utilizando el modelo \TODO para convertir las grabaciones de audio en texto en su idioma original.
-    \item \textbf{Traducción de audio a audio:} \TODO
+    \item \textbf{Tradución de audio a texto:} Utilizando el modelo \TODO para convertir las grabaciones de audio a texto traducido al ingés.
+    \item \textbf{Identificación automática de tags:} A partir de las transcripciones de audio en inglés, identificar las tags de cada grabación automáticamente mendiante \TODO.
+    \item \textbf{Traducción de audio a audio:} Utilizando el modelo \TODO para traducir el audio de cada grabación al idioma del usuario.
 \end{itemize}
 
 \subsection{Objectivos}
