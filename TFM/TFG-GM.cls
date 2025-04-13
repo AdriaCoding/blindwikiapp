@@ -1,13 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% mammeTFM.cls
-%
-% Style for the master thesis in MAMME
-% This file is a modification of the style file of the 
-% journal reports@scm
-% to facillitate the publication of the master thesis
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \LoadClass[11pt,twoside]{article}
 \NeedsTeXFormat{LaTeX2e}
 
@@ -26,7 +16,7 @@
 \usepackage[a4paper,left=20mm,top=20mm,right=20mm,bottom=18mm,includeheadfoot,headheight=10mm, headsep=0mm, footskip=15mm]{geometry}
 \makeatletter
 %Parametres de la pagina
-\hypersetup{colorlinks=true,urlcolor=black}
+\hypersetup{colorlinks=true,urlcolor=black,linkcolor=blue}
 %Definim les variables numero, any, pagin, pagfin, doi, ...
 \def\l@any{????}
 \def\l@numero{??}
@@ -71,25 +61,7 @@
 %\setlength{\unitlength}{1mm}%
 \thispagestyle{empty}
 
-\begin{center} \LARGE
-Universitat Polit\`ecnica de Catalunya (UPC) - BarcelonaTech\\[0.2em]
-Facultat d'Informàtica de Barcelona (FIB)
-\end{center}
-\vspace{1cm}
-\begin{center} \LARGE
-Master in Innovation and Research in Informatics\\[0.2em]
-\huge Bachelor's Degree Thesis
-\end{center}
-\vspace{2cm}
-\begin{center}
-{\color{blau}\Huge\bf\@title}\\[1em]
-\LARGE \textbf{\l@authorStudent}
-\end{center}
-\vspace{4cm}
-\begin{center}
-\Large Supervised by \l@supervisors \\[0.5em]
-\l@monthYear
-\end{center}
+\includepdf[pages=-]{portada.pdf}
 
 \newpage\null
 \thispagestyle{empty}
@@ -179,7 +151,7 @@ Master in Innovation and Research in Informatics\\[0.2em]
 \setlength{\parskip}{1mm}
 %\setlength{\parindent}{0pt}
 % Modifiquem les fonts
-\renewcommand*{\familydefault}{\sfdefault}
+%\renewcommand*{\familydefault}{\sfdefault}
 %\renewcommand{\normalsize}{\fontsize{12pt}{14pt}\selectfont}
 
 % Modifiquem la bibliografia
