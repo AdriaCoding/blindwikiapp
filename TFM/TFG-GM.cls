@@ -75,9 +75,9 @@
 \setcounter{page}{1}
 
 \noindent
-{\color{gris}\Large\bf Abstract}\\[1em]
+{\Large\bf Abstract}\\[1em]
 \l@abstracteng\\[2cm]
-{\color{gris}\large\bf Keywords}\\[1em]
+{\large\bf Keywords}\\[1em]
 \@paraulesclau
 
 \newpage
@@ -114,7 +114,7 @@
 %Seccions i altres
 \RequirePackage{titlesec}
 \titleformat{\section}
-          {\color{gris}\normalfont\Huge\bfseries} 
+          {\normalfont\Huge\bfseries} 
           {\thesection.}
           {1ex \@plus.2ex}
           {}
