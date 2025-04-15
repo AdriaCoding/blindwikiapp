@@ -44,315 +44,205 @@ En la siguiente tabla \ref{tab:framework-comparison} se muestra un resumen de la
     \end{tabular}
 \end{table}
 
-Para el desarrollo de la aplicación blind wiki, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y no el rendimiento interno de la aplicación.
+Para el desarrollo de BlindWiki 2.0, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y no el rendimiento interno de la aplicación.
 
-\subsection{Modelos Clave en Traducción de Voz}
+\subsection{Reconocimiento Automático de Habla (ASR)}
+Nos interesa el reconocimiento automático de habla para la identificación del idioma de las grabaciones de audio. Eso facilitará para la etiquetación de las grabaciones con el idioma correcto, y tambien las traducciones posteriores.
 
-\subsubsection{El Panorama Actual de la Traducción Automatizada}
-La traducción automática ha experimentado una revolución radical con el advenimiento de modelos neuronales avanzados. Esta evolución ha transformado un campo tradicionalmente dominado por sistemas basados en reglas y estadísticas hacia arquitecturas de aprendizaje profundo cada vez más sofisticadas, capaces de capturar sutilezas lingüísticas previamente inaccesibles para sistemas automatizados.
+\TODO{Repasar esta sección}
 
-El paradigma actual se caracteriza por varios avances fundamentales:
-
+\paragraph{Principales avances técnicos:}
 \begin{itemize}
-    \item \textbf{Arquitecturas Transformer}: Han reemplazado a las redes neuronales recurrentes (RNN) como base de los sistemas más avanzados, permitiendo el procesamiento paralelo y la captura de dependencias a larga distancia en el texto y audio.
-    
-    \item \textbf{Modelos Multimodales}: La integración de diferentes modalidades (texto, voz, imagen) ha permitido sistemas que comprenden el lenguaje de manera más holística, similares a la comprensión humana.
-    
-    \item \textbf{Modelos de Extremo a Extremo}: Los sistemas modernos tienden a minimizar los pasos intermedios, traduciendo directamente entre modalidades (por ejemplo, Speech-to-Speech) sin necesidad de convertir explícitamente a representaciones intermedias.
-    
-    \item \textbf{Preprocesamiento y Representaciones Universales}: El uso de representaciones universales del lenguaje (\textit{embeddings}) ha permitido que los modelos generalicen mejor entre idiomas, incluso aquellos con pocos recursos de entrenamiento.
+    \item Modelos multilingües unificados que comparten parámetros entre idiomas
+    \item Técnicas de cuantización para ejecución en dispositivos móviles ($<$500MB)
+    \item Integración nativa con aceleradores neuronales (NPUs)
 \end{itemize}
 
-\subsubsection{Análisis Comparativo de Modelos}
-En la Tabla \ref{tab:model-comparison} se presenta un análisis comparativo de los principales modelos de traducción actuales.
+\paragraph{Métricas Clave y Benchmarks}
+En la Tabla \ref{tab:asr-metrics} se presentan las métricas clave de los principales modelos ASR.
 
 \begin{table}[h]
     \centering
-    \caption{Comparación de Modelos de Traducción}
-    \label{tab:model-comparison}
-    \begin{tabular}{|l|c|c|c|c|c|}
+    \caption{Métricas de Modelos ASR}
+    \label{tab:asr-metrics}
+    \begin{tabular}{|l|c|c|c|c|}
         \hline
-        \textbf{Característica} & \textbf{SeamlessM4T} & \textbf{Whisper} & \textbf{Google Translate} & \textbf{NLLB-200} & \textbf{DeepL} \\
+        \textbf{Modelo} & \textbf{WER (EN)} & \textbf{Tiempo Inferencia (ms)} & \textbf{Memoria (MB)} & \textbf{Idiomas} \\
         \hline
-        Arquitectura & Transformer multimodal & Transformer & Transformer & BLISS & Redes neuronales \\
+        Whisper v3 & 4.2\% & 320 & 310 & 97 \\
         \hline
-        Modalidades & Voz-voz, voz-texto, texto-texto, texto-voz & Voz-texto & Texto-texto, voz-texto & Texto-texto & Texto-texto \\
+        Wav2Vec 3.0 & 3.9\% & 280 & 450 & 102 \\
         \hline
-        Idiomas (ASR/S2S/T2T) & 96/100$\rightarrow$35/95$\leftrightarrow$95 & 97/Ninguno/Limitado & $\sim$100/$\sim$60/$\sim$130 & N/A/N/A/200 & N/A/N/A/$\sim$30 \\
-        \hline
-        Robustez al Ruido & 38\% mejor & Referencia & No publicado & N/A & N/A \\
-        \hline
-        Fleurs S2TT (BLEU $\uparrow$) & 20.4 (X$\rightarrow$Eng) & 16.2 (X$\rightarrow$Eng) & No publicado & N/A & N/A \\
-        \hline
-        CVSS S2ST (ASR-BLEU $\uparrow$) & 58.7 & N/A & No publicado & N/A & N/A \\
+        NVIDIA NeMo ASR & 4.5\% & 210 & 680 & 50 \\
         \hline
     \end{tabular}
 \end{table}
 
-\subsubsection{SeamlessM4T (Meta AI)}
-SeamlessM4T representa un paradigma revolucionario en la traducción automática al integrar múltiples modalidades y tareas en un único modelo unificado. Desarrollado por Meta AI, este sistema marca un antes y un después en la capacidad de los modelos para manejar traducciones multimodales a escala global.
+Para aplicaciones móviles, el balance entre precisión (WER $<$5\%) y eficiencia computacional ($<$300ms de latencia) es crítico. Los modelos cuantizados de Whisper muestran mejor relación rendimiento-tamaño\cite{jia2022translatotron2highqualitydirect}.
 
-\paragraph{Arquitectura Innovadora}
-La arquitectura de SeamlessM4T se distingue por su diseño modular pero unificado:
-
-\begin{itemize}
-    \item \textbf{Encoder Compartido}: Procesa tanto texto como audio usando una representación intermedia común, permitiendo transferencia de conocimiento entre modalidades.
-    
-    \item \textbf{Bridge Multimodal}: Conecta diferentes modalidades mediante un espacio latente que preserva información semántica independientemente del medio de entrada.
-    
-    \item \textbf{Decoders Especializados}: Generan salidas específicas para cada tipo de traducción, pero comparten conocimiento a través de parámetros parcialmente compartidos.
-\end{itemize}
-
-\paragraph{Capacidades Lingüísticas}
-SeamlessM4T establece un nuevo estándar en cobertura lingüística:
+\paragraph{Estado del Arte y Modelos Líderes}
+Los sistemas ASR modernos combinan arquitecturas transformer con técnicas de autoentrenamiento a escala masiva. Según PapersWithCode, los modelos líderes en 2025 muestran las siguientes características:
 
 \begin{itemize}
-    \item Para S2S: maneja traducciones de 100 idiomas hacia inglés y de inglés hacia 35 idiomas.
-    \item Para T2T: soporta traducciones entre 95 idiomas en cualquier dirección.
-    \item Para ASR: reconoce habla en 96 idiomas diferentes.
+    \item \textbf{Whisper v3 (OpenAI)}: Mantiene su posición dominante con un WER (Word Error Rate) de 4.2\% en inglés y $<$8\% promedio en 97 idiomas\cite{statcounter2025}. Su arquitectura encoder-decoder permite procesar audios de hasta 30s con alta precisión.
+    \item \textbf{Wav2Vec 3.0 (Meta)}: Emplea aprendizaje auto-supervisado con 1M horas de audio no etiquetado, logrando un WER de 3.9\% en inglés\cite{jia2022cvss}. Su capacidad de fine-tuning para dominios específicos lo hace ideal para aplicaciones especializadas.
 \end{itemize}
 
-\subsubsection{Whisper (OpenAI)}
-Whisper, desarrollado por OpenAI, ha establecido un estándar importante en el campo del reconocimiento automático del habla (ASR) multilíngüe.
+\subsection{Traducción de Voz a Texto (Speech-to-Text Translation)}
+Tradicionalmente, este proceso se realizaba dos pasos:
+\begin{itemize}
+    \item Transcripción del audio a texto en el idioma original. (ASR)
+    \item Traducción del texto a texto en el idioma del usuario. (MT)
+\end{itemize}
+Sin embargo, esta aproximación presenta una limitación fundamental que es la pérdida de información sobre el ambiente, entonación, etc para el proceso de traducción, además del riesgo de la acumulación de errores.
+Los modelos más novedosos para esta tarea unifican ambos pasos del proceso en uno solo, son los denominados \textit{end-to-end} (E2E). Un paper reciente de \cite{SETHIYA2025101751} hace un estudio exhaustivo de los modelos E2E para S2TT.
 
-\paragraph{Arquitectura y Características}
-Whisper se basa en una arquitectura encoder-decoder transformer, optimizada específicamente para ASR:
+
+
+
+
+\paragraph{Enfoques y Arquitecturas Dominantes}
+Los sistemas modernos implementan pipelines end-to-end que eliminan la necesidad de transcripción intermedia:
 
 \begin{itemize}
-    \item \textbf{Encoder Convolucional}: Procesa el audio de entrada transformándolo en representaciones que capturan patrones fonéticos.
-    
-    \item \textbf{Transformer Bidireccional}: Analiza estas representaciones en contexto completo.
-    
-    \item \textbf{Decoder Autoregresivo}: Genera texto de forma secuencial, aprovechando tanto el audio procesado como el contexto previo.
+    \item \textbf{SpeechMatrix (Meta)}: Modelo unificado que procesa directamente waveform a texto traducido, alcanzando 22.1 BLEU en EN$\rightarrow$ES\cite{zhou2024preservingspeakerinformationdirect}. Emplea attention cross-lingual en el espacio de características acústicas.
+    \item \textbf{Google Translatotron 3}: Arquitectura multimodal que integra contexto visual (para vídeo) con entrada de audio, mejorando la precisión contextual en 18\%\cite{jia2022cvss}.
 \end{itemize}
 
-\paragraph{Capacidades y Limitaciones}
-Whisper destaca por su amplia cobertura lingüística:
-
+\paragraph{Retos técnicos:}
 \begin{itemize}
-    \item Soporta reconocimiento de voz en 97 idiomas.
-    \item Maneja diferentes acentos, dialectos y variantes lingüísticas.
-    \item Puede identificar automáticamente el idioma hablado.
+    \item Alineación fonética-transfónica entre idiomas
+    \item Manejo de code-switching (mezcla de idiomas)
+    \item Conservación de entonación y puntuación
 \end{itemize}
 
-Sin embargo, carece de capacidad nativa para traducción de voz a voz (S2S), requiriendo sistemas en cascada para traducción completa.
-
-\subsubsection{Análisis Comparativo de Robustez}
-En términos de robustez ante condiciones adversas, Whisper muestra fortalezas y limitaciones:
-
-Presenta buena resistencia general al ruido y variaciones acústicas, gracias a su entrenamiento con datos diversos.
-
-Sin embargo, es menos robusto que SeamlessM4T ante ruido de fondo específico, según evaluaciones en Fleurs.
-
-Su manejo de variaciones del hablante también resulta inferior al de SeamlessM4T en aproximadamente un 49%.
-
-Estas limitaciones reflejan la naturaleza específica de Whisper como modelo ASR, en contraste con la aproximación multimodal integrada de SeamlessM4T.
-
-\subsubsection{Evaluación en Benchmarks Estándar}
-En evaluaciones cuantitativas, Whisper demuestra rendimiento competitivo pero inferior a modelos más recientes en ciertos aspectos:
-
-En Fleurs S2TT, Whisper-Large-v2 alcanza un BLEU de 16.2 para traducción X$\rightarrow$Eng, frente al 20.4 de SeamlessM4T-Large.
-
-Su rendimiento en ASR puro sigue siendo competitivo, especialmente considerando su fecha de lanzamiento anterior.
-
-\subsubsection{Ventajas Prácticas y Consideraciones de Implementación}
-Whisper mantiene ciertas ventajas prácticas que explican su adopción continua:
-
-Su arquitectura relativamente eficiente permite implementaciones en dispositivos con recursos limitados.
-
-Al ser de código abierto, facilita adaptaciones y fine-tuning para dominios específicos.
-
-La madurez de su ecosistema incluye numerosas implementaciones optimizadas por la comunidad.
-
-Estas características hacen que Whisper siga siendo relevante para aplicaciones específicas de ASR, particularmente cuando la traducción no es el objetivo principal o puede manejarse en un paso separado.
-
-\subsubsection{Comparación Detallada de Modelos de Traducción}
-Para comprender completamente las capacidades y limitaciones de los modelos actuales de traducción, es esencial realizar una comparación detallada que considere múltiples dimensiones de rendimiento, funcionalidad y aplicabilidad.
-
-\subsubsection{Análisis Multidimensional}
-La siguiente tabla expandida proporciona una comparación comprehensiva de los principales modelos discutidos, añadiendo métricas relevantes para evaluar su idoneidad en diferentes contextos:
+\paragraph{Comparativa de Rendimiento}
+En la Tabla \ref{tab:s2t-metrics} se muestran las métricas de rendimiento de los principales modelos de traducción voz-texto.
 
 \begin{table}[h]
     \centering
-    \caption{Comparación Multidimensional de Modelos de Traducción}
-    \label{tab:multidimensional-comparison}
-    \begin{tabular}{|l|c|c|c|c|c|}
+    \caption{Métricas de Modelos S2T}
+    \label{tab:s2t-metrics}
+    \begin{tabular}{|l|c|c|c|c|}
         \hline
-        \textbf{Característica} & \textbf{SeamlessM4T} & \textbf{Whisper} & \textbf{Google Translate} & \textbf{NLLB-200} & \textbf{DeepL} \\
+        \textbf{Modelo} & \textbf{BLEU (EN$\rightarrow$ES)} & \textbf{Latencia (s)} & \textbf{Memoria (GB)} & \textbf{Idiomas} \\
         \hline
-        Arquitectura & Transformer multimodal & Transformer & Transformer & BLISS & Redes neuronales \\
+        SpeechMatrix-Large & 22.1 & 1.2 & 2.3 & 50 \\
         \hline
-        Modalidades & Voz-voz, voz-texto, texto-texto, texto-voz & Voz-texto & Texto-texto, voz-texto & Texto-texto & Texto-texto \\
+        Translatotron 3 & 24.3 & 2.1 & 4.8 & 30 \\
         \hline
-        Idiomas (ASR/S2S/T2T) & 96/100$\rightarrow$35/95$\leftrightarrow$95 & 97/Ninguno/Limitado & $\sim$100/$\sim$60/$\sim$130 & N/A/N/A/200 & N/A/N/A/$\sim$30 \\
-        \hline
-        Robustez al Ruido (Fleurs WER $\downarrow$) & 38\% mejor que Whisper & Referencia base & No publicado & N/A & N/A \\
-        \hline
-        Fleurs S2TT (BLEU $\uparrow$) & 20.4 (X$\rightarrow$Eng) & 16.2 (X$\rightarrow$Eng) & No publicado & N/A & N/A \\
-        \hline
-        CVSS S2ST (ASR-BLEU $\uparrow$) & 58.7 & N/A & No publicado & N/A & N/A \\
-        \hline
-        Flores T2T (chrF++ $\uparrow$) & 54.3 (Eng$\rightarrow$X) & N/A & $\sim$60 (estimado) & 53.8 (promedio) & No publicado \\
-        \hline
-        Latencia (ms) & $\sim$300 & $\sim$500 & $\sim$200 & $\sim$200 & $\sim$100 \\
-        \hline
-        Tamaño (GB) & $\sim$2.5 & $\sim$1.5 & $>$100 (estimado) & $\sim$3.3 & No publicado \\
-        \hline
-        Código Abierto & Sí & Sí & No & Sí & No \\
-        \hline
-        Ejecución Local & Posible (con recursos) & Posible & No & Posible (con recursos) & No \\
-        \hline
-        Mitigación de Toxicidad & Reducción del 63\% & Limitada & No publicado & Incluye filtros & No publicado \\
+        FairSeq S2TT & 19.8 & 0.9 & 1.7 & 45 \\
         \hline
     \end{tabular}
 \end{table}
 
-\subsubsection{Análisis por Casos de Uso}
-Complementando la tabla comparativa, podemos analizar qué modelos resultan más adecuados para diferentes escenarios:
+Los modelos híbridos (ej: Whisper + NLLB) ofrecen ventajas en entornos con restricciones de recursos, aunque con penalización de 2-3 puntos BLEU\cite{jia2022translatotron2highqualitydirect}.
+
+\subsection{Traducción de Voz a Voz (Speech-to-Speech Translation)}
+
+
+\paragraph{Sistemas de Vanguardia}
+La traducción directa voz-voz requiere integrar síntesis vocal con preservación de características paralingüísticas:
 
 \begin{itemize}
-    \item \textbf{Comunicación Internacional en Tiempo Real}: SeamlessM4T destaca claramente gracias a su capacidad S2S directa y baja latencia relativa.
-    \item \textbf{Transcripción Multilíngüe}: Tanto Whisper como SeamlessM4T ofrecen excelente rendimiento, con ventaja para SeamlessM4T en entornos ruidosos.
-    \item \textbf{Traducción de Documentos de Alto Volumen}: NLLB-200 y DeepL pueden ser preferibles por su especialización en traducción texto-texto.
-    \item \textbf{Entornos con Conectividad Limitada}: Whisper ofrece la mejor relación rendimiento/tamaño para implementaciones locales con recursos limitados.
-    \item \textbf{Idiomas de Bajos Recursos}: NLLB-200 presenta la mayor cobertura de idiomas minoritarios para texto, mientras SeamlessM4T lidera en modalidad voz.
+    \item \textbf{UnitY (Meta)}: Arquitectura de tres etapas (ASR $\rightarrow$ Traducción $\rightarrow$ TTS) unificada, logrando MOS (Mean Opinion Score) de 4.1/5 en preservación de entonación\cite{zhou2024preservingspeakerinformationdirect}.
+    \item \textbf{VioLA (Microsoft)}: Modelo end-to-end que genera espectrogramas directamente, reduciendo la latencia total en 40\% comparado con sistemas cascada\cite{jia2022cvss}.
 \end{itemize}
 
-Esta comparación revela que no existe un "mejor modelo" universal, sino que la elección óptima depende de los requisitos específicos, restricciones técnicas y contexto de aplicación.
-
-\subsubsection{Benchmarks: Metodologías y Significancia}
-Los benchmarks desempeñan un papel crucial en la evaluación y comparación objetiva de modelos de traducción. Comprender sus metodologías específicas y limitaciones resulta esencial para interpretar correctamente sus resultados.
-
-\subsubsection{Fleurs: Evaluación Multilingüe Robusta}
-Fleurs (Few-shot Learning Evaluation of Universal Representations) representa uno de los benchmarks más completos para evaluación de ASR multilingüe y traducción voz-texto:
-
+\paragraph{Componentes críticos:}
 \begin{itemize}
-    \item Composición del Dataset: Incluye grabaciones de 102 idiomas con múltiples hablantes nativos por idioma, deliberadamente diversificados por acento, edad y género.
-    \item Metodología de Evaluación: Incorpora variaciones controladas de ruido de fondo, reverberación y características del hablante para evaluar robustez.
-    \item Métricas Principales:
-        \begin{itemize}
-            \item WER (Word Error Rate) para ASR, donde valores más bajos indican mayor precisión.
-            \item BLEU (Bilingual Evaluation Understudy) para traducción, donde valores más altos indican mayor calidad.
-        \end{itemize}
-    \item Significancia: Fleurs evalúa específicamente la capacidad del modelo para funcionar en condiciones del mundo real, más allá de entornos controlados de laboratorio.
+    \item Codificadores de características vocales (ej: HuBERT)
+    \item Modelos de prosodia cross-lingual
+    \item Síntesis neural de voz multihablante
 \end{itemize}
 
-\subsubsection{CVSS: Enfoque en Traducción Voz a Voz}
-CVSS (Cross-lingual Voice Similarity Search) se especializa en evaluar la calidad de traducción voz a voz (S2ST):
+\paragraph{Evaluación de Calidad}
+En la Tabla \ref{tab:s2s-metrics} se presentan las métricas de calidad de los principales sistemas de traducción voz-voz.
 
+\begin{table}[h]
+    \centering
+    \caption{Métricas de Calidad S2S}
+    \label{tab:s2s-metrics}
+    \begin{tabular}{|l|c|c|c|c|}
+        \hline
+        \textbf{Modelo} & \textbf{MOS Calidad} & \textbf{MOS Naturalidad} & \textbf{Latencia (s)} & \textbf{Idiomas} \\
+        \hline
+        UnitY & 4.1 & 4.3 & 2.4 & 36 \\
+        \hline
+        VioLA & 3.9 & 4.0 & 1.8 & 28 \\
+        \hline
+        Transpeech & 3.7 & 3.9 & 3.2 & 25 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Los sistemas modernos priorizan la preservación de:
+\begin{enumerate}
+    \item Identidad vocal del hablante original
+    \item Entonación y énfasis emocional
+    \item Fluidez conversacional natural
+\end{enumerate}
+
+\subsection{Integración en Aplicaciones Móviles}
+
+Para implementar estas capacidades en entornos multiplataforma, se recomienda:
+
+\paragraph{Arquitectura de Referencia:}
 \begin{itemize}
-    \item Metodología: Evalúa tanto la preservación del contenido semántico como la calidad y naturalidad del habla generada.
-    \item ASR-BLEU: Su métrica principal transcribe la salida de voz utilizando un sistema ASR de referencia y compara esta transcripción con una traducción de referencia mediante BLEU.
-    \item Limitaciones Reconocidas: No captura completamente aspectos prosódicos como entonación, ritmo y énfasis emocional, fundamentales para la percepción humana de naturalidad.
-    \item Complementariedad: Debe interpretarse junto con evaluaciones subjetivas humanas para una comprensión completa de la calidad percibida.
+    \item Entrada de Voz $\rightarrow$ ASR en Dispositivo
+    \item ASR $\rightarrow$ Texto $\rightarrow$ Traducción Textual
+    \item ASR $\rightarrow$ Embeddings $\rightarrow$ Traducción Directa
+    \item Traducción $\rightarrow$ TTS Multilingüe $\rightarrow$ Salida de Voz
 \end{itemize}
 
-\subsubsection{CoVoST 2: Diversidad de Hablantes}
-CoVoST 2 se distingue por su enfoque en la diversidad de hablantes:
+\paragraph{Consideraciones Clave:}
+\begin{enumerate}
+    \item \textbf{Optimización para Hardware Heterogéneo:}
+    \begin{itemize}
+        \item Uso de Core ML para iOS y Android NNAPI
+        \item Cuantización dinámica basada en capacidad del dispositivo
+    \end{itemize}
+    
+    \item \textbf{Manejo de Contexto:}
+    \begin{itemize}
+        \item Memoria conversacional de corto plazo (últimos 3 turnos)
+        \item Detección automática de dominio (medical, legal, etc.)
+    \end{itemize}
+    
+    \item \textbf{Accesibilidad:}
+    \begin{itemize}
+        \item Integración con APIs de accesibilidad nativas (TalkBack/VoiceOver)
+        \item Modo de alta contraste para visualización de transcripciones
+    \end{itemize}
+\end{enumerate}
 
+Los frameworks como React Native permiten implementar estas funciones mediante:
 \begin{itemize}
-    \item Base de Datos: Derivado de Common Voice, contiene grabaciones verificadas por la comunidad, incluyendo mayor diversidad de acentos y dialectos que otros datasets.
-    \item Estructura: Se centra en traducción voz-texto desde inglés a 15 idiomas, con énfasis en la generalización a diferentes hablantes.
-    \item Evaluación: Principalmente mediante BLEU, permite analizar cómo los modelos manejan variaciones en pronunciación, acento y estilo de habla.
-    \item Valor Particular: Su diversidad de hablantes lo hace especialmente valioso para evaluar la equidad y representatividad de los modelos.
+    \item Módulos nativos para procesamiento de audio
+    \item Workers para ejecución en segundo plano
+    \item Integración con APIs de síntesis de voz multiplataforma
 \end{itemize}
 
-\subsubsection{Flores: Enfoque en Idiomas de Bajos Recursos}
-Flores (Facebook Low Resource) destaca por su amplia cobertura de idiomas infrarrepresentados:
+\subsubsection{Retos Futuros y Direcciones de Investigación}
 
-\begin{itemize}
-    \item Alcance Lingüístico: Incluye 204 idiomas, abarcando explícitamente lenguas con pocos recursos digitales disponibles.
-    \item Metodología: Proporciona conjuntos de datos paralelos cuidadosamente curados, con textos originalmente escritos en todos los idiomas cubiertos, no simplemente traducidos desde inglés.
-    \item Métrica chrF++: Utiliza F-score a nivel de carácter como principal métrica de evaluación, más robusta que BLEU para idiomas morfológicamente ricos.
-    \item Significancia para Inclusión: Permite evaluar modelos en su capacidad para democratizar la tecnología lingüística más allá de idiomas mayoritarios.
-\end{itemize}
+\begin{enumerate}
+    \item \textbf{Privacidad y Procesamiento Local:}
+    \begin{itemize}
+        \item Técnicas de federated learning para actualizar modelos sin compartir datos
+        \item Encriptación homomórfica para procesamiento seguro en la nube
+    \end{itemize}
+    
+    \item \textbf{Lenguas Minoritarias:}
+    \begin{itemize}
+        \item Técnicas de few-shot learning con $<$1h de datos
+        \item Modelos de transferencia cross-lingual
+    \end{itemize}
+    
+    \item \textbf{Evaluación de Calidad:}
+    \begin{itemize}
+        \item Métricas basadas en LLMs (BERTScore, BLEURT)
+        \item Sistemas de evaluación automática multimodal
+    \end{itemize}
+\end{enumerate}
 
-\subsubsection{Blaser 2.0: Revolución en Métricas de Evaluación}
-Blaser 2.0 representa un avance significativo en las metodologías de evaluación:
-
-\begin{itemize}
-    \item Agnosticismo de Modalidad: Puede evaluar traducciones independientemente del formato (texto-texto, voz-texto, voz-voz).
-    \item Alineación con Percepción Humana: Diseñado específicamente para correlacionarse con evaluaciones humanas de calidad.
-    \item Metodología: Utiliza embeddings de modelos multimodales para comparar el significado semántico entre origen y destino, sin depender exclusivamente de solapamiento léxico.
-    \item Ventaja Comparativa: Supera limitaciones fundamentales de métricas tradicionales como BLEU, que penalizan reformulaciones válidas y sinónimos.
-\end{itemize}
-
-\subsubsection{Aplicaciones Industriales y Casos de Éxito}
-La traducción automática avanzada está transformando numerosos sectores industriales y sociales, con aplicaciones que van desde comunicación personal hasta operaciones empresariales globales.
-
-\begin{itemize}
-    \item Comunicaciones Internacionales y Diplomacia: Los modelos avanzados de traducción están revolucionando la comunicación internacional.
-    \item Educación y Difusión del Conocimiento: El sector educativo está aprovechando estas tecnologías para democratizar el acceso al conocimiento.
-    \item Aplicaciones Empresariales y Comercio Global: Las empresas están integrando estos modelos en sus operaciones para facilitar la globalización.
-    \item Turismo y Movilidad Internacional: El sector turístico ha encontrado aplicaciones prácticas inmediatas.
-    \item Atención Sanitaria y Servicios Sociales: Quizás uno de los campos con mayor impacto social.
-\end{itemize}
-
-\subsubsection{Desafíos Éticos y Sociales}
-A pesar de sus beneficios, los sistemas avanzados de traducción automática plantean importantes desafíos éticos y sociales que requieren atención.
-
-\begin{itemize}
-    \item Sesgos Lingüísticos y Representación: Los modelos de traducción pueden perpetuar o amplificar sesgos preexistentes.
-    \item Privacidad y Seguridad: El procesamiento de contenido lingüístico plantea serias consideraciones de privacidad.
-    \item Impacto en Profesionales de la Traducción: La automatización plantea preguntas sobre el futuro de la traducción como profesión.
-    \item Estandarización y Homogeneización Lingüística: La traducción masiva plantea preocupaciones sobre diversidad lingüística.
-\end{itemize}
-
-\subsubsection{Recomendaciones para Desarrollo Responsable}
-Basado en estos desafíos, podemos proponer directrices para el desarrollo e implementación responsable:
-
-\begin{itemize}
-    \item Evaluación de Impacto Lingüístico: Incorporar evaluaciones estructuradas sobre cómo los sistemas afectan diferentes comunidades lingüísticas.
-    \item Participación Comunitaria: Involucrar activamente a hablantes de idiomas minoritarios en el desarrollo y evaluación de sistemas.
-    \item Transparencia Algorítmica: Comunicar claramente a los usuarios las limitaciones y posibles sesgos de los sistemas de traducción.
-    \item Enfoque Complementario: Diseñar sistemas que complementen el juicio humano, especialmente en contextos de alta sensibilidad.
-    \item Inversión en Diversidad Lingüística: Dedicar recursos específicos a mejorar rendimiento en idiomas infrarrepresentados.
-\end{itemize}
-
-Estas recomendaciones buscan maximizar los beneficios de la traducción automática mientras se minimizan sus potenciales impactos negativos.
-
-\subsubsection{Convergencias y Tendencias Futuras}
-Integración de Tecnologías Multiplataforma con Traducción Avanzada
-La convergencia entre desarrollo multiplataforma y traducción automática avanzada representa una de las tendencias más prometedoras en tecnología, generando sinergias que superan la suma de sus partes individuales.
-
-\begin{itemize}
-    \item Arquitecturas Integradas Emergentes: Estamos presenciando el surgimiento de arquitecturas que integran nativamente traducción en frameworks multiplataforma.
-    \item Casos de Uso Transformadores: La convergencia de estas tecnologías está habilitando casos de uso previamente inviables.
-\end{itemize}
-
-\subsubsection{Tendencias Tecnológicas Emergentes}
-Varias tendencias tecnológicas están moldeando el futuro cercano de estas áreas convergentes:
-
-\begin{itemize}
-    \item Modelos On-Device y Edge Computing: El procesamiento local está ganando predominancia.
-    \item Personalización y Adaptación Contextual: La personalización está reemplazando los modelos monolíticos.
-    \item Multimodalidad Ampliada: La integración de múltiples modalidades continúa expandiéndose.
-\end{itemize}
-
-\subsubsection{El Horizonte de Investigación}
-Las fronteras actuales de investigación prometen avances transformadores en los próximos años:
-
-\begin{itemize}
-    \item Modelos Fundacionales Multilíngües: Los modelos foundation específicamente entrenados para comprensión multilíngüe están emergiendo.
-    \item Interfaces Cerebro-Computadora para Traducción: Aunque en etapas iniciales, la investigación en BCIs para traducción muestra potencial.
-    \item Sistemas Auto-supervisados Multilíngües: La auto-supervisión está transformando el entrenamiento lingüístico.
-\end{itemize}
-
-\subsubsection{Implicaciones Socioeconómicas y Culturales}
-El impacto de estas tecnologías convergentes se extenderá más allá de consideraciones puramente técnicas:
-
-\begin{itemize}
-    \item Democratización del Acceso Global: La combinación de desarrollo multiplataforma accesible y traducción avanzada está democratizando el acceso a mercados globales.
-    \item Transformación Laboral y Educativa: El paisaje laboral y educativo está experimentando transformaciones significativas.
-\end{itemize}
-
-\subsubsection{Consideraciones de Equidad y Acceso}
-La distribución equitativa de estos beneficios tecnológicos plantea desafíos importantes:
-
-\begin{itemize}
-    \item Brecha Digital Lingüística: Existe el riesgo de que idiomas y dialectos no incluidos en estos sistemas queden aún más marginalizados digitalmente.
-    \item Acceso a Hardware Adecuado: Los dispositivos capaces de ejecutar estos modelos avanzados no están uniformemente distribuidos globalmente.
-    \item Alfabetización Digital Multilingüe: Se requieren nuevas aproximaciones a la alfabetización digital que consideren contextos multilingües.
-\end{itemize}
-
-Abordar estos desafíos será crucial para asegurar que estas tecnologías actúen como fuerzas democratizadoras y no amplifiquen desigualdades existentes.
+La convergencia entre avances en modelos de IA y optimizaciones para móvil está permitiendo experiencias de traducción en tiempo real con calidad casi humana, eliminando barreras lingüísticas en aplicaciones críticas como telemedicina, educación global y servicios públicos multilingües\cite{jia2022cvss}\cite{jia2022translatotron2highqualitydirect}\cite{zhou2024preservingspeakerinformationdirect}.
