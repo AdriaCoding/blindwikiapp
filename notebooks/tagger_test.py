@@ -3,6 +3,8 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.neighbors import NearestNeighbors
 import os
+from transformers import pipeline
+import torch
 
 # 1. Cargar y preprocesar las etiquetas de tags_text.txt
 def load_and_preprocess_tags(file_path):
@@ -22,7 +24,20 @@ def load_and_preprocess_tags(file_path):
     
     return processed_tags
 
-# 2 y 3. Cargar MP3 y leer transcripción
+# 2. Transcribir audio usando Whisper
+def transcribe_audio(audio_file, asr_model=None):
+    if asr_model is None:
+        # Inicializar el modelo ASR si no se proporciona
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        asr_model = pipeline("automatic-speech-recognition", 
+                           model="openai/whisper-large-v3",
+                           device=device)
+    
+    # Transcribir el audio
+    result = asr_model(audio_file)
+    return result["text"]
+
+# 3. Obtener transcripción desde CSV
 def get_transcription(mp3_file, transcriptions_csv):
     # Obtener solo el nombre base del archivo
     mp3_basename = os.path.basename(mp3_file)
@@ -38,8 +53,8 @@ def get_transcription(mp3_file, transcriptions_csv):
     else:
         return None
 
-# 4. Calcular embeddings
-def compute_embeddings(texts, model_name='all-MiniLM-L6-v2'):
+# 4. Calcular embeddings con modelo mejorado
+def compute_embeddings(texts, model_name='paraphrase-multilingual-mpnet-base-v2'):
     # Cargar modelo
     model = SentenceTransformer(model_name)
     
@@ -68,6 +83,10 @@ if __name__ == "__main__":
     transcriptions_file = "data/transcriptions.csv"
     output_file = "data/automatic_tags.csv"
     
+    # Configurar dispositivo
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Usando dispositivo: {device}")
+    
     # 1. Cargar y preprocesar tags
     print("Cargando y preprocesando etiquetas...")
     tags = load_and_preprocess_tags(tags_file)
@@ -78,9 +97,19 @@ if __name__ == "__main__":
     transcriptions_df = pd.read_csv(transcriptions_file)
     print(f"Se encontraron {len(transcriptions_df)} transcripciones")
     
-    # Inicializar el modelo de embeddings una sola vez
-    print("\nCargando modelo de embeddings...")
-    model = SentenceTransformer('all-MiniLM-L6-v2')
+    # Inicializar el modelo ASR mejorado (si se van a transcribir audios directamente)
+    # Si solo usamos transcripciones existentes, esto no es necesario
+    use_direct_transcription = False  # Cambiar a True si quieres transcribir directamente
+    asr_model = None
+    if use_direct_transcription:
+        print("\nCargando modelo ASR Whisper...")
+        asr_model = pipeline("automatic-speech-recognition", 
+                           model="openai/whisper-large-v3",
+                           device=device)
+    
+    # Inicializar el modelo de embeddings mejorado
+    print("\nCargando modelo de embeddings mejorado...")
+    model = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
     
     # Calcular embeddings para todas las etiquetas
     print("Calculando embeddings para las etiquetas...")
@@ -93,7 +122,17 @@ if __name__ == "__main__":
     print("\nProcesando transcripciones...")
     for idx, row in transcriptions_df.iterrows():
         file_name = row['file']
-        transcription = row['transcription']
+        
+        # Si tenemos transcripciones, usarlas; sino, transcribir directamente
+        if use_direct_transcription:
+            audio_path = os.path.join("data/audios", file_name)  # Ajustar ruta según sea necesario
+            if os.path.exists(audio_path):
+                transcription = transcribe_audio(audio_path, asr_model)
+            else:
+                print(f"Archivo de audio {audio_path} no encontrado, omitiendo...")
+                continue
+        else:
+            transcription = row['transcription']
         
         if pd.isna(transcription) or transcription == "":
             print(f"Transcripción vacía para {file_name}, omitiendo...")
