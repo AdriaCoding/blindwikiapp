@@ -104,8 +104,16 @@ if __name__ == "__main__":
     parser.add_argument("--language", type=str, help="Idioma de transcripción (ej: en, es, fr). Dejar vacío para auto-detección", 
                        default=None)
     parser.add_argument("--model_name", type=str, 
-                       help="Modelo Whisper a utilizar (tiny, base, small, medium, large-v2, large-v3)", 
-                       default="openai/whisper-large-v3")
+                       help="""Modelo Whisper a utilizar. Opciones completas:
+                       - openai/whisper-tiny (39M parámetros)
+                       - openai/whisper-base (74M parámetros)
+                       - openai/whisper-small (244M parámetros)
+                       - openai/whisper-medium (769M parámetros)
+                       - openai/whisper-large-v2 (1550M parámetros)
+                       - openai/whisper-large-v3 (1550M parámetros, mejor rendimiento)
+                       - openai/whisper-large-v3-turbo (versión optimizada para mejor velocidad)
+                       """, 
+                       default="openai/whisper-tiny")
     parser.add_argument("--device", type=str, 
                        help="Dispositivo a utilizar (cuda, cpu). Si no se especifica, se autodetecta", 
                        default=None)
