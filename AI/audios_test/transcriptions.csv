@@ -1,3 +1,6 @@
-,message_66563_author_Paula_83315.wav
-openai/whisper-tiny," Hi, the Spanish restaurant at Glipp Boen Road is accessible and no stairs."
-openai/whisper-large-v3," Hi,  accessfffible and no stairs."
+,message_66563_author_Paula_83315.wav,RTFx_message_66563_author_Paula_83315.wav
+openai/whisper-tiny," Hi, the Spanish restaurant at Glipp Boen Road is accessible and no stairs.",4.5303253223982525
+openai/whisper-base," Hola, es paniche restauranta, con el punto de vista de la glipo y el sueldo.",3.4934649153466224
+openai/whisper-small," Hi, the Spanish restaurant at Clip Point Road is accessible and no stairs.",1.2724637895361437
+openai/whisper-large-v3," Hi, the Spanish restaurant at Clip Point Road is accessible and no stairs.",0.17497011159670947
+openai/whisper-large-v3-turbo," Hi, the Spanish restaurant at Clipp Point Road is accessible and no stairs.",0.2756156116187991

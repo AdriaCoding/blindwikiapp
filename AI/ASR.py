@@ -7,12 +7,11 @@ import textwrap
 # Lista de modelos Whisper disponibles
 SUPPORTED_MODELS = [
     "openai/whisper-tiny",      # 39M parámetros
-    #"openai/whisper-base",      # 74M parámetros
-    #"openai/whisper-small",     # 244M parámetros
+    "openai/whisper-base",      # 74M parámetros
+    "openai/whisper-small",     # 244M parámetros
     #"openai/whisper-medium",    # 769M parámetros
-    #"openai/whisper-large-v2",  # 1550M parámetros
-    "openai/whisper-large-v3",  # 1550M parámetros, mejor rendimiento
-    #"openai/whisper-large-v3-turbo"  # versión optimizada para mejor velocidad
+    "openai/whisper-large-v3-turbo",  # versión optimizada para mejor velocidad
+    "openai/whisper-large-v3"  # 1550M parámetros, mejor rendimiento
 ]
 
 class WhisperASR:
@@ -124,7 +123,7 @@ if __name__ == "__main__":
     
     # Argumentos disponibles
     parser.add_argument("--audio_file_path", type=str, help="Ruta relativa al archivo de audio", 
-                       default="audios_test/message_67207_author_Manuelb_83952.wav")
+                       default="audios_test\\message_66563_author_Paula_83315.wav")
     parser.add_argument("--language", type=str, help="Idioma de transcripción (ej: en, es, fr). Dejar vacío para auto-detección", 
                        default=None)
     
