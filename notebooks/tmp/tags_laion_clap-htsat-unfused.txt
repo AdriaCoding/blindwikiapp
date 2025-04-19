@@ -1,0 +1,17 @@
+accessibility: person talking about accessible cities or accessibility
+ambient_sounds: environmental sounds and background noise
+bar: places for drinks and social gatherings
+bridges: structures spanning water bodies or gaps
+caution: warning signals or situations requiring attention
+churches: religious buildings and places of worship
+culture: art, museums, and cultural activities
+danger: hazardous situations or places.
+mobility: transportation methods like buses, cars trains, ferris.
+music: musical performances and music instruments.
+park: green spaces and recreational areas
+restaurant: places to eat and dining experiences
+smells: person talking about odors and fragrances in the environment
+square: public plazas and gathering spaces
+streets_for_everyone: urban streets and pathways inlcusive for blind people. 
+water: bodies of water like rivers, lakes, fountains
+una nena petita que juga amb cassoles i olles de couina, i diu que ha fet un grup de música

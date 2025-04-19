@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import torch
-from transformers import ClapModel, ClapProcessor
+from transformers import ClapModel, ClapProcessor, ClapConfig
 from sklearn.neighbors import NearestNeighbors
 from tqdm.auto import tqdm
 import matplotlib.pyplot as plt
@@ -77,15 +77,25 @@ class ClapTagger:
         with open(file_path, 'r', encoding='utf-8') as f:
             tags_text = f.read()
         
-        tags_list, processed_tags = tags_text.split(" "), []
-        non_supported_letters = set(["#","(",")","_"])
+        # Dividir por saltos de línea en lugar de espacios
+        tags_list = tags_text.splitlines()
+        processed_tags = []
+        
+        # No eliminar guiones bajos (_) ya que son parte del formato de etiquetas
+        non_supported_letters = set(["#","(",")",])
         
         for tag in tags_list:
+            # Omitir líneas vacías
+            if not tag.strip():
+                continue
+                
             tmp_tag = ""
             for letter in tag:
                 if letter not in non_supported_letters and not letter.isnumeric():
                     tmp_tag += letter
+                    
             if len(tmp_tag) != 0:
+                # Mantener los guiones bajos y conservar el formato original
                 processed_tags.append(tmp_tag.lower())
         
         return processed_tags
@@ -420,7 +430,7 @@ if __name__ == "__main__":
     # Configuración
     audio_dir = "uploads"  # Directorio con archivos de audio
     tmp_dir = "tmp" # Directorio para guardar los embeddings de los tags
-    tags_file = "tags_text.txt"  # Archivo con etiquetas
+    tags_file = "16tags.txt"  # Archivo con los tags
     output_file = "data/clap_tags.csv"  # Archivo para guardar resultados
     
     # Asegurar que existen las carpetas necesarias
