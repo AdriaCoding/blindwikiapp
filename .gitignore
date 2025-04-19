@@ -5,6 +5,7 @@ BlindWiki2/services/backend_reference_files/main.php
 *.pyc
 SeamlessExpressive/*.pt
 SeamlessExpressive/seamless
+AI\audios_test\~$Transcriptions_wrangling.xlsx
 
 # LaTeX intermediate files
 *.aux
