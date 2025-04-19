@@ -92,7 +92,7 @@ def test_multiple_files(path_to_folder, models=None, language=None, device=None)
     
     # Guardar resultados
     output_file = os.path.join(path_to_folder, 'transcriptions.csv')
-    results.to_csv(output_file, float_format='%.2f')
+    results.to_csv(output_file, float_format='%.2f', index_label="Model")
     print(f"\nResultados guardados en: {output_file}")
 
     return results
