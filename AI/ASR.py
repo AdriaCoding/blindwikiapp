@@ -123,7 +123,7 @@ if __name__ == "__main__":
     
     # Argumentos disponibles
     parser.add_argument("--audio_file_path", type=str, help="Ruta relativa al archivo de audio", 
-                       default="audios_test\\message_66563_author_Paula_83315.wav")
+                       default="audios_test\\barcelona_alexdobano_m68284_a85028_audio_converted.wav")
     parser.add_argument("--language", type=str, help="Idioma de transcripción (ej: en, es, fr). Dejar vacío para auto-detección", 
                        default=None)
     
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     
     parser.add_argument("--model_name", type=str, 
                        help=model_help,
-                       default="openai/whisper-tiny")
+                       default="openai/whisper-small")
     parser.add_argument("--device", type=str, 
                        help="Dispositivo a utilizar (cuda, cpu). Si no se especifica, se autodetecta", 
                        default=None)
