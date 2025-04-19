@@ -2,6 +2,18 @@ import torch
 from transformers import pipeline
 import argparse
 import os
+import textwrap
+
+# Lista de modelos Whisper disponibles
+SUPPORTED_MODELS = [
+    "openai/whisper-tiny",      # 39M parámetros
+    #"openai/whisper-base",      # 74M parámetros
+    #"openai/whisper-small",     # 244M parámetros
+    #"openai/whisper-medium",    # 769M parámetros
+    #"openai/whisper-large-v2",  # 1550M parámetros
+    "openai/whisper-large-v3",  # 1550M parámetros, mejor rendimiento
+    #"openai/whisper-large-v3-turbo"  # versión optimizada para mejor velocidad
+]
 
 class WhisperASR:
     """
@@ -53,11 +65,20 @@ class WhisperASR:
         # Si se especifica un idioma, usarlo
         if language:
             generate_kwargs['language'] = language
+            
+        # Asegurarse de que return_timestamps esté habilitado para archivos largos
+        generate_kwargs['return_timestamps'] = True
         
         # Transcribir audio
         result = self.asr_model(audio_file, generate_kwargs=generate_kwargs, **kwargs)
         
-        return result
+        # Si el resultado incluye timestamps, extraer solo el texto
+        if isinstance(result, dict) and 'text' in result:
+            return result
+        elif isinstance(result, str):
+            return {"text": result}
+        else:
+            return {"text": str(result)}
     
     def get_info(self):
         """
@@ -95,24 +116,25 @@ def transcribe_audio(audio_file, model_name="openai/whisper-large-v3", language=
 
 # Uso de ejemplo
 if __name__ == "__main__":
-    # Configurar el parser de argumentos
-    parser = argparse.ArgumentParser(description="Transcribe audio usando el modelo Whisper")
+    # Configurar el parser de argumentos con RawTextHelpFormatter para preservar saltos de línea
+    parser = argparse.ArgumentParser(
+        description="Transcribe audio usando el modelo Whisper",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
     
     # Argumentos disponibles
     parser.add_argument("--audio_file_path", type=str, help="Ruta relativa al archivo de audio", 
                        default="audios_test/message_67207_author_Manuelb_83952.wav")
     parser.add_argument("--language", type=str, help="Idioma de transcripción (ej: en, es, fr). Dejar vacío para auto-detección", 
                        default=None)
+    
+    # Crear el mensaje de ayuda para los modelos
+    model_help = "Modelo Whisper a utilizar. Opciones disponibles:\n"
+    for model in SUPPORTED_MODELS:
+        model_help += f"  - {model}\n"
+    
     parser.add_argument("--model_name", type=str, 
-                       help="""Modelo Whisper a utilizar. Opciones completas:
-                       - openai/whisper-tiny (39M parámetros)
-                       - openai/whisper-base (74M parámetros)
-                       - openai/whisper-small (244M parámetros)
-                       - openai/whisper-medium (769M parámetros)
-                       - openai/whisper-large-v2 (1550M parámetros)
-                       - openai/whisper-large-v3 (1550M parámetros, mejor rendimiento)
-                       - openai/whisper-large-v3-turbo (versión optimizada para mejor velocidad)
-                       """, 
+                       help=model_help,
                        default="openai/whisper-tiny")
     parser.add_argument("--device", type=str, 
                        help="Dispositivo a utilizar (cuda, cpu). Si no se especifica, se autodetecta", 
