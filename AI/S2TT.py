@@ -4,6 +4,11 @@ import argparse
 import os
 import warnings
 import textwrap
+import sys
+import io
+import logging
+from contextlib import contextmanager
+from transformers import logging as transformers_logging
 
 # Lista de modelos Whisper disponibles
 SUPPORTED_MODELS = [
@@ -14,6 +19,27 @@ SUPPORTED_MODELS = [
     "openai/whisper-large-v3-turbo",  # versión optimizada para mejor velocidad
     "openai/whisper-large-v3"  # 1550M parámetros, mejor rendimiento
 ]
+
+# Contextmanager para suprimir stdout/stderr temporalmente
+@contextmanager
+def suppress_stdout_stderr():
+    """
+    Contexto que suprime temporalmente salidas a stdout y stderr.
+    """
+    # Guardar los file descriptors originales
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+    
+    # Redirigir stdout y stderr a /dev/null
+    sys.stdout = io.StringIO()
+    sys.stderr = io.StringIO()
+    
+    try:
+        yield  # Ejecutar el bloque dentro del contexto
+    finally:
+        # Restaurar los file descriptors originales
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
 
 class WhisperS2TT:
     """
@@ -35,21 +61,42 @@ class WhisperS2TT:
                                               Por defecto es True.
         """
         # Suprimir warnings si se solicita
+        self.suppress_warnings = suppress_warnings
         if suppress_warnings:
+            # Suprimir warnings estándar de Python
             warnings.filterwarnings("ignore")
             
+            # Suprimir warnings específicos de transformers
+            transformers_logging.set_verbosity_error()
+            
+            # En algunos casos, los warnings vienen directamente por stdout/stderr
+            # y no pasan por el sistema de logging
+            old_environ = os.environ.copy()
+            os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+            os.environ["TOKENIZERS_PARALLELISM"] = "false"
+        
         # Autodetectar dispositivo si no se especifica
         if device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
             self.device = device
-                        
-        # Inicializar pipeline de ASR 
-        self.asr_model = pipeline(
-            task="automatic-speech-recognition",
-            model=model_name,
-            device=self.device
-        )
+        
+        print(f"Device set to use {self.device}")
+        
+        # Inicializar pipeline de ASR, suprimiendo salidas si es necesario
+        if suppress_warnings:
+            with suppress_stdout_stderr():
+                self.asr_model = pipeline(
+                    task="automatic-speech-recognition",
+                    model=model_name,
+                    device=self.device
+                )
+        else:
+            self.asr_model = pipeline(
+                task="automatic-speech-recognition",
+                model=model_name,
+                device=self.device
+            )
         
         self.model_name = model_name
         
@@ -75,8 +122,12 @@ class WhisperS2TT:
         # Asegurarse de que return_timestamps esté habilitado para archivos largos
         generate_kwargs['return_timestamps'] = True
         
-        # Transcribir audio
-        result = self.asr_model(audio_file, generate_kwargs=generate_kwargs, **kwargs)
+        # Transcribir audio, suprimiendo salidas si es necesario
+        if self.suppress_warnings:
+            with suppress_stdout_stderr():
+                result = self.asr_model(audio_file, generate_kwargs=generate_kwargs, **kwargs)
+        else:
+            result = self.asr_model(audio_file, generate_kwargs=generate_kwargs, **kwargs)
         
         # Si el resultado incluye timestamps, extraer solo el texto
         if isinstance(result, dict) and 'text' in result:
@@ -146,8 +197,8 @@ if __name__ == "__main__":
     parser.add_argument("--device", type=str, 
                        help="Dispositivo a utilizar (cuda, cpu). Si no se especifica, se autodetecta", 
                        default=None)
-    parser.add_argument("--show_warnings", action="store_true", 
-                       help="Mostrar advertencias durante la ejecución")
+    parser.add_argument("--silent", action="store_true", 
+                       help="No mostrar advertencias durante la ejecución")
     
     # Parsear argumentos
     args = parser.parse_args()
@@ -171,7 +222,7 @@ if __name__ == "__main__":
         # Transcribir audio
         transcription = transcribe_audio(audio_path, model_name=args.model_name, 
                                         language=args.language, device=args.device,
-                                        suppress_warnings=not args.show_warnings)
+                                        suppress_warnings=args.silent)
         
         # Mostrar resultados
         print(f"\nTranscripción: {transcription}")
