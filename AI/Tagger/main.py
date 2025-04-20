@@ -1,5 +1,12 @@
-from AI.base_tagger import DECISION_METHOD_KNN, DECISION_METHOD_RADIUS, DECISION_METHOD_HDBSCAN, BaseTagger
-from AI.text_embedding_tagger import TextEmbeddingTagger
+import argparse
+import os
+import json
+from .base_tagger import (
+    DECISION_METHOD_KNN,
+    DECISION_METHOD_RADIUS,
+    DECISION_METHOD_HDBSCAN
+)
+from .text_embedding_tagger import TextEmbeddingTagger
 
 def create_tagger(tagger_type, taxonomy_file, **kwargs):
     """
@@ -18,12 +25,7 @@ def create_tagger(tagger_type, taxonomy_file, **kwargs):
     else:
         raise ValueError(f"Tipo de tagger no reconocido: {tagger_type}. Opciones válidas: 'text'")
     
-
 if __name__ == "__main__":
-    import argparse
-    import os
-    import json
-    
     # Configurar argumentos
     parser = argparse.ArgumentParser(description="Etiquetar un archivo de audio con diferentes modelos")
     
@@ -51,8 +53,11 @@ if __name__ == "__main__":
                       help="Idioma para transcripción (ej: es, en)")
     parser.add_argument("--json_output", action="store_true",
                       help="Mostrar resultado en formato JSON en la consola")
-    parser.add_argument("--decision_method", type=str, choices=[DECISION_METHOD_KNN, DECISION_METHOD_RADIUS, DECISION_METHOD_HDBSCAN], 
-                      default=DECISION_METHOD_KNN, help="Método para seleccionar etiquetas")
+    parser.add_argument('--decision_method', type=str, default=DECISION_METHOD_KNN,
+                      choices=[DECISION_METHOD_KNN, DECISION_METHOD_RADIUS, DECISION_METHOD_HDBSCAN],
+                      help='Método de decisión para seleccionar etiquetas')
+    parser.add_argument('--decision_params', type=json.loads, default='{}',
+                      help='Parámetros para el método de decisión en formato JSON')
     parser.add_argument("--top_k", type=int, default=None,
                       help="Número de etiquetas a devolver (para KNN)")
     parser.add_argument("--threshold", type=float, default=None,
@@ -63,11 +68,7 @@ if __name__ == "__main__":
                       help="Número mínimo de muestras para HDBSCAN")
     
     args = parser.parse_args()
-    
-    # Crear directorios necesarios
-    os.makedirs("data", exist_ok=True)
-    os.makedirs("embeddings", exist_ok=True)
-    
+
     # Configurar parámetros según el tipo de tagger
     tagger_params = {}
     decision_params = {}
@@ -107,7 +108,6 @@ if __name__ == "__main__":
     
     # Crear tagger
     tagger = create_tagger(args.tagger_type, args.taxonomy_file, **tagger_params)
-    
     
     # Procesar archivo de audio individual
     if not os.path.exists(args.audio_file):

@@ -5,10 +5,7 @@ from tqdm import tqdm
 import warnings
 import sys
 import librosa
-
-# Añadir la ruta del directorio padre al path para poder importar desde AI
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from AI.cascaded_tagger import AudioTagger
+from .text_embedding_tagger import TextEmbeddingTagger
 
 # Suprimir todos los warnings
 warnings.filterwarnings("ignore")
@@ -57,7 +54,7 @@ def test_tagger_on_folder(path_to_folder, taxonomy_file="taxonomies/16tags.txt",
             audio_durations[audio_file] = 0
     
     # Inicializar el etiquetador
-    tagger = AudioTagger(
+    tagger = TextEmbeddingTagger(
         taxonomy_file=taxonomy_file,
         model_name=embedding_model,
         whisper_model=whisper_model

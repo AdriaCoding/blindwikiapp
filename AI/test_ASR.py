@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import time
-from AI.S2TT import WhisperS2TT, SUPPORTED_MODELS
+from AI.Tagger.S2TT import WhisperS2TT, SUPPORTED_MODELS
 from tqdm import tqdm
 import warnings
 import librosa

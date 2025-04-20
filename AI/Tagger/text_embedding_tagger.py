@@ -2,16 +2,17 @@ import os
 import numpy as np
 from sentence_transformers import SentenceTransformer
 import torch
-from S2TT import WhisperS2TT
+from .S2TT import WhisperS2TT
 from .base_tagger import BaseTagger, DECISION_METHOD_KNN
+
 class TextEmbeddingTagger(BaseTagger):
     """
     Tagger que utiliza embeddings de texto a través de SentenceTransformer
     Requiere transcripción previa del audio
     """
     
-    def __init__(self, taxonomy_file, model_name='paraphrase-multilingual-mpnet-base-v2', 
-                 embeddings_dir='embeddings', S2TT_model="openai/whisper-small", device=None,
+    def __init__(self, taxonomy_file, model_name='paraphrase-multilingual-mpnet-base-v2',
+                 S2TT_model="openai/whisper-small", device=None,
                  decision_method=DECISION_METHOD_KNN, decision_params=None):
         """
         Inicializa el tagger basado en embeddings de texto.
@@ -19,7 +20,6 @@ class TextEmbeddingTagger(BaseTagger):
         Args:
             taxonomy_file (str): Ruta al archivo de taxonomía
             model_name (str): Nombre del modelo de embeddings de texto
-            embeddings_dir (str): Directorio para guardar/cargar embeddings
             S2TT_model (str): Modelo para transcribir audio al inglés
             device (str): Dispositivo a utilizar
             decision_method (str): Método para seleccionar etiquetas
@@ -42,7 +42,7 @@ class TextEmbeddingTagger(BaseTagger):
         self.asr = WhisperS2TT(model_name=S2TT_model, device=device_to_use)
         
         # Inicializar clase base
-        super().__init__(taxonomy_file, embeddings_dir, device, decision_method, decision_params)
+        super().__init__(taxonomy_file, device, decision_method, decision_params)
     
     def get_model_identifier(self):
         """

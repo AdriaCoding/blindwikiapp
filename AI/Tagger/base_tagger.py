@@ -15,6 +15,8 @@ DEFAULT_RADIUS = 0.5
 DECISION_METHOD_HDBSCAN = "hdbscan"
 DEFAULT_MIN_CLUSTER_SIZE = 5
 DEFAULT_MIN_SAMPLES = 1
+TAGGER_DIR = os.path.dirname(os.path.abspath(__file__))
+EMBEDDINGS_DIR = os.path.join(TAGGER_DIR, 'embeddings')
 
 class BaseTagger(ABC):
     """
@@ -22,14 +24,13 @@ class BaseTagger(ABC):
     Define la interfaz común para todos los tipos de etiquetadores
     """
     
-    def __init__(self, taxonomy_file, embeddings_dir='embeddings', device=None, 
+    def __init__(self, taxonomy_file, device=None, 
                 decision_method=DECISION_METHOD_KNN, decision_params=None):
         """
         Inicialización común para todos los etiquetadores
         
         Args:
             taxonomy_file (str): Ruta al archivo de taxonomía
-            embeddings_dir (str): Directorio donde guardar/cargar los embeddings
             device (str): Dispositivo a utilizar (cuda o cpu)
             decision_method (str): Método para seleccionar etiquetas ('knn', 'radius', 'hdbscan')
             decision_params (dict): Parámetros adicionales para el método de selección:
@@ -39,7 +40,7 @@ class BaseTagger(ABC):
                                   'min_samples': muestras mínimas (default: 1)}
         """
         self.taxonomy_file = taxonomy_file
-        self.embeddings_dir = embeddings_dir
+        self.embeddings_dir = EMBEDDINGS_DIR
         self.decision_method = decision_method
         
         # Configurar parámetros por defecto si no se especifican
