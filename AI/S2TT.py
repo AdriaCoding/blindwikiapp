@@ -2,6 +2,7 @@ import torch
 from transformers import pipeline
 import argparse
 import os
+import warnings
 import textwrap
 
 # Lista de modelos Whisper disponibles
@@ -14,12 +15,12 @@ SUPPORTED_MODELS = [
     "openai/whisper-large-v3"  # 1550M parámetros, mejor rendimiento
 ]
 
-class WhisperASR:
+class WhisperS2TT:
     """
-    Clase para realizar reconocimiento automático de voz (ASR) utilizando el modelo Whisper.
+    Clase para realizar transcripción de audio al inglés utilizando el modelo Whisper.
     """
     
-    def __init__(self, model_name="openai/whisper-large-v3", device=None):
+    def __init__(self, model_name="openai/whisper-large-v3", device=None, suppress_warnings=True):
         """
         Inicializa el modelo Whisper para transcripción de audio.
         
@@ -30,14 +31,20 @@ class WhisperASR:
                                       "openai/whisper-large-v2", "openai/whisper-large-v3"
             device (str, optional): Dispositivo a utilizar ('cuda' o 'cpu'). 
                                    Si es None, se autodetecta.
+            suppress_warnings (bool, optional): Si es True, suprime todos los warnings.
+                                              Por defecto es True.
         """
+        # Suprimir warnings si se solicita
+        if suppress_warnings:
+            warnings.filterwarnings("ignore")
+            
         # Autodetectar dispositivo si no se especifica
         if device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
             self.device = device
                         
-        # Inicializar pipeline de ASR
+        # Inicializar pipeline de ASR 
         self.asr_model = pipeline(
             task="automatic-speech-recognition",
             model=model_name,
@@ -92,7 +99,7 @@ class WhisperASR:
         }
 
 # Función simple para transcribir un archivo de audio sin crear una instancia de clase
-def transcribe_audio(audio_file, model_name="openai/whisper-large-v3", language=None, device=None):
+def transcribe_audio(audio_file, model_name="openai/whisper-large-v3", language=None, device=None, suppress_warnings=True):
     """
     Transcribe un archivo de audio usando Whisper sin crear una instancia de clase.
     
@@ -101,12 +108,13 @@ def transcribe_audio(audio_file, model_name="openai/whisper-large-v3", language=
         model_name (str): Nombre del modelo Whisper a utilizar
         language (str, optional): Idioma para la transcripción. Si es None, se detecta automáticamente.
         device (str, optional): Dispositivo a utilizar ('cuda' o 'cpu'). Si es None, se autodetecta.
+        suppress_warnings (bool, optional): Si es True, suprime todos los warnings. Por defecto es True.
     
     Returns:
         str: Texto transcrito del audio
     """
     # Crear instancia temporal de WhisperASR
-    asr = WhisperASR(model_name=model_name, device=device)
+    asr = WhisperS2TT(model_name=model_name, device=device, suppress_warnings=suppress_warnings)
     
     # Transcribir audio
     result = asr.transcribe(audio_file, language=language)
@@ -138,6 +146,8 @@ if __name__ == "__main__":
     parser.add_argument("--device", type=str, 
                        help="Dispositivo a utilizar (cuda, cpu). Si no se especifica, se autodetecta", 
                        default=None)
+    parser.add_argument("--show_warnings", action="store_true", 
+                       help="Mostrar advertencias durante la ejecución")
     
     # Parsear argumentos
     args = parser.parse_args()
@@ -160,7 +170,8 @@ if __name__ == "__main__":
         
         # Transcribir audio
         transcription = transcribe_audio(audio_path, model_name=args.model_name, 
-                                        language=args.language, device=args.device)
+                                        language=args.language, device=args.device,
+                                        suppress_warnings=not args.show_warnings)
         
         # Mostrar resultados
         print(f"\nTranscripción: {transcription}")

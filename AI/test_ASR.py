@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import time
-from ASR import WhisperASR, SUPPORTED_MODELS
+from AI.S2TT import WhisperS2TT, SUPPORTED_MODELS
 from tqdm import tqdm
 import warnings
 import librosa
@@ -48,7 +48,7 @@ def test_multiple_files(path_to_folder, models=None, language=None, device=None)
     # Procesar cada modelo
     for model_name in tqdm(models, desc="Procesando modelos"):
         print(f"\nProcesando con modelo: {model_name}")
-        asr = WhisperASR(model_name=model_name, device=device)
+        asr = WhisperS2TT(model_name=model_name, device=device)
         
         # Procesar cada archivo de audio
         for audio_file in tqdm(audio_files, desc=f"Archivos con {model_name}", leave=False):
