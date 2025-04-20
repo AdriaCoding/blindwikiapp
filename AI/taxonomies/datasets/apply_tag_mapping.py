@@ -2,7 +2,7 @@ import json
 import os
 import argparse
 
-def apply_tag_mapping(dict_file, mapping_name="16tags", output_suffix="_x_message"):
+def apply_tag_mapping(dict_file, mapping_name="16tags"):
     """
     Applies a taxonomy mapping to the data structure.
     
@@ -65,7 +65,7 @@ def apply_tag_mapping(dict_file, mapping_name="16tags", output_suffix="_x_messag
     }
     
     # Generate output filename
-    output_file = f"{mapping_name}{output_suffix}.json"
+    output_file = f"{mapping_name}_x_message.json"
     
     # Save the mapping result
     with open(output_file, 'w', encoding='utf-8') as f:
@@ -81,13 +81,11 @@ def main():
                         help='Input dictionary file (.json) (default: all_tags_x_message_dict.json)')
     parser.add_argument('--mapping', default="16tags", 
                         help='Mapping name to use (default: 16tags)')
-    parser.add_argument('--suffix', default="_x_message", 
-                        help='Suffix for output filename (default: _x_message)')
     
     args = parser.parse_args()
     
     # Apply mapping
-    apply_tag_mapping(args.input, args.mapping, args.suffix)
+    apply_tag_mapping(args.input, args.mapping)
     
     print("Process completed successfully!")
 
