@@ -1,0 +1,3 @@
+﻿[submodule "AI/Tagger"]
+    path = AI/Tagger
+    url = git@github.com:AdriaCoding/Tagger.git
