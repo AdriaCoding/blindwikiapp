@@ -8,6 +8,7 @@ class MessageController extends Controller
 	// I'll call the ajax-only action "update" just in case I need a "edit" action
 	// which would consist in showing the edit controls (still ajax)
 
+	public static $USE_TAGGER_BY_DEFAULT = true;
 
 	public $layout='//layouts/public';
 	
@@ -331,7 +332,7 @@ class MessageController extends Controller
 
 					// Tagger Integration - Automatic audio tagging
 					// Check use_tagger flag (default true for backward compatibility)
-					$useTagger = (bool) Yii::app()->request->getParam('use_tagger', false);
+					$useTagger = (bool) Yii::app()->request->getParam('use_tagger', self::USE_TAGGER_BY_DEFAULT);
 					Yii::log("Tagger integration starting. useTagger flag: " . ($useTagger ? 'true' : 'false'), 'info');
 					
 					if ($useTagger && count($message->attachments) > 0) {
