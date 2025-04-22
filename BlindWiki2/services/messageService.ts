@@ -331,6 +331,9 @@ export async function publishMessage(
     formData.append("PublishForm[device]", deviceInfo || "BlindWiki2 App");
     formData.append("PHPSESSID", sessionId);
     
+    // Enable the automatic tagging functionality
+    formData.append("use_tagger", "true");
+    
     // Using axios to upload the file
     const response = await axios({
       method: 'post',
@@ -473,8 +476,6 @@ function getMimeTypeForExtension(extension: string): string {
   
   return mimeTypes[extension] || 'audio/mpeg';
 }
-
-
 
 /**
  * Records that an audio attachment was played
