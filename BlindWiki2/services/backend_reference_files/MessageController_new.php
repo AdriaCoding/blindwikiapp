@@ -154,19 +154,60 @@ class MessageController extends Controller
 		}
 		
 		// Build the command to execute the script
-		$cmd = escapeshellcmd("/srv/www/blind.wiki/public_html/Tagger/run_tagger.sh $audioFilePath");
+		$script = "/srv/www/blind.wiki/public_html/Tagger/run_tagger.sh";
 		
-		Yii::log("Executing Tagger command: $cmd", 'info');
-		
-		$output = array();
-		$ret = 0;
-		exec($cmd, $output, $ret);
-		
-		if ($ret !== 0) {
-			Yii::log("Error executing Tagger (code: $ret): " . implode("\n", $output), 'error');
+		// Check if the script exists and is executable
+		if (!file_exists($script)) {
+			Yii::log("Tagger script not found: $script", 'error');
 			return array('tags' => array(), 'transcription' => '');
 		}
-				
+		
+		// Check script permissions
+		$permissions = fileperms($script);
+		$isExecutable = ($permissions & 0x0040) || ($permissions & 0x0008) || ($permissions & 0x0001);
+		Yii::log("Tagger script permissions: " . decoct($permissions) . ", executable: " . ($isExecutable ? 'yes' : 'no'), 'info');
+		
+		// Use output buffer and direct execution
+		$scriptArgument = escapeshellarg($audioFilePath);
+		$cmd = "$script $scriptArgument";
+		Yii::log("Executing Tagger command: $cmd", 'info');
+		
+		// Set a longer timeout (5 minutes)
+		$defaultTimeout = ini_get('max_execution_time');
+		set_time_limit(300);
+		
+		// Execute command and capture output directly
+		$startTime = microtime(true);
+		$output = array();
+		$ret = 0;
+		exec($cmd." 2>&1", $output, $ret);
+		$endTime = microtime(true);
+		$executionTime = round($endTime - $startTime, 2);
+		
+		Yii::log("Tagger execution completed in {$executionTime} seconds with exit code: $ret", 'info');
+		
+		// Reset timeout to default
+		set_time_limit($defaultTimeout);
+		
+		// Log each line of output separately to ensure everything is captured
+		Yii::log("Tagger output START", 'info');
+		foreach ($output as $index => $line) {
+			Yii::log("Tagger output line " . ($index + 1) . ": " . $line, 'info');
+		}
+		Yii::log("Tagger output END", 'info');
+		
+		// Use a non-newline separator for the full output
+		$fullOutput = implode(" | ", $output);
+		Yii::log("Tagger complete output (pipe-separated): " . $fullOutput, 'info');
+		
+		if ($ret !== 0) {
+			Yii::log("Error executing Tagger (code: $ret) - See output above", 'error');
+			Yii::log("SUGGESTION: Verify the Tagger script manually by running the following command on the server:", 'error');
+			Yii::log("cd /srv/www/blind.wiki/public_html && ./Tagger/run_tagger.sh " . escapeshellarg($audioFilePath), 'error');
+			Yii::log("Check for Python dependencies and environment setup", 'error');
+			return array('tags' => array(), 'transcription' => '');
+		}
+		
 		// Look for JSON in the console output
 		Yii::log("Processing console output from Tagger", 'info');
 		
@@ -290,17 +331,25 @@ class MessageController extends Controller
 
 					// Tagger Integration - Automatic audio tagging
 					// Check use_tagger flag (default true for backward compatibility)
-					$useTagger = (bool) Yii::app()->request->getParam('use_tagger', true);
+					$useTagger = (bool) Yii::app()->request->getParam('use_tagger', false);
+					Yii::log("Tagger integration starting. useTagger flag: " . ($useTagger ? 'true' : 'false'), 'info');
+					
 					if ($useTagger && count($message->attachments) > 0) {
+						Yii::log("Message has " . count($message->attachments) . " attachments, looking for audio files", 'info');
+						
 						foreach ($message->attachments as $attachment) {
 							// Only process audio files - use the type constant instead of mime_type
+							Yii::log("Checking attachment ID: " . $attachment->id . ", type: " . $attachment->type, 'info');
+							
 							if ($attachment->type == Attachment::TYPE_AUDIO) {
 								try {
 									// Path to the audio file
 									$audioFilePath = Yii::getPathOfAlias('webroot.uploads') . "/". $attachment->local_filename;
+									Yii::log("Found audio attachment, path: " . $audioFilePath, 'info');
 									
 									// Execute the tagger
 									$taggerResult = $this->useTagger($audioFilePath);
+									Yii::log("Tagger execution completed, processing results", 'info');
 									
 									// Extract all tags returned by the tagger
 									$autoTags = array();
@@ -311,21 +360,30 @@ class MessageController extends Controller
 										
 										if (!empty($autoTags)) {
 											// Pass array; second parameter true merges with existing tags
+											Yii::log("Adding " . count($autoTags) . " tags to message: " . implode(", ", $autoTags), 'info');
 											$message->setNewTags($autoTags, true);
 											$message->updateTagSummaries('add');
 											$message->save(false);
 											
 											Yii::log("Tagger: tags added to message {$message->id}: " . implode(',', $autoTags), 'info');
+										} else {
+											Yii::log("No valid tags found in Tagger results", 'info');
 										}
+									} else {
+										Yii::log("Tagger returned empty tags array", 'info');
 									}
 								} catch (Exception $e) {
-									Yii::log("Error executing Tagger: " . $e->getMessage(), 'error');
+									Yii::log("Error executing Tagger: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 'error');
 								}
 								
 								// Only process the first audio attachment
+								Yii::log("Processing complete for first audio attachment", 'info');
 								break;
 							}
 						}
+					} else {
+						Yii::log("Skipping Tagger integration: useTagger=" . ($useTagger ? 'true' : 'false') . 
+						    ", attachment count=" . count($message->attachments), 'info');
 					}
 					// End of Tagger Integration
 
