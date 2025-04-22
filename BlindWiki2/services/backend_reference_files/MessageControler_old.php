@@ -139,79 +139,6 @@ class MessageController extends Controller
 	}
 
 	
-	/**
-	 * Runs Python Tagger submodule to process the audio file.
-	 * 
-	 * @param string $audioFilePath Path to the WAV/MP3 file
-	 * @return array ['tags'=>[['tag'=>'foo','similarity'=>0.7],...], 'transcription'=>'...']
-	 */
-	protected function useTagger(string $audioFilePath): array
-	{
-		// Check if the file exists
-		if (!file_exists($audioFilePath)) {
-			Yii::log("Audio file not found: $audioFilePath", 'error');
-			return ['tags' => [], 'transcription' => ''];
-		}
-		
-		// Build the command to execute the script
-		$cmd = escapeshellcmd("/srv/www/blind.wiki/public_html/Tagger/run_tagger.sh $audioFilePath");
-		
-		Yii::log("Executing Tagger command: $cmd", 'info');
-		
-		$output = [];
-		$ret = 0;
-		exec($cmd, $output, $ret);
-		
-		if ($ret !== 0) {
-			Yii::log("Error executing Tagger (code: $ret): " . implode("\n", $output), 'error');
-			return ['tags' => [], 'transcription' => ''];
-		}
-				
-		// Look for JSON in the console output
-		Yii::log("Processing console output from Tagger", 'info');
-		
-		// Find where the JSON begins (after "Resultado:")
-		$jsonLines = [];
-		$foundResultado = false;
-		
-		foreach ($output as $line) {
-			if ($foundResultado) {
-				$jsonLines[] = $line;
-			} elseif (trim($line) === "Resultado:") {
-				$foundResultado = true;
-			}
-		}
-		
-		// Extract information directly from console output
-		$transcription = '';
-		$tags = [];
-		$outputStr = implode("\n", $output);
-		
-		// Extract transcription
-		if (preg_match('/"transcription":\s*"([^"]*)"/', $outputStr, $matches)) {
-			$transcription = $matches[1];
-		}
-		
-		// Extract tags
-		preg_match_all('/"tag":\s*"([^"]*)"\s*,\s*"similarity":\s*([\d\.]+)/', $outputStr, $matches, PREG_SET_ORDER);
-		foreach ($matches as $match) {
-			if (!empty($match[1])) {
-				$tags[] = [
-					'tag' => $match[1],
-					'similarity' => (float)$match[2]
-				];
-			}
-		}
-		
-		Yii::log("Extraction completed. Transcription: " . substr($transcription, 0, 50) . "... Tags: " . count($tags), 'info');
-		
-		return [
-			'transcription' => $transcription,
-			'tags' => $tags
-		];
-	}
-
-	// Modified actionPublish method to integrate Tagger
 	public function actionPublish()
 	{	
 	    
@@ -287,48 +214,6 @@ class MessageController extends Controller
 					if ($form->audioDataUri!=null) $dataUris[]=$form->audioDataUri;
 					$attsuccess=$message->createAttachments($uploadedfiles, isset($_REQUEST['uploadedImage'])?$_REQUEST['uploadedImage']:null, $dataUris);
 					$message->setTags($form->tags,$form->newtags);
-
-					// Tagger Integration - Automatic audio tagging
-					// Check use_tagger flag (default true for backward compatibility)
-					$useTagger = (bool) Yii::app()->request->getParam('use_tagger', true);
-					if ($useTagger && count($message->attachments) > 0) {
-						foreach ($message->attachments as $attachment) {
-							// Only process audio files
-							if (strpos($attachment->mime_type, 'audio/') === 0) {
-								try {
-									// Path to the audio file
-									$audioFilePath = Yii::getPathOfAlias('webroot.uploads') . "/". $attachment->filename;
-									
-									// Execute the tagger
-									$taggerResult = $this->useTagger($audioFilePath);
-									
-									// Extract all tags returned by the tagger
-									$autoTags = [];
-									if (!empty($taggerResult['tags'])) {
-										foreach ($taggerResult['tags'] as $tagInfo) {
-											$autoTags[] = $tagInfo['tag'];
-										}
-										
-										if (!empty($autoTags)) {
-											// Pass array; second parameter true merges with existing tags
-											$message->setNewTags($autoTags, true);
-											$message->updateTagSummaries('add');
-											$message->save(false);
-											
-											Yii::log("Tagger: tags added to message {$message->id}: " . implode(',', $autoTags), 'info');
-										}
-									}
-								} catch (Exception $e) {
-									Yii::log("Error executing Tagger: " . $e->getMessage(), 'error');
-								}
-								
-								// Only process the first audio attachment
-								break;
-							}
-						}
-					}
-					// End of Tagger Integration
-
 					if (Yii::app()->request->isAjaxRequest) {
 						echo json_encode(array('status'=>'OK', 'message'=>array('id'=>$message->id)));
 						Yii::app()->end();
