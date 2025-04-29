@@ -19,7 +19,6 @@ import { Message } from "@/models/message";
 import { useTranslation } from "react-i18next";
 import Colors from "@/constants/Colors";
 import React from "react";
-import { GOOGLE_MAPS_API_KEY } from "@env";
 import { InstructionsText } from "@/components/InstructionsText";
 
 // Interfaces para los resultados de Google Places
@@ -69,11 +68,12 @@ export default function Search() {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
           searchQuery
-        )}&key=${GOOGLE_MAPS_API_KEY}`
+        )}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`
       );
 
       const data = await response.json();
       console.log("Resultados de la búsqueda:", data);
+      console.log("GOOGLE_MAPS_API_KEY:", process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY);
 
       if (data.predictions && data.predictions.length > 0) {
         // Guardar las predicciones para mostrarlas en la lista
@@ -95,7 +95,7 @@ export default function Search() {
     try {
       // Obtener detalles del lugar seleccionado (coordenadas)
       const detailsResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,formatted_address&key=${GOOGLE_MAPS_API_KEY}`
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry,formatted_address&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`
       );
 
       const detailsData = await detailsResponse.json();
