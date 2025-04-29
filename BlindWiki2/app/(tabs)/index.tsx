@@ -1,7 +1,7 @@
 import { StyleSheet, Alert, Platform } from 'react-native';
 import { useState, useEffect } from 'react';
 import { InstructionsText } from '@/components/InstructionsText';
-import LocationComponent from '@/components/Location';
+import LocationComponent, { getCurrentLocation } from '@/components/Location';
 import { useTranslation } from 'react-i18next';
 import Colors from '@/constants/Colors';
 import { Text, View } from 'react-native';
@@ -15,7 +15,7 @@ import * as FileSystem from 'expo-file-system';
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
-  const { location } = useLocation();
+  const { location, updateLocation } = useLocation();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingInstance, setRecordingInstance] = useState<Audio.Recording | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -49,11 +49,10 @@ export default function HomeScreen() {
     try {
       // Check if we have location data
       if (!location) {
-        Alert.alert(
-          t('home.noLocationTitle'),
-          t('home.noLocationMessage')
-        );
-        return;
+        const result = await getCurrentLocation(t, { updateLocation });
+        if (result.error) {
+          return;
+        }
       }
 
       // Web platform handling for recording

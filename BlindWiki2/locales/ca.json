@@ -59,10 +59,12 @@
     "currentLocation": "Ubicació actual: ",
     "error": "Error en obtenir la ubicació",
     "highAccuracy": "Alta precisió",
-    "loading": "Obtenint ubicació...",
+    "loading": "Obtenint la teva ubicació...",
     "normalAccuracy": "Precisió normal",
+    "openSettings": "Obrir Configuració",
     "permissionDenied": "Permís d'ubicació denegat",
-    "permissionRequired": "Es requereix permís d'ubicació per gravar amb informació GPS.",
+    "permissionExplanation": "Blind Wiki necessita accedir a la teva ubicació per trobar missatges a prop teu i per poder geolocalitzar els teus missatges. Si us plau, activa el permís en la configuració del teu dispositiu.",
+    "permissionRequired": "Es Requereix Permís d'Ubicació",
     "permissionTitle": "Permís d'ubicació"
   },
   "login": {

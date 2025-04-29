@@ -59,10 +59,12 @@
     "currentLocation": "Ubicación actual: ",
     "error": "Error al obtener la ubicación",
     "highAccuracy": "Alta precisión",
-    "loading": "Obteniendo ubicación...",
+    "loading": "Obteniendo tu ubicación...",
     "normalAccuracy": "Precisión normal",
+    "openSettings": "Abrir Ajustes",
     "permissionDenied": "Permiso de ubicación denegado",
-    "permissionRequired": "Se requiere permiso de ubicación para grabar con información GPS.",
+    "permissionExplanation": "Blind Wiki necesita acceder a tu ubicación para encontrar mensajes cerca de ti y para poder geolocalizar tus mensajes. Por favor, activa el permiso en la configuración de tu dispositivo.",
+    "permissionRequired": "Se Requiere Permiso de Ubicación",
     "permissionTitle": "Permiso de ubicación"
   },
   "login": {

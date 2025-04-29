@@ -5,96 +5,135 @@ import {
   Pressable,
   ActivityIndicator,
   Platform,
+  Alert,
+  Linking,
 } from "react-native";
 import * as Location from "expo-location";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "@/contexts/LocationContext";
 import Colors from "@/constants/Colors";
+
+const requestLocationPermission = async (t: (key: string) => string) => {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status == "granted") return true;
+  else {
+    Alert.alert(
+      t("location.permissionRequired"),
+      t("location.permissionExplanation"),
+      [
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("location.openSettings"),
+          onPress: () => {
+            if (Platform.OS === "ios") {
+              Linking.openURL("app-settings:");
+            } else {
+              Linking.openSettings();
+            }
+          },
+        },
+      ]
+    );
+    const statusAfterRequest = await Location.getForegroundPermissionsAsync();
+    if (statusAfterRequest.status == "granted") {
+      return true;
+    }
+    return false;
+  }
+};
+
+export const getCurrentLocation = async (t: (key: string) => string, locationContext: any) => {
+  try {
+    // Request permissions
+    const hasPermission = await requestLocationPermission(t);
+    if (!hasPermission) {
+      return { error: t("location.permissionDenied") };
+    }
+
+    // Get current position
+    const position = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
+
+    // Get address from coordinates (reverse geocoding)
+    const addressResponse = await Location.reverseGeocodeAsync({
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    });
+
+    if (addressResponse && addressResponse.length > 0) {
+      const address = addressResponse[0];
+      const locationText = `${address.street || ""}, ${address.district || ""}, ${
+        address.postalCode || ""
+      } ${address.city || ""}, ${address.country || ""}`;
+      
+      // Update the location context
+      locationContext.updateLocation(position, address);
+      
+      return { 
+        success: true, 
+        position, 
+        address, 
+        locationText 
+      };
+    } else {
+      // Fallback to coordinates if geocoding fails
+      const locationText = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+      
+      // Update the location context with position only
+      locationContext.updateLocation(position);
+      
+      return { 
+        success: true, 
+        position, 
+        locationText 
+      };
+    }
+  } catch (err) {
+    console.error("Error getting location:", err);
+    return { error: t("location.error") };
+  }
+};
+
 export default function LocationComponent() {
   const { t } = useTranslation();
   const [locationText, setLocationText] = useState<string | null>(null);
-  const [loading, setLoading] = useState(Platform.OS !== 'web');
+  const [loading, setLoading] = useState(Platform.OS !== "web");
   const [error, setError] = useState<string | null>(null);
   
   // Get access to the location context
   const locationContext = useLocation();
 
-  const parseLocationText = (
-    address: Location.LocationGeocodedAddress,
-    position: Location.LocationObject
-  ): string => {
-    const accuracy = position.coords.accuracy ?? 0;
-    const isHighAccuracy = accuracy < 20;
-    return `${address.street || ""}, ${address.district || ""}, ${
-      address.postalCode || ""
-    } ${address.city || ""}, ${address.country || ""} : ${
-      isHighAccuracy ? t("location.highAccuracy") : t("location.normalAccuracy")
-    }`;
-  };
-  
   // Function to get the current location
-  const getCurrentLocation = async () => {
+  const handleGetLocation = async () => {
     setLoading(true);
     setError(null);
 
-    try {
-      // Request permissions
-      const { status } = await Location.requestForegroundPermissionsAsync();
-
-      if (status !== "granted") {
-        setError(t("location.permissionDenied"));
-        setLoading(false);
-        return;
-      }
-
-      // Get current position
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-
-      // Get address from coordinates (reverse geocoding)
-      const addressResponse = await Location.reverseGeocodeAsync({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      });
-
-      if (addressResponse && addressResponse.length > 0) {
-        const address = addressResponse[0];
-        const locationText = parseLocationText(address, position);
-        setLocationText(locationText);
-        
-        // Update the location context
-        locationContext.updateLocation(position, address);
-      } else {
-        // Fallback to coordinates if geocoding fails
-        setLocationText(
-          `${position.coords.latitude.toFixed(
-            6
-          )}, ${position.coords.longitude.toFixed(6)}`
-        );
-        
-        // Update the location context with position only
-        locationContext.updateLocation(position);
-      }
-    } catch (err) {
-      setError(t("location.error"));
-      console.error("Error getting location:", err);
-    } finally {
-      setLoading(false);
+    const result = await getCurrentLocation(t, locationContext);
+    
+    if (result.error) {
+      setError(result.error);
+    } else if (result.success) {
+      setLocationText(result.locationText);
     }
+    
+    setLoading(false);
   };
 
   // Get location when component mounts (solo en móvil)
   useEffect(() => {
-    if (Platform.OS !== 'web') {
-      getCurrentLocation();
+    if (Platform.OS !== "web") {
+      handleGetLocation();
     }
   }, []);
 
   // Handle press on location box
   const pressLocationHandler = () => {
-    getCurrentLocation(); // Refresh location on press
+    handleGetLocation(); // Refresh location on press
   };
 
   return (
@@ -109,7 +148,10 @@ export default function LocationComponent() {
     >
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
+          <ActivityIndicator
+            size="large"
+            color={Colors.light.activityIndicator}
+          />
           <Text style={styles.loadingText}>{t("location.loading")}</Text>
         </View>
       ) : error ? (
@@ -118,8 +160,8 @@ export default function LocationComponent() {
         <Text style={styles.locationText}>{locationText}</Text>
       ) : (
         <Text style={styles.locationText}>
-          {Platform.OS === 'web' 
-            ? t("location.clickToGetLocation") 
+          {Platform.OS === "web"
+            ? t("location.clickToGetLocation")
             : t("location.loading")}
         </Text>
       )}

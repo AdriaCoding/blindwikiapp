@@ -37,7 +37,7 @@ node proxy.js
 Otherwise, all requests from the app on your localhost will be blocked by the server's CORS policy
 
 
-## EAS deplument
+## EAS deployment
 ```shell
 npx eas update --branch HEAD --message "Updating..."
 ```
