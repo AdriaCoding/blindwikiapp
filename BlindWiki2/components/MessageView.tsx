@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, GestureResponderEvent, Alert } from "react-native";
+import { View, Text, StyleSheet, GestureResponderEvent, Alert, Linking, Platform } from "react-native";
 import StyledButton from "./StyledButton";
 import AudioButton from "./AudioButton";
 import { Message } from "@/models/message";
@@ -194,6 +194,39 @@ export function useMessageActions(
   };
 
   /**
+   * Handle opening directions to a message location in maps app
+   */
+  const handleDirections = (message: Message) => {
+    const { latitude, longitude } = message;
+    console.log("Navigating to coordinates:", latitude, longitude);
+    
+    const scheme = Platform.select({
+      ios: 'maps:0,0?q=',
+      android: 'geo:0,0?q='
+    });
+    
+    const latLng = `${latitude},${longitude}`;
+    const label = message.address || "Mensaje de BlindWiki";
+    
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latLng}`,
+      android: `${scheme}${latLng}(${label})`
+    });
+    
+    Linking.canOpenURL(url!)
+      .then(supported => {
+        if (supported) {
+          return Linking.openURL(url!);
+        } else {
+          // Fallback para abrir en navegador si la app de mapas no está disponible
+          const browser_url = `https://www.google.com/maps/search/?api=1&query=${latLng}`;
+          return Linking.openURL(browser_url);
+        }
+      })
+      .catch(err => console.error('Error abriendo el mapa:', err));
+  };
+
+  /**
    * Create MessageActions object for a specific message
    */
   const getActionsForMessage = (message: Message) => {
@@ -227,7 +260,7 @@ export function useMessageActions(
         openCommentsModal(message);
       },
       onDirection: (event: GestureResponderEvent) => {
-        console.log("Clicked on Directions for message:", message.id);
+        handleDirections(message);
       },
     };
   };
@@ -237,6 +270,7 @@ export function useMessageActions(
     getActionsForMessage,
     handleAudioPlayback,
     getAudioUrl,
+    handleDirections,
     playingMessageId,
     isProcessing,
     error,
