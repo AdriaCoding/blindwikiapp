@@ -226,7 +226,9 @@ export function useMessageActions(
       onViewComments: (event: GestureResponderEvent) => {
         openCommentsModal(message);
       },
-      onDirection: undefined, // Implement if needed
+      onDirection: (event: GestureResponderEvent) => {
+        console.log("Clicked on Directions for message:", message.id);
+      },
     };
   };
 

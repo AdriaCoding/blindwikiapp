@@ -41,16 +41,16 @@ export default function TagsView({ messages }: { messages: Message[] }) {
     setFilteredMessages
   );
 
-  // Filtrar las acciones para solo incluir onListen y onViewComments
+  // Filtrar las acciones para solo incluir onListen, onViewComments y onDirection
   const getLimitedActionsForMessage = (message: Message): MessageActions => {
     const allActions = getActionsForMessage(message);
     return {
       onListen: allActions.onListen,
       onViewComments: allActions.onViewComments,
+      onDirection: allActions.onDirection,
       // Otras acciones se establecen como undefined
       onEditTags: undefined,
-      onDelete: undefined,
-      onDirection: undefined
+      onDelete: undefined
     };
   };
 
