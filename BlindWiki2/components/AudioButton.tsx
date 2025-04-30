@@ -103,6 +103,15 @@ export default function AudioButton({
         await sound.unloadAsync();
       }
 
+      // Configure audio output to use the speaker instead of earpiece on iOS
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: true,
+      });
+
       // Skip file existence check on web platform
       if (!isRemoteUri && Platform.OS !== 'web') {
         try {

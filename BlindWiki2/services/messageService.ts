@@ -299,8 +299,8 @@ export async function publishMessage(
     }
 
     // Extract filename and determine MIME type
-    const filename = audioFilePath.split('/').pop() || 'audio.mp3';
-    const extension = filename.split('.').pop()?.toLowerCase() || 'mp3';
+    const filename = audioFilePath.split('/').pop() || 'audio.wav';
+    const extension = filename.split('.').pop()?.toLowerCase() || 'wav';
     const mimeType = getMimeTypeForExtension(extension);
     
     // Create form data object
@@ -408,7 +408,7 @@ export async function postComment(
         const fileInfo = await FileSystem.getInfoAsync(audioFilePath);
         if (fileInfo.exists) {
           // Determine file extension and mime type from the path
-          const extension = audioFilePath.split('.').pop()?.toLowerCase() || 'mp3';
+          const extension = audioFilePath.split('.').pop()?.toLowerCase() || 'wav';
           const mimeType = getMimeTypeForExtension(extension);
           
           formData.append("Comment[files][0]", {
@@ -424,7 +424,8 @@ export async function postComment(
       } catch (error) {
         console.error("Error accessing audio file:", error);
       }
-    }     
+    }
+    
     // Use fetch directly for FormData
     const response = await fetch("https://api.blind.wiki/message/postComment", {
       method: "POST",
@@ -474,7 +475,7 @@ function getMimeTypeForExtension(extension: string): string {
     '3gp': 'audio/3gpp',
   };
   
-  return mimeTypes[extension] || 'audio/mpeg';
+  return mimeTypes[extension] || 'audio/wav'; // Default to WAV instead of MP3
 }
 
 /**
