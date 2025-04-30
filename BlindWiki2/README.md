@@ -16,7 +16,7 @@ For the search functionality to work, you need to set up a Google Maps API key:
 
 4. Create a `.env` file in the root of the project with the following content:
    ```
-   GOOGLE_MAPS_API_KEY=your_api_key_here
+   EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
    ```
    Replace `your_api_key_here` with your actual Google Maps API key.
 
