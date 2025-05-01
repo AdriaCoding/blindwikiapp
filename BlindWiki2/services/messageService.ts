@@ -4,6 +4,7 @@ import { Message, Attachment, Comment } from "@/models/message";
 import * as FileSystem from 'expo-file-system';
 import { useAuth } from "@/contexts/AuthContext"; // Add this import
 import axios from 'axios'; // Import axios for HTTP requests
+import { Platform } from 'react-native';
 
 // Server response interfaces
 export interface MessagesResponse extends ServerResponse {
@@ -298,9 +299,12 @@ export async function publishMessage(
       };
     }
 
+    // Información del dispositivo con detalles de la plataforma
+    const platformInfo = deviceInfo || Platform.OS; // Simplemente "ios" o "android"
+
     // Extract filename and determine MIME type
-    const filename = audioFilePath.split('/').pop() || 'audio.wav';
-    const extension = filename.split('.').pop()?.toLowerCase() || 'wav';
+    const filename = audioFilePath.split('/').pop() || `audio.${Platform.OS === 'ios' ? 'm4a' : 'mp3'}`;
+    const extension = filename.split('.').pop()?.toLowerCase() || (Platform.OS === 'ios' ? 'm4a' : 'mp3');
     const mimeType = getMimeTypeForExtension(extension);
     
     // Create form data object
@@ -328,7 +332,7 @@ export async function publishMessage(
     formData.append("PublishForm[address]", address);
     formData.append("PublishForm[text]", "");
     formData.append("PublishForm[newtags]", tags);
-    formData.append("PublishForm[device]", deviceInfo || "BlindWiki2 App");
+    formData.append("PublishForm[device]", platformInfo);
     formData.append("PHPSESSID", sessionId);
     
     // Enable the automatic tagging functionality
@@ -475,7 +479,7 @@ function getMimeTypeForExtension(extension: string): string {
     '3gp': 'audio/3gpp',
   };
   
-  return mimeTypes[extension] || 'audio/wav'; // Default to WAV instead of MP3
+  return mimeTypes[extension] || 'audio/mpeg'; // Default a MP3 en lugar de WAV
 }
 
 /**
