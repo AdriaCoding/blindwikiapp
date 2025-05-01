@@ -351,6 +351,13 @@ class MessageController extends Controller
 									$taggerResult = $this->useTagger($audioFilePath);
 									Yii::log("Tagger execution completed, processing results", 'info');
 									
+									// Set message text to transcription if original text is empty
+									if (empty($message->text) && !empty($taggerResult['transcription'])) {
+										$message->text = $taggerResult['transcription'];
+										$message->save(false);
+										Yii::log("Text set from transcription: " . substr($message->text, 0, 50) . "...", 'info');
+									}
+									
 									// Extract all tags returned by the tagger
 									$autoTags = array();
 									if (!empty($taggerResult['tags'])) {
