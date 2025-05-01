@@ -100,26 +100,25 @@ export default function HomeScreen() {
         playsInSilentModeIOS: true,
       });
       
-      // Custom recording options for WAV format
+      // Custom recording options for MP3 format
       const recordingOptions = {
         ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
         android: {
-          ...Audio.RecordingOptionsPresets.HIGH_QUALITY.android,
-          extension: '.wav',
-          outputFormat: Audio.AndroidOutputFormat.THREE_GPP,
+          extension: '.mp3',
+          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
           audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 16000,
+          sampleRate: 44100,
           numberOfChannels: 1,
-          bitRate: 256000,
+          bitRate: 128000,
+          encodingBitRate: 128000,
         },
         ios: {
-          ...Audio.RecordingOptionsPresets.HIGH_QUALITY.ios,
-          extension: '.wav',
-          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
-          audioQuality: Audio.IOSAudioQuality.MEDIUM,
-          sampleRate: 16000,
+          extension: '.aac',
+          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
+          audioQuality: Audio.IOSAudioQuality.HIGH,
+          sampleRate: 44100,
           numberOfChannels: 1,
-          bitRate: 256000,
+          bitRate: 128000,
           linearPCMBitDepth: 16,
           linearPCMIsBigEndian: false,
           linearPCMIsFloat: false,
@@ -193,7 +192,7 @@ export default function HomeScreen() {
         if (fileInfo.exists) {
           // Create a new file in app's documents directory with a simple name
           const timestamp = Date.now();
-          const extension = '.wav';
+          const extension = Platform.OS === 'ios' ? '.aac' : '.mp3';
           const newFilename = `recording-${timestamp}${extension}`;
           const newUri = `${FileSystem.documentDirectory}${newFilename}`;
           
