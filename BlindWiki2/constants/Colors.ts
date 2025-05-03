@@ -41,7 +41,7 @@ export default {
     button: {
       text: whiteColor,
       background: buttonColor,
-      shadow: "#000000",
+      shadow: blackColor,
       border: "rgba(0, 0, 0, 0.2)",
       borderBottom: darkenColor(buttonColor, 30),
     },
