@@ -85,8 +85,17 @@ export default function RootLayout() {
 function RootLayoutNav() {
   //const { isLoading } = useAuth();
   // Show loading screen while checking credentials and auto-login
-  const isLoading = false;
+  const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Force loading screen to show for at least 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // 3 seconds
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   useEffect(() => {
     if (Platform.OS === 'web') {

@@ -2,6 +2,7 @@ import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { Text, View, StyleSheet } from "react-native";
 
 import Colors from "@/constants/Colors";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
@@ -19,7 +20,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({ route }) => ({
         tabBarActiveTintColor: Colors.light.primary,
         tabBarInactiveTintColor: Colors.light.tabBar.inactive,
         // Disable the static render of the header on web
@@ -34,12 +35,29 @@ export default function TabLayout() {
         },
         // Colocar texto debajo de los iconos
         tabBarLabelPosition: 'below-icon',
-      }}
+        // Custom header to show tab title on left and app name on right
+        headerTitle: () => {
+          // Get the title based on the route name
+          let title = '';
+          if (route.name === 'index') title = t('home.title');
+          else if (route.name === 'myMessages') title = t('myMessages.title');
+          else if (route.name === 'explore') title = t('explore.title');
+          else if (route.name === 'world') title = t('world.title');
+          else if (route.name === 'search') title = t('search.title');
+          else if (route.name === 'settings') title = t('settings.title');
+          
+          return (
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerLeftText}>{title}</Text>
+              <Text style={styles.headerRightText}>Blind Wiki 2.0</Text>
+            </View>
+          );
+        },
+      })}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: t('home.title'),
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="microphone" color={color} />
           ),
@@ -48,7 +66,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="myMessages"
         options={{
-          title: t('myMessages.title'),
           tabBarLabel: t('myMessages.tabLabel'),
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="file-audio-o" color={color} />
@@ -58,28 +75,24 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: t('explore.title'),
           tabBarIcon: ({ color }) => <TabBarIcon name="map-marker" color={color} />,
         }}
       />
       <Tabs.Screen
         name="world"
         options={{
-          title: t('world.title'),
           tabBarIcon: ({ color }) => <TabBarIcon name="globe" color={color} />,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          title: t('search.title'),
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: t('settings.title'),
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="sliders" color={color} />
           ),
@@ -88,3 +101,23 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  headerLeftText: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: Colors.light.topBannerText,
+  },
+  headerRightText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.light.topBannerText,
+  },
+});
