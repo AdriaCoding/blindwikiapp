@@ -14,13 +14,22 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "@/contexts/LocationContext";
 import Colors from "@/constants/Colors";
 import React from "react";
+
 export default function Explore() {
   const { t } = useTranslation();
-  const { location } = useLocation();
+  const { location, isLoading: isLoadingLocation, getCurrentLocation } = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch location if not available
+  useEffect(() => {
+    if (!location && !isLoadingLocation) {
+      getCurrentLocation(t);
+    }
+  }, [location, isLoadingLocation]);
+
+  // Load messages when location is available
   useEffect(() => {
     const loadMessages = async () => {
       if (!location) return;
@@ -63,19 +72,20 @@ export default function Explore() {
     loadMessages();
   }, [location]);
 
-
   return (
     <ScrollView style={styles.container}>
       <Location />
-      {!location ? (
-        <></>
+      {isLoadingLocation || !location ? (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
+        </View>
       ) : isLoadingMessages ? (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={Colors.light.activityIndicator} />
         </View>
       ) : error ? (
         <Text style={styles.errorText}>{error}</Text>
-      ) : messages.length == 0 ? (
+      ) : messages.length === 0 ? (
         <Text style={styles.errorText}>{t("explore.noMessages")}</Text>
       ) : (
         <TagsView messages={messages} />

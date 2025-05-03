@@ -5,123 +5,29 @@ import {
   Pressable,
   ActivityIndicator,
   Platform,
-  Alert,
-  Linking,
 } from "react-native";
-import * as Location from "expo-location";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "@/contexts/LocationContext";
 import Colors from "@/constants/Colors";
 
-const requestLocationPermission = async (t: (key: string) => string) => {
-  const { status } = await Location.requestForegroundPermissionsAsync();
-  if (status == "granted") return true;
-  else {
-    Alert.alert(
-      t("location.permissionRequired"),
-      t("location.permissionExplanation"),
-      [
-        {
-          text: t("common.cancel"),
-          style: "cancel",
-        },
-        {
-          text: t("location.openSettings"),
-          onPress: () => {
-            if (Platform.OS === "ios") {
-              Linking.openURL("app-settings:");
-            } else {
-              Linking.openSettings();
-            }
-          },
-        },
-      ]
-    );
-    const statusAfterRequest = await Location.getForegroundPermissionsAsync();
-    if (statusAfterRequest.status == "granted") {
-      return true;
-    }
-    return false;
-  }
-};
-
-export const getCurrentLocation = async (t: (key: string) => string, locationContext: any) => {
-  try {
-    // Request permissions
-    const hasPermission = await requestLocationPermission(t);
-    if (!hasPermission) {
-      return { error: t("location.permissionDenied") };
-    }
-
-    // Get current position
-    const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.High,
-    });
-
-    // Get address from coordinates (reverse geocoding)
-    const addressResponse = await Location.reverseGeocodeAsync({
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    });
-
-    if (addressResponse && addressResponse.length > 0) {
-      const address = addressResponse[0];
-      const locationText = `${address.street || ""}, ${address.district || ""}, ${
-        address.postalCode || ""
-      } ${address.city || ""}, ${address.country || ""}`;
-      
-      // Update the location context
-      locationContext.updateLocation(position, address);
-      
-      return { 
-        success: true, 
-        position, 
-        address, 
-        locationText 
-      };
-    } else {
-      // Fallback to coordinates if geocoding fails
-      const locationText = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
-      
-      // Update the location context with position only
-      locationContext.updateLocation(position);
-      
-      return { 
-        success: true, 
-        position, 
-        locationText 
-      };
-    }
-  } catch (err) {
-    console.error("Error getting location:", err);
-    return { error: t("location.error") };
-  }
-};
-
 export default function LocationComponent() {
   const { t } = useTranslation();
   const [locationText, setLocationText] = useState<string | null>(null);
-  const [loading, setLoading] = useState(Platform.OS !== "web");
-  const [error, setError] = useState<string | null>(null);
   
   // Get access to the location context
   const locationContext = useLocation();
+  const { getCurrentLocation, location, isLoading, error } = locationContext;
 
   // Function to get the current location
   const handleGetLocation = async () => {
-    setLoading(true);
-    setError(null);
-
-    const result = await getCurrentLocation(t, locationContext);
+    const result = await getCurrentLocation(t);
     
-    if (result.error) {
-      setError(result.error);
-    } else if (result.success) {
+    if ('error' in result) {
+      // Error is already set in context
+    } else if (result.success && result.locationText) {
       setLocationText(result.locationText);
     }
-    
-    setLoading(false);
   };
 
   // Get location when component mounts (solo en móvil)
@@ -146,7 +52,7 @@ export default function LocationComponent() {
           : error || t("location.loading")
       }
     >
-      {loading ? (
+      {isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"

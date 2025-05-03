@@ -9,7 +9,7 @@ import i18n from "../locales/i18n";
 import "react-native-reanimated";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { LocationProvider } from "@/contexts/LocationContext";
+import { LocationProvider, useLocation } from "@/contexts/LocationContext";
 import Colors from "@/constants/Colors";
 import { Platform, View, StyleSheet, Dimensions } from "react-native";
 
@@ -87,6 +87,12 @@ function RootLayoutNav() {
   // Show loading screen while checking credentials and auto-login
   const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const locationContext = useLocation();
+  
+  // Start fetching location data during loading
+  useEffect(() => {
+    locationContext.fetchLocationWithoutRequestingPermisisons();
+  }, []);
   
   // Force loading screen to show for at least 3 seconds
   useEffect(() => {
@@ -133,7 +139,7 @@ function RootLayoutNav() {
     return (
       <View style={styles.webContainer}>
         <View style={styles.phoneContainer}>
-          {isLoading ? <LoadingScreen /> : content}
+          {isLoading ? <LoadingScreen loading={true} /> : content}
         </View>
       </View>
     );
