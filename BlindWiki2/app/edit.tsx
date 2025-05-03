@@ -58,6 +58,10 @@ export default function EditScreen() {
   useEffect(() => {
     Alert.alert(t("edit.quickPublishTitle"), "", [
       {
+        text: t("edit.publishButton"),
+        onPress: handlePublish,
+      },
+      {
         text: t("edit.quickPublishChangeTags"),
         style: "cancel",
       },
@@ -65,10 +69,6 @@ export default function EditScreen() {
         text: t("common.cancel"),
         style: "cancel",
         onPress: () => router.back(),
-      },
-      {
-        text: t("edit.publishButton"),
-        onPress: handlePublish,
       },
     ]);
   }, []);
@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    justifyContent: "center",
     backgroundColor: Colors.light.background,
   },
   title: {

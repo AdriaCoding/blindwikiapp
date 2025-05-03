@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
   },
   addTagButton: {
     paddingHorizontal: 16,
-    height: 40,
     backgroundColor: Colors.light.button.background,
   },
   addTagButtonText: {
