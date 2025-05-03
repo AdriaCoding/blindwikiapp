@@ -1,5 +1,5 @@
 import { StyleSheet, Alert, Platform } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { InstructionsText } from '@/components/InstructionsText';
 import LocationComponent from '@/components/Location';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,17 @@ export default function HomeScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
+    // Running‐range per platform for Min–Max scaling
+    const rangeRef = useRef<any>({
+      android: { min: Infinity, max: -Infinity },
+      ios:     { min: Infinity, max: -Infinity },
+    });
   
+    // Update min/max range
+    function updateRange(stats: any, x: number) {
+      stats.min = Math.min(stats.min, x);
+      stats.max = Math.max(stats.max, x);
+    }
   // Request recording permissions on component mount
   useEffect(() => {
     (async () => {
@@ -127,18 +137,28 @@ export default function HomeScreen() {
       const { recording } = await Audio.Recording.createAsync(
         recordingOptions,
         (status) => {
-          // Extract audio level data from the status object
           if (status.isRecording && status.metering !== undefined) {
-            // Convert dB metering value to a normalized value between 0 and 1
-            // Typical metering values range from -160 (silence) to 0 (max volume)
-            const dB = status.metering || -160;
-            const normalized = Math.max(0, (dB + 160) / 160); // Normalize to 0-1 range
+            const dB = status.metering;
+            const platform = Platform.OS; // 'android' or 'ios'
+            const range = (rangeRef.current as any)[platform];
+
+            updateRange(range, dB);
+            let normalized = range.max > range.min
+              ? (dB - range.min) / (range.max - range.min)
+              : 0;
+            normalized = Math.max(0, Math.min(1, normalized));
+
+            console.log(
+              `Platform: ${platform}, dB: ${dB.toFixed(2)}, ` +
+              `min: ${range.min.toFixed(2)}, max: ${range.max.toFixed(2)}, ` +
+              `norm: ${normalized.toFixed(2)}`
+            );
+
             setAudioLevel(normalized);
           }
         },
-        100 // Update every 100ms
+        100
       );
-      
       setRecordingInstance(recording);
       setIsRecording(true);
     } catch (err) {
