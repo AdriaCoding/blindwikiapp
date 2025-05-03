@@ -109,7 +109,6 @@ export default function AudioButton({
         playsInSilentModeIOS: true,
         staysActiveInBackground: true,
         shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: true,
       });
 
       // Skip file existence check on web platform
