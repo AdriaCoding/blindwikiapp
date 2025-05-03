@@ -107,15 +107,20 @@ export default function HomeScreen() {
           extension: '.aac',
           outputFormat: Audio.AndroidOutputFormat.AAC_ADTS,
           audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          numberOfChannels: 1,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
         },
         ios: {
           extension: '.aac',
           outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
           audioQuality: Audio.IOSAudioQuality.HIGH,
-          numberOfChannels: 1,
-          sampleRate: 44100, // Provide default to satisfy TS
-          bitRate: 128000, // Provide default to satisfy TS
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+          linearPCMBitDepth: 16,
+          linearPCMIsBigEndian: false,
+          linearPCMIsFloat: false,
         }
       };
       
