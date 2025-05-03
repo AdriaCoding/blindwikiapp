@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
-import Location from "@/components/Location";
+import LocationComponent from "@/components/Location";
 import TagsView from "@/components/tags/TagsView";
 import { getMessages } from "@/services/messageService";
 import { Message } from "@/models/message";
@@ -21,13 +21,6 @@ export default function Explore() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Fetch location if not available
-  useEffect(() => {
-    if (!location && !isLoadingLocation) {
-      getCurrentLocation(t);
-    }
-  }, [location, isLoadingLocation]);
 
   // Load messages when location is available
   useEffect(() => {
@@ -74,7 +67,7 @@ export default function Explore() {
 
   return (
     <ScrollView style={styles.container}>
-      <Location />
+      <LocationComponent />
       {isLoadingLocation || !location ? (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={Colors.light.activityIndicator} />

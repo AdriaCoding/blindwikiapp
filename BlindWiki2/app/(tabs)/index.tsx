@@ -3,8 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { InstructionsText } from '@/components/InstructionsText';
 import LocationComponent from '@/components/Location';
 import { useTranslation } from 'react-i18next';
-import Colors from '@/constants/Colors';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import StyledButton from '@/components/StyledButton';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,7 +14,7 @@ import * as FileSystem from 'expo-file-system';
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
-  const { location, getCurrentLocation } = useLocation();
+  const { location, getCurrentLocation, isLoading, error} = useLocation();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingInstance, setRecordingInstance] = useState<Audio.Recording | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -58,7 +57,8 @@ export default function HomeScreen() {
   const startRecording = async () => {
     try {
       // Check if we have location data
-      if (!location) {
+      console.log(location);
+      if (!location || isLoading || error) {
         const result = await getCurrentLocation(t);
         if ('error' in result) {
           return;
@@ -147,12 +147,6 @@ export default function HomeScreen() {
               ? (dB - range.min) / (range.max - range.min)
               : 0;
             normalized = Math.max(0, Math.min(1, normalized));
-
-            console.log(
-              `Platform: ${platform}, dB: ${dB.toFixed(2)}, ` +
-              `min: ${range.min.toFixed(2)}, max: ${range.max.toFixed(2)}, ` +
-              `norm: ${normalized.toFixed(2)}`
-            );
 
             setAudioLevel(normalized);
           }

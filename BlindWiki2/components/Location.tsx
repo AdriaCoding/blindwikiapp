@@ -17,12 +17,12 @@ export default function LocationComponent() {
   
   // Get access to the location context
   const locationContext = useLocation();
-  const { getCurrentLocation, location, isLoading, error } = locationContext;
+  const { getCurrentLocation, location, isLoading, setLocation,error } = locationContext;
 
   // Function to get the current location
   const handleGetLocation = async () => {
     const result = await getCurrentLocation(t);
-    
+    console.log("Result of getCurrentLocation: ", result);
     if ('error' in result) {
       // Error is already set in context
     } else if (result.success && result.locationText) {
@@ -30,16 +30,17 @@ export default function LocationComponent() {
     }
   };
 
-  // Get location when component mounts (solo en móvil)
+  // Get location if not already loaded
   useEffect(() => {
-    if (Platform.OS !== "web") {
+    if (!location && !isLoading) {
       handleGetLocation();
     }
   }, []);
 
-  // Handle press on location box
+  // Refresh location when box is pressed
   const pressLocationHandler = () => {
-    handleGetLocation(); // Refresh location on press
+    setLocation(null);
+    handleGetLocation();
   };
 
   return (
@@ -52,7 +53,7 @@ export default function LocationComponent() {
           : error || t("location.loading")
       }
     >
-      {isLoading ? (
+      {!location || isLoading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"

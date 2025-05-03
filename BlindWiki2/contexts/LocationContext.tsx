@@ -20,6 +20,7 @@ type LocationResult = LocationSuccessResult | LocationErrorResult;
 // Define the shape of the context data
 type LocationContextType = {
   location: ExpoLocation.LocationObject | null;
+  setLocation: (location: ExpoLocation.LocationObject | null) => void;
   address: ExpoLocation.LocationGeocodedAddress | null;
   isLoading: boolean;
   error: string | null;
@@ -201,6 +202,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   // Context value object
   const contextValue: LocationContextType = {
     location,
+    setLocation,
     address,
     isLoading,
     error,
