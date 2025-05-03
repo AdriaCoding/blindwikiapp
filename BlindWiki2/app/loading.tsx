@@ -8,7 +8,13 @@ import {
 } from "react-native";
 import Colors from "../constants/Colors";
 import { useTranslation } from "react-i18next";
-export default function LoadingScreen() {
+
+// Add the prop type
+type LoadingScreenProps = {
+  loading?: boolean;
+};
+
+export default function LoadingScreen({ loading = false }: LoadingScreenProps) {
   const { t } = useTranslation();
   return (
     <View style={styles.loadingContainer}>
@@ -20,9 +26,17 @@ export default function LoadingScreen() {
           resizeMode="contain"
         />
       </View>
+      {loading && (
+          <ActivityIndicator
+            size="large"
+            color={Colors.light.primary}
+            style={{ marginVertical: 20 }}
+          />
+        )}
       <View style={styles.subtitleContainer}>
         <Text style={styles.subtitle}>{t("loading.subtitle")}</Text>
         <Text style={styles.credits}>{t("loading.credits")}</Text>
+
         <Image
           source={require("../assets/images/ideai_upc.jpg")}
           style={styles.UPCbanner}

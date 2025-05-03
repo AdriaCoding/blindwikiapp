@@ -142,7 +142,7 @@ function RootLayoutNav() {
   // For native platforms or web on mobile, render normally
   return (
     <>
-      {true ? <LoadingScreen /> : content}
+      {isLoading ? <LoadingScreen loading={true} /> : content}
     </>
   );
 }
