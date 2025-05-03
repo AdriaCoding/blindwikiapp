@@ -44,7 +44,8 @@
   "explore": {
     "error": "An error occurred loading exploration data",
     "noMessages": "No messages found nearby your location.",
-    "title": "Explore"
+    "title": "Explore",
+    "tabLabel": "Explore"
   },
   "home": {
     "info-gps": "Press the following button to update your GPS location:",
@@ -52,6 +53,7 @@
     "noLocationMessage": "We need your location before recording. Please check your device's location settings.",
     "noLocationTitle": "No Location Data",
     "record": "Record",
+    "tabLabel": "Record",
     "title": "Record"
   },
   "location": {
@@ -158,7 +160,8 @@
     "placeholder": "Enter a location name",
     "searchingPlaces": "Searching places...",
     "selectLocation": "Select the location matching your search:",
-    "title": "Search"
+    "title": "Search",
+    "tabLabel": "Search"
   },
   "settings": {
     "language": {
@@ -185,13 +188,15 @@
       "title": "Unit of Measure"
     },
     "showInstructions": "Show instructions",
-    "title": "Settings"
+    "title": "Settings",
+    "tabLabel": "Settings"
   },
   "tags": {
     "filterInstructions": "Select any tags to display recordings that include at least one of them:"
   },
   "world": {
     "error": "An error occurred loading world data",
-    "title": "World"
+    "title": "World",
+    "tabLabel": "World"
   }
 }

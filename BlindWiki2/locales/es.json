@@ -44,7 +44,8 @@
   "explore": {
     "error": "Se ha producido un error al cargar los datos de exploración",
     "noMessages": "No se han encontrado mensajes cerca de tu ubicación.",
-    "title": "Explorar"
+    "title": "Explorar",
+    "tabLabel": "Explorar"
   },
   "home": {
     "info-gps": "Pulsa el siguiente botón para actualizar tu ubicación GPS:",
@@ -52,6 +53,7 @@
     "noLocationMessage": "Necesitamos tu ubicación antes de grabar. Por favor, verifica la configuración de ubicación de tu dispositivo.",
     "noLocationTitle": "Sin datos de ubicación",
     "record": "Grabar",
+    "tabLabel": "Grabar",
     "title": "Grabar"
   },
   "location": {
@@ -158,7 +160,8 @@
     "placeholder": "Introduce un nombre de ubicación",
     "searchingPlaces": "Buscando lugares...",
     "selectLocation": "Selecciona la ubicación que coincida con tu búsqueda:",
-    "title": "Buscar"
+    "title": "Buscar",
+    "tabLabel": "Buscar"
   },
   "settings": {
     "language": {
@@ -185,13 +188,15 @@
       "title": "Unidad de medida"
     },
     "showInstructions": "Mostrar instrucciones",
-    "title": "Configuración"
+    "title": "Configuración",
+    "tabLabel": "Ajustes"
   },
   "tags": {
     "filterInstructions": "Selecciona etiquetas para mostrar grabaciones que incluyan al menos una de ellas:"
   },
   "world": {
     "error": "Se ha producido un error al cargar los datos del mundo",
-    "title": "Mundo"
+    "title": "Mundo",
+    "tabLabel": "Mundo"
   }
 }

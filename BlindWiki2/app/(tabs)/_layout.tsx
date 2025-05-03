@@ -58,8 +58,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          tabBarLabel: t('home.tabLabel'),
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="microphone" color={color} />
+            <TabBarIcon name="home" color={color} />
           ),
         }}
       />
@@ -76,18 +77,21 @@ export default function TabLayout() {
         name="explore"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="map-marker" color={color} />,
+          tabBarLabel: t('explore.tabLabel'),
         }}
       />
       <Tabs.Screen
         name="world"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="globe" color={color} />,
+          tabBarLabel: t('world.tabLabel'),
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
+          tabBarLabel: t('search.tabLabel'),
         }}
       />
       <Tabs.Screen
@@ -96,6 +100,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="sliders" color={color} />
           ),
+          tabBarLabel: t('settings.tabLabel'),
         }}
       />
     </Tabs>

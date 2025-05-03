@@ -44,7 +44,8 @@
   "explore": {
     "error": "S'ha produït un error en carregar les dades d'exploració",
     "noMessages": "Encara no hi ha missatges a prop de la teva ubicació.",
-    "title": "Explorar"
+    "title": "Explorar",
+    "tabLabel": "Explorar"
   },
   "home": {
     "info-gps": "Prem el següent botó per actualitzar la teva ubicació GPS:",
@@ -52,7 +53,8 @@
     "noLocationMessage": "Necessitem la teva ubicació abans de gravar. Si us plau, verifica la configuració d'ubicació del teu dispositiu.",
     "noLocationTitle": "Sense dades d'ubicació",
     "record": "Gravar",
-    "title": "Gravar"
+    "title": "Gravar",
+    "tabLabel": "Gravar"
   },
   "location": {
     "clickToGetLocation": "Fes clic per obtenir la teva ubicació",
@@ -110,7 +112,7 @@
     },
     "loading": "Carregant els teus missatges...",
     "noMessages": "Encara no has creat cap missatge.",
-    "tabLabel": "Els meus àudios",
+    "tabLabel": "Àudios",
     "title": "Les meves gravacions"
   },
   "not-found": {
@@ -158,7 +160,8 @@
     "placeholder": "Introdueix un nom d'ubicació",
     "searchingPlaces": "Cercant llocs...",
     "selectLocation": "Selecciona la ubicació que coincideixi amb la teva cerca:",
-    "title": "Cercar"
+    "title": "Cercar",
+    "tabLabel": "Cercar"
   },
   "settings": {
     "language": {
@@ -185,13 +188,15 @@
       "title": "Unitat de mesura"
     },
     "showInstructions": "Mostrar instruccions",
-    "title": "Configuració"
+    "title": "Configuració",
+    "tabLabel": "Ajustos"
   },
   "tags": {
     "filterInstructions": "Selecciona etiquetes per mostrar gravacions que incloguin almenys una d'elles:"
   },
   "world": {
     "error": "S'ha produït un error en carregar les dades del món",
-    "title": "Món"
+    "title": "Món",
+    "tabLabel": "Món"
   }
 }
