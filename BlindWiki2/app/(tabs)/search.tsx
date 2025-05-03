@@ -190,9 +190,11 @@ export default function Search() {
           style={styles.input}
           placeholder={t("search.placeholder")}
         />
+        <View style={styles.buttonContainer}>
           <StyledButton
             onPress={searchPlaces}
             title={t("search.button")}
+            style={styles.searchButton}
           />
           {/* Botón de prueba para verificar el sessionId y otros datos de depuración 
           <StyledButton
@@ -201,6 +203,7 @@ export default function Search() {
             style={styles.testButton}
           />
           */}
+        </View>
       </View>
 
       {/* Lista de resultados de búsqueda */}
@@ -252,10 +255,16 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginBottom: 20,
   },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
   input: {
     marginBottom: 10,
   },
   searchButton: {
+    flex: 3,
     marginRight: 5,
   },
   testButton: {
