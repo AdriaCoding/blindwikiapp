@@ -124,12 +124,6 @@ export default function HomeScreen() {
         }
       };
       
-      // Attempt to clear explicit rates for iOS at runtime, relying on audioQuality
-      if (Platform.OS === 'ios') {
-          (recordingOptions.ios as any).sampleRate = undefined;
-          (recordingOptions.ios as any).bitRate = undefined;
-      }
-      
       const { recording } = await Audio.Recording.createAsync(
         recordingOptions,
         (status) => {
