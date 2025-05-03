@@ -89,7 +89,7 @@ export default function SettingsScreen() {
           </View>
         </Pressable>
       </View>
-      <View style={styles.settingContainer}>
+      <View style={styles.buttonContainer}>
         {!isLoggedIn() ? (
           <StyledButton
             title={t("login.title")}
@@ -115,11 +115,15 @@ const styles = StyleSheet.create({
     height: "50%",
     justifyContent: "center",
     padding: 16,
+    marginBottom: 80
   },
   settingContainer: {
     flex: 2,
     marginBottom: 24, // Adds space between settings
     paddingVertical: 8, // Adds internal padding
+  },
+  buttonContainer: {
+    minHeight: 80,
   },
   checkboxContainer: {
     alignItems: "center", // Centers items horizontally

@@ -75,7 +75,8 @@ export default function LogInScreen() {
           <Text style={styles.errorText}>{errorMessage}</Text>
         </View>
       )}
-      
+      <View style={styles.inputContainer}>
+
       <StyledInput
         value={username}
         onChangeText={(text) => {
@@ -84,7 +85,7 @@ export default function LogInScreen() {
         }}
         placeholder={t("login.username")}
         autoFocus={true}
-      />
+        />
       
       <StyledInput
         value={password}
@@ -94,8 +95,9 @@ export default function LogInScreen() {
         }}
         placeholder={t("login.password")}
         secureTextEntry={true}
-      />
+        />
 
+      </View>
       <View style={styles.buttonContainer}>
         {isLoading ? (
           <ActivityIndicator size="small" color={Colors.light.primary} />
@@ -105,6 +107,7 @@ export default function LogInScreen() {
         <StyledButton
           title={t("login.forgotPassword")}
           onPress={handleForgotPassword}
+          style={styles.forgotPasswordButton}
         />
       </View>
       
@@ -126,6 +129,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 20,
+    marginBottom: 100,
   },
   errorContainer: {
     backgroundColor: '#ffebee',
@@ -140,11 +144,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
+  inputContainer: {
+    flexDirection: "column",
+  },
   buttonContainer: {
     flexDirection: "column",
     justifyContent: "space-between",
     marginTop: 10,
-    minHeight: 80, // Ensure space for activity indicator
+    minHeight: 100, // Ensure space for activity indicator
   },
   signUpContainer: {
     alignItems: 'center',
@@ -164,5 +171,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textDecorationLine: 'underline',
     color: Colors.light.primary,
+  },
+  forgotPasswordButton: {
+    marginTop: 10,
   },
 });
