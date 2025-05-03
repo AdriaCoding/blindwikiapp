@@ -100,30 +100,30 @@ export default function HomeScreen() {
         playsInSilentModeIOS: true,
       });
       
-      // Custom recording options for MP3 format
-      const recordingOptions = {
+      // Custom recording options for AAC format
+      const recordingOptions: Audio.RecordingOptions = {
         ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
         android: {
           extension: '.aac',
           outputFormat: Audio.AndroidOutputFormat.AAC_ADTS,
           audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
           numberOfChannels: 1,
-          bitRate: 128000,
-          encodingBitRate: 128000,
         },
         ios: {
           extension: '.aac',
           outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
           audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
           numberOfChannels: 1,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
+          sampleRate: 44100, // Provide default to satisfy TS
+          bitRate: 128000, // Provide default to satisfy TS
         }
       };
+      
+      // Attempt to clear explicit rates for iOS at runtime, relying on audioQuality
+      if (Platform.OS === 'ios') {
+          (recordingOptions.ios as any).sampleRate = undefined;
+          (recordingOptions.ios as any).bitRate = undefined;
+      }
       
       const { recording } = await Audio.Recording.createAsync(
         recordingOptions,
