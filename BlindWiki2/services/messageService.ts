@@ -479,7 +479,7 @@ function getMimeTypeForExtension(extension: string): string {
     '3gp': 'audio/3gpp',
   };
   
-  return mimeTypes[extension] || 'audio/mpeg'; // Default a MP3 en lugar de WAV
+  return mimeTypes[extension] || 'audio/aac';
 }
 
 /**

@@ -104,8 +104,8 @@ export default function HomeScreen() {
       const recordingOptions = {
         ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
         android: {
-          extension: '.mp3',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+          extension: '.aac',
+          outputFormat: Audio.AndroidOutputFormat.AAC_ADTS,
           audioEncoder: Audio.AndroidAudioEncoder.AAC,
           sampleRate: 44100,
           numberOfChannels: 1,
