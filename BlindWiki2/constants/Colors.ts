@@ -18,7 +18,10 @@ export default {
     placeHolderText: '#8e8e8f',
     button: {
       text: whiteColor,
-      background: '#404040'
+      background: '#404040',
+      shadow: '#000000',
+      borderLight: 'rgba(0,0,0,0.1)',
+      borderDark: 'rgba(0,0,0,0.2)'
     },
     tabBar: {
       active: primaryColor,
