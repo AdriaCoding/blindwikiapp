@@ -41,6 +41,12 @@
     "tagsPlaceholder": "Ej: calle, obstáculo, punto de referencia",
     "uploading": "Subiendo..."
   },
+  "exit": {
+    "confirmButton": "Salir",
+    "message": "¿Estás seguro de que quieres salir?",
+    "tabLabel": "Salir",
+    "title": "Salir de la aplicación"
+  },
   "explore": {
     "error": "Se ha producido un error al cargar los datos de exploración",
     "noMessages": "No se han encontrado mensajes cerca de tu ubicación.",

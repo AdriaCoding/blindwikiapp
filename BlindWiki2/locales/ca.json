@@ -41,6 +41,12 @@
     "tagsPlaceholder": "Ex: carrer, obstacle, punt de referència",
     "uploading": "Pujant..."
   },
+  "exit": {
+    "confirmButton": "Sortir",
+    "message": "Estàs segur que vols sortir?",
+    "tabLabel": "Sortir",
+    "title": "Sortir de l'aplicació"
+  },
   "explore": {
     "error": "S'ha produït un error en carregar les dades d'exploració",
     "noMessages": "Encara no hi ha missatges a prop de la teva ubicació.",

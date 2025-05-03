@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
+import { Tabs, useNavigation } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, BackHandler } from "react-native";
 
 import Colors from "@/constants/Colors";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
-
+import { handleExitApp } from "./exit";
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -17,6 +17,21 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
+
+  // Add back handler to show exit confirmation when pressing back on the root screen
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Check if we're at the root screen
+      if (!navigation.canGoBack()) {
+        return handleExitApp(t);
+      }
+      // Otherwise, let the default back behavior happen
+      return false;
+    });
+
+    return () => backHandler.remove();
+  }, [navigation]);
 
   return (
     <Tabs
@@ -45,6 +60,7 @@ export default function TabLayout() {
           else if (route.name === 'world') title = t('world.title');
           else if (route.name === 'search') title = t('search.title');
           else if (route.name === 'settings') title = t('settings.title');
+          else if (route.name === 'exit') title = t('exit.title');
           
           return (
             <View style={styles.headerContainer}>
@@ -101,6 +117,26 @@ export default function TabLayout() {
             <TabBarIcon name="sliders" color={color} />
           ),
           tabBarLabel: t('settings.tabLabel'),
+        }}
+      />
+      {/* Exit tab - doesn't navigate to a screen */}
+      <Tabs.Screen
+        name="exit"
+        listeners={{
+          tabPress: (e) => {
+            // Prevent default navigation
+            e.preventDefault();
+            // Show exit confirmation
+            handleExitApp(t);
+          },
+        }}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="power-off" color={color} />
+          ),
+          tabBarLabel: t('exit.tabLabel'),
+          // Hide the screen but keep tab visible
+          headerShown: false,
         }}
       />
     </Tabs>

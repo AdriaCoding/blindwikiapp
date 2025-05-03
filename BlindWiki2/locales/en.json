@@ -41,6 +41,12 @@
     "tagsPlaceholder": "E.g., street, obstacle, landmark",
     "uploading": "Uploading..."
   },
+  "exit": {
+    "confirmButton": "Exit",
+    "message": "Are you sure you want to exit?",
+    "tabLabel": "Exit",
+    "title": "Exit App"
+  },
   "explore": {
     "error": "An error occurred loading exploration data",
     "noMessages": "No messages found nearby your location.",
