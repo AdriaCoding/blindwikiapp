@@ -67,6 +67,11 @@
     "permissionRequired": "Location Permission Required",
     "permissionTitle": "Location Permission"
   },
+  "loading": {
+    "credits": "with the support of the Intelligent Data Science and Artificial Intelligence research group (IDEAI).",
+    "subtitle": "A project by Antoni Abad © 2014",
+    "title": "Blind Wiki 2.0"
+  },
   "login": {
     "error": {
       "credentials": "The username or password you entered is incorrect. Please try again.",

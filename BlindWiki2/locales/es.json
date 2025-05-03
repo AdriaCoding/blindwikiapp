@@ -67,6 +67,11 @@
     "permissionRequired": "Se Requiere Permiso de Ubicación",
     "permissionTitle": "Permiso de ubicación"
   },
+  "loading": {
+    "credits": "con el apoyo del grupo de investigación en Ciencia de Datos Inteligente e Inteligencia Artificial (IDEAI).",
+    "subtitle": "Un proyecto de Antoni Abad © 2014",
+    "title": "Blind Wiki 2.0"
+  },
   "login": {
     "error": {
       "credentials": "El nombre de usuario o la contraseña que has introducido son incorrectos. Inténtalo de nuevo.",
