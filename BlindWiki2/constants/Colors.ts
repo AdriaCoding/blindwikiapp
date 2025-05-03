@@ -14,15 +14,15 @@ export default {
     background: whiteColor,
     surface: whiteColor,
     border: '#cccccc',
-    formBackground: '#fee300',
-    placeHolderText: '#404040',
+    formBackground: '#ffff99',
+    placeHolderText: '#8e8e8f',
     button: {
       text: whiteColor,
-      background: blackColor
+      background: '#404040'
     },
     tabBar: {
       active: primaryColor,
-      inactive: '#8e8e8f',
+      inactive: '#404040',
       background: whiteColor
     },
     tag:{
@@ -37,7 +37,9 @@ export default {
       error: '#f44336',
       warning: '#ff9800'
     },
-    activityIndicator: secondaryColor
+    activityIndicator: secondaryColor,
+    topBannerBackground: blackColor,
+    topBannerText: whiteColor,
   },
   dark: {
     primary: '#82b1ff',
