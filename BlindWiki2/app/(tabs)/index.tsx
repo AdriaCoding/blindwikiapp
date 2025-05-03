@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
   },
   recordButton: {
     flex: 2,
-    width: "95%",
+    padding: 30,
   },
   recordButtonText: {
     fontSize: 20,

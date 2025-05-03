@@ -94,9 +94,14 @@ export default function SettingsScreen() {
           <StyledButton
             title={t("login.title")}
             onPress={() => router.push("/login")}
+            style={styles.button}
           />
         ) : (
-          <StyledButton title={t("settings.logout.title")} onPress={handleLogout} />
+          <StyledButton
+            title={t("settings.logout.title")}
+            onPress={handleLogout}
+            style={styles.button}
+          />
         )}
       </View>
     </View>
@@ -112,7 +117,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   settingContainer: {
-    flex: 1,
+    flex: 2,
     marginBottom: 24, // Adds space between settings
     paddingVertical: 8, // Adds internal padding
   },
@@ -134,5 +139,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
     textAlign: "center",
+  },
+  button: {
+    width: "100%",
+    minHeight: 50,
+    paddingVertical: 12,
+    justifyContent: "center",
   },
 });
