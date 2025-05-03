@@ -14,7 +14,7 @@ import * as FileSystem from 'expo-file-system';
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
-  const { location, getCurrentLocation, isLoading, error} = useLocation();
+  const { location, getCurrentLocation, isLoading, error: locationError } = useLocation();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingInstance, setRecordingInstance] = useState<Audio.Recording | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -57,12 +57,27 @@ export default function HomeScreen() {
   const startRecording = async () => {
     try {
       // Check if we have location data
-      console.log(location);
-      if (!location || isLoading || error) {
-        const result = await getCurrentLocation(t);
-        if ('error' in result) {
+      console.log("Location: ", location, "isLoading: ", isLoading, "locationError: ", locationError);
+      if (!location || isLoading || locationError) {
+        if (locationError) {
+          Alert.alert(
+            t('recording.errorTitle'),
+            locationError
+          );
           return;
         }
+        if (isLoading) {
+          Alert.alert(
+            t('recording.errorTitle'),
+            t('recording.locationIsLoading')
+          );
+          return;
+        }
+        Alert.alert(
+          t('recording.errorTitle'),
+          t('recording.locationRequired')
+        );
+        return;
       }
 
       // Web platform handling for recording

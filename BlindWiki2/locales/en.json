@@ -73,7 +73,8 @@
     "permissionDenied": "Location permission denied",
     "permissionExplanation": "Blind Wiki needs to access your location to find messages near you and to geolocate your messages. Please enable the permission in your device settings.",
     "permissionRequired": "Location Permission Required",
-    "permissionTitle": "Location Permission"
+    "permissionTitle": "Location Permission",
+    "getLocationPrompt": "Tap to get location"
   },
   "loading": {
     "credits": "with the support of the Intelligent Data Science and Artificial Intelligence research group (IDEAI).",
@@ -131,7 +132,9 @@
     "permissionRequired": "Microphone permission is required to record audio.",
     "permissionTitle": "Microphone Permission",
     "startError": "Failed to start recording. Please try again.",
-    "stopError": "Failed to stop recording. Please try again."
+    "stopError": "Failed to stop recording. Please try again.",
+    "locationRequired": "We need your location before recording. Please check your device's location settings.",
+    "locationIsLoading": "Please wait while we get your location. You will hear a 'beep' when it's ready."
   },
   "register": {
     "button": "Register",

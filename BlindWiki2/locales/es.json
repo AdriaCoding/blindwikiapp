@@ -73,7 +73,8 @@
     "permissionDenied": "Permiso de ubicación denegado",
     "permissionExplanation": "Blind Wiki necesita acceder a tu ubicación para encontrar mensajes cerca de ti y para poder geolocalizar tus mensajes. Por favor, activa el permiso en la configuración de tu dispositivo.",
     "permissionRequired": "Se Requiere Permiso de Ubicación",
-    "permissionTitle": "Permiso de ubicación"
+    "permissionTitle": "Permiso de ubicación",
+    "getLocationPrompt": "Toca para obtener la ubicación"
   },
   "loading": {
     "credits": "con el apoyo del grupo de investigación en Ciencia de Datos Inteligente e Inteligencia Artificial (IDEAI).",
@@ -131,7 +132,9 @@
     "permissionRequired": "Se requiere permiso de micrófono para grabar audio.",
     "permissionTitle": "Permiso de micrófono",
     "startError": "No se ha podido iniciar la grabación. Inténtalo de nuevo.",
-    "stopError": "No se ha podido detener la grabación. Inténtalo de nuevo."
+    "stopError": "No se ha podido detener la grabación. Inténtalo de nuevo.",
+    "locationRequired": "Necesitamos tu ubicación antes de grabar. Por favor, verifica la configuración de ubicación de tu dispositivo.",
+    "locationIsLoading": "Espera mientras obtenemos tu ubicación. Oirás un 'beep' cuando esté lista."
   },
   "register": {
     "button": "Registrarse",

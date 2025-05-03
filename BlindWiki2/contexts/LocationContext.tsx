@@ -7,7 +7,7 @@ type LocationSuccessResult = {
   success: true;
   position: ExpoLocation.LocationObject;
   address?: ExpoLocation.LocationGeocodedAddress;
-  locationText?: string;
+  // locationText is removed from here, will be in context state
 };
 
 type LocationErrorResult = {
@@ -22,6 +22,7 @@ type LocationContextType = {
   location: ExpoLocation.LocationObject | null;
   setLocation: (location: ExpoLocation.LocationObject | null) => void;
   address: ExpoLocation.LocationGeocodedAddress | null;
+  locationText: string | null; // Add locationText state
   isLoading: boolean;
   error: string | null;
   updateLocation: (
@@ -40,6 +41,7 @@ const LocationContext = createContext<LocationContextType | undefined>(undefined
 export function LocationProvider({ children }: { children: ReactNode }) {
   const [location, setLocation] = useState<ExpoLocation.LocationObject | null>(null);
   const [address, setAddress] = useState<ExpoLocation.LocationGeocodedAddress | null>(null);
+  const [locationText, setLocationText] = useState<string | null>(null); // Add state for locationText
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,7 +53,10 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     setLocation(newLocation);
     if (newAddress) {
       setAddress(newAddress);
+    } else {
+      setAddress(null); // Clear address if not provided
     }
+    setLocationText(null); // Clear locationText when core location changes
   };
 
   // Function to clear error state
@@ -107,47 +112,57 @@ export function LocationProvider({ children }: { children: ReactNode }) {
           longitude: position.coords.longitude,
         });
 
+        let generatedLocationText: string | null = null;
         if (addressResponse && addressResponse.length > 0) {
           const addressData = addressResponse[0];
           // Update the location context
-          updateLocation(position, addressData);
+          setLocation(position); // Update position
+          setAddress(addressData); // Update address
           
-          if (t) {
-            const locationText = `${addressData.street || ""}, ${addressData.district || ""}, ${
-              addressData.postalCode || ""
-            } ${addressData.city || ""}, ${addressData.country || ""}`;
-            
-            return { 
-              success: true, 
-              position, 
-              address: addressData, 
-              locationText 
-            };
-          }
-          return { success: true, position, address: addressData };
+          // Generate and set locationText state
+          const parts = [
+            addressData.street,
+            addressData.district,
+            `${addressData.postalCode || ''} ${addressData.city || ''}`.trim(),
+            addressData.country,
+          ];
+          generatedLocationText = parts.filter(Boolean).join(', ').trim();
+
+          setLocationText(generatedLocationText || null); // Set the state
+
+          return { 
+            success: true, 
+            position, 
+            address: addressData
+          };
         } else {
           // Update the location context with position only
-          updateLocation(position);
+          setLocation(position); // Update position
+          setAddress(null); // Clear address
           
-          if (t) {
-            // Fallback to coordinates if geocoding fails
-            const locationText = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
-            return { success: true, position, locationText };
-          }
+          // Generate and set locationText state using coordinates
+          generatedLocationText = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+          setLocationText(generatedLocationText); // Set state with coordinates
+
           return { success: true, position };
         }
       } catch (err) {
+        console.warn("Reverse geocoding failed:", err); // Changed to warn as it's not critical
         // If geocoding fails, at least update with position
-        updateLocation(position);
-        if (t) {
-          const locationText = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
-          return { success: true, position, locationText };
-        }
+        setLocation(position); // Update position
+        setAddress(null); // Clear address
+
+        // Generate and set locationText state using coordinates
+        const generatedLocationText = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
+        setLocationText(generatedLocationText); // Set state with coordinates
+        
         return { success: true, position };
       }
     } catch (err) {
       console.error("Error getting location data:", err);
-      return { error: t ? t("location.error") : "Error getting location" };
+      // Assign error message first, then return, to potentially help linter
+      const errorMsg = t ? t("location.error") : "Error getting location";
+      return { error: errorMsg };
     }
   };
 
@@ -204,6 +219,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     location,
     setLocation,
     address,
+    locationText, // Add locationText here
     isLoading,
     error,
     updateLocation,

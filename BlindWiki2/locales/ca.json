@@ -73,7 +73,8 @@
     "permissionDenied": "Permís d'ubicació denegat",
     "permissionExplanation": "Blind Wiki necessita accedir a la teva ubicació per trobar missatges a prop teu i per poder geolocalitzar els teus missatges. Si us plau, activa el permís en la configuració del teu dispositiu.",
     "permissionRequired": "Es Requereix Permís d'Ubicació",
-    "permissionTitle": "Permís d'ubicació"
+    "permissionTitle": "Permís d'ubicació",
+    "getLocationPrompt": "Toca per obtenir la ubicació"
   },
   "loading": {
     "credits": "amb el suport del grup de recerca en Ciència de Dades Intel·ligent i Intel·ligència Artificial (IDEAI).",
@@ -131,7 +132,9 @@
     "permissionRequired": "Es requereix permís de micròfon per gravar àudio.",
     "permissionTitle": "Permís de micròfon",
     "startError": "No s'ha pogut iniciar la gravació. Torna-ho a provar.",
-    "stopError": "No s'ha pogut aturar la gravació. Torna-ho a provar."
+    "stopError": "No s'ha pogut aturar la gravació. Torna-ho a provar.",
+    "locationRequired": "Necessitem la teva ubicació abans de gravar. Si us plau, verifica la configuració d'ubicació del teu dispositiu.",
+    "locationIsLoading": "Espera mentre obtenim la teva ubicació. Sentiràs un 'beep' quan estigui llesta."
   },
   "register": {
     "button": "Registrar-se",

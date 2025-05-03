@@ -6,36 +6,31 @@ import {
   ActivityIndicator,
   Platform,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "@/contexts/LocationContext";
 import Colors from "@/constants/Colors";
 
 export default function LocationComponent() {
   const { t } = useTranslation();
-  const [locationText, setLocationText] = useState<string | null>(null);
   
-  // Get access to the location context
+  // Get access to the location context, including locationText
   const locationContext = useLocation();
-  const { getCurrentLocation, location, isLoading, setLocation,error } = locationContext;
+  const { getCurrentLocation, location, isLoading, setLocation, error, locationText } = locationContext;
 
-  // Function to get the current location
+  // Function to get the current location - no longer sets local state
   const handleGetLocation = async () => {
-    const result = await getCurrentLocation(t);
-    console.log("Result of getCurrentLocation: ", result);
-    if ('error' in result) {
-      // Error is already set in context
-    } else if (result.success && result.locationText) {
-      setLocationText(result.locationText);
-    }
+    await getCurrentLocation(t);
+    // No need to set local state here
   };
 
   // Get location if not already loaded
   useEffect(() => {
-    if (!location && !isLoading) {
+    // Fetch location if we don't have the location object OR the locationText
+    if ((!location || !locationText) && !isLoading) {
       handleGetLocation();
     }
-  }, []);
+  }, [location, locationText, isLoading]); // Add locationText to dependency array
 
   // Refresh location when box is pressed
   const pressLocationHandler = () => {
@@ -48,12 +43,12 @@ export default function LocationComponent() {
       style={[styles.outerBox, error ? styles.errorBox : {}]}
       onPress={pressLocationHandler}
       accessibilityLabel={
-        locationText
+        locationText // Use locationText from context
           ? t("location.currentLocation") + locationText
           : error || t("location.loading")
       }
     >
-      {!location || isLoading ? (
+      {isLoading ? ( // Simplify check: only isLoading matters for the indicator
         <View style={styles.loadingContainer}>
           <ActivityIndicator
             size="large"
@@ -63,13 +58,12 @@ export default function LocationComponent() {
         </View>
       ) : error ? (
         <Text style={styles.errorText}>{error}</Text>
-      ) : locationText ? (
+      ) : locationText ? ( // Show text directly from context
         <Text style={styles.locationText}>{locationText}</Text>
       ) : (
+        // Fallback if still loading text for some reason (or initial state)
         <Text style={styles.locationText}>
-          {Platform.OS === "web"
-            ? t("location.clickToGetLocation")
-            : t("location.loading")}
+            {t("location.getLocationPrompt", "Tap to get location")} 
         </Text>
       )}
     </Pressable>
