@@ -26,7 +26,7 @@ const primaryColor = "#0000ff";
 const secondaryColor = "#0066cc";
 const whiteColor = "#ffffff";
 const blackColor = "#000000";
-const buttonColor = "#cc1f1f";
+const buttonColor = "#404040";
 
 export default {
   light: {
