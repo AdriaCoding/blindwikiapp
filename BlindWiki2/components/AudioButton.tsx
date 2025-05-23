@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, ViewStyle, StyleProp, Alert, Platform } from 'react-native';
 import { Audio } from 'expo-av';
 import StyledButton from './StyledButton';
-import * as FileSystem from 'expo-file-system';
 import { useTranslation } from 'react-i18next';
+import { playAudio, stopAudio } from '../utils/audioUtils';
 
 interface AudioButtonProps {
   /**
@@ -44,14 +44,11 @@ export default function AudioButton({
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Determine if the URI is a remote URL or local file
-  const isRemoteUri = audioUri?.startsWith('http');
-
   // Clean up sound resources when component unmounts
   useEffect(() => {
     return sound
       ? () => {
-          sound.unloadAsync();
+          stopAudio(sound);
         }
       : undefined;
   }, [sound]);
@@ -91,76 +88,24 @@ export default function AudioButton({
   const togglePlayback = async () => {
     // If already playing, stop playback
     if (isPlaying && sound) {
-      await sound.stopAsync();
+      await stopAudio(sound);
+      setSound(null);
       setIsPlaying(false);
       onPlaybackStatusChange?.(false);
       return;
     }
 
-    try {
-      // Unload previous sound if it exists
-      if (sound) {
-        await sound.unloadAsync();
-      }
+    // Start new playback
+    const playbackStatus = await playAudio(audioUri, {
+      onPlaybackStatusChange: (playing) => {
+        setIsPlaying(playing);
+        onPlaybackStatusChange?.(playing);
+      },
+      onError: handlePlaybackError
+    });
 
-      // Configure audio output to use the speaker instead of earpiece on iOS
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
-        shouldDuckAndroid: true,
-      });
-
-      // Skip file existence check on web platform
-      if (!isRemoteUri && Platform.OS !== 'web') {
-        try {
-          const fileInfo = await FileSystem.getInfoAsync(audioUri);
-          if (!fileInfo.exists) {
-            throw new Error('Audio file not found');
-          }
-        } catch (fileError) {
-          console.error("Error checking file existence:", fileError);
-          // On non-web platforms, rethrow the error
-          throw fileError;
-        }
-      }
-
-      console.log(`Loading audio from: ${audioUri}`);
-
-      // Load the audio
-      const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioUri },
-        { shouldPlay: true }
-      );
-      
-      setSound(newSound);
-      setIsPlaying(true);
-      onPlaybackStatusChange?.(true);
-
-      // Listen for playback status updates
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && !status.isPlaying && status.didJustFinish) {
-          setIsPlaying(false);
-          onPlaybackStatusChange?.(false);
-        }
-      });
-    } catch (error) {
-      console.error("Failed to play audio", error);
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : "Unknown error occurred";
-      
-      handlePlaybackError(errorMessage);
-    }
-  };
-
-  // Stop playback programmatically (can be called from parent)
-  const stopPlayback = async () => {
-    if (sound && isPlaying) {
-      await sound.stopAsync();
-      setIsPlaying(false);
-      onPlaybackStatusChange?.(false);
-    }
+    setSound(playbackStatus.sound);
+    setIsPlaying(playbackStatus.isPlaying);
   };
 
   return (
