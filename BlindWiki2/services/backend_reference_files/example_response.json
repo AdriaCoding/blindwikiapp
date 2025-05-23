@@ -268,5 +268,47 @@
     }
   ],
   "registerInfo": { "nonce": "67e04b7a43f19" },
-  "status": "error"
+  "status": "error",
+  "processTaggerSuccess": {
+    "status": "OK",
+    "message": {
+      "id": "71856",
+      "text": "Esta es la transcripción automática del audio generada por el tagger",
+      "date_time": "2025-05-23 17:06:16",
+      "longitude": "2.1783463",
+      "latitude": "41.4150872",
+      "address": "Carrer d'Amèrica Barcelona, España",
+      "area_id": "1",
+      "author_user_id": "5897",
+      "visible": "1",
+      "pending": "0",
+      "device_string": "app_ios",
+      "tags": [
+        {
+          "id": "123",
+          "name": "historia",
+          "similarity": 0.85
+        },
+        {
+          "id": "456", 
+          "name": "arquitectura",
+          "similarity": 0.75
+        }
+      ],
+      "attachments": [
+        {
+          "id": "88600",
+          "type": "2",
+          "local_filename": "elbarcelonC3A8s_Blas_m71856_a88600_audio.mp3"
+        }
+      ]
+    }
+  },
+  "processTaggerError": {
+    "status": "error",
+    "error": {
+      "code": 403,
+      "message": "No tienes permiso para procesar este mensaje"
+    }
+  }
 }

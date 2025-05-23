@@ -491,6 +491,30 @@
               ]
             }
           }
+        },
+        {
+          "name": "Process Message with Tagger",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/message/processTagger/{{messageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["message", "processTagger", "{{messageId}}"],
+              "query": [
+                {
+                  "key": "PHPSESSID",
+                  "value": "{{sessionId}}"
+                }
+              ]
+            },
+            "description": "Procesa un mensaje existente con el tagger para extraer automáticamente transcripción y etiquetas del audio adjunto.\n\nRequiere:\n- El usuario debe ser el autor del mensaje o tener permisos de administrador\n- El mensaje debe tener un archivo de audio adjunto\n\nRespuesta exitosa:\n- Devuelve el mensaje actualizado con la transcripción y nuevas etiquetas\n\nPosibles errores:\n- 404: Mensaje no encontrado\n- 403: Sin permisos para procesar el mensaje\n- 400: No se encontraron archivos de audio"
+          }
         }
       ]
     },

@@ -5,6 +5,7 @@ import * as FileSystem from 'expo-file-system';
 import { useAuth } from "@/contexts/AuthContext"; // Add this import
 import axios from 'axios'; // Import axios for HTTP requests
 import { Platform } from 'react-native';
+import { Alert } from 'react-native';
 
 // Server response interfaces
 export interface MessagesResponse extends ServerResponse {
@@ -261,6 +262,44 @@ export async function updateMessageTags(
 }
 
 /**
+ * Procesa un mensaje con el tagger para extraer transcripción y etiquetas del audio
+ * Esta función es silenciosa y solo muestra un error si falla
+ * @param messageId ID del mensaje a procesar
+ */
+async function processTagger(messageId: string): Promise<void> {
+  try {
+    // Get session token from secure storage
+    const sessionId = await getSessionToken();
+
+    if (!sessionId) {
+      console.error("No session token available for tagger");
+      return;
+    }
+
+    // Make API request
+    const response = await apiRequest<ServerResponse, CleanResponse>(
+      `/message/processTagger/${messageId}`,
+      "POST",
+      { PHPSESSID: sessionId }
+    );
+
+    if (!response.success) {
+      // Solo mostrar alerta si hay error
+      Alert.alert(
+        "Error al procesar audio",
+        response.errorMessage || "No se pudo procesar el audio con el tagger"
+      );
+    }
+  } catch (error) {
+    console.error("Error calling tagger:", error);
+    Alert.alert(
+      "Error al procesar audio",
+      error instanceof Error ? error.message : "Error desconocido al procesar el audio"
+    );
+  }
+}
+
+/**
  * Publishes a new message with an audio attachment. Requires authentication.
  * @param audioFilePath Path to the audio file to upload
  * @param latitude Latitude where the message was recorded
@@ -351,7 +390,12 @@ export async function publishMessage(
     
     const serverResponse = response.data as MessageResponse;
     
-    if (serverResponse.status === "ok") {
+    if (serverResponse.status === "ok" && serverResponse.data?.id) {
+      // Llamar al tagger de forma asíncrona sin esperar respuesta
+      processTagger(serverResponse.data.id).catch(error => {
+        console.error("Background tagger processing failed:", error);
+      });
+
       return {
         success: true,
         message: serverResponse.data,
