@@ -328,6 +328,62 @@ class MessageController extends Controller
 					$attsuccess=$message->createAttachments($uploadedfiles, isset($_REQUEST['uploadedImage'])?$_REQUEST['uploadedImage']:null, $dataUris);
 					$message->setTags($form->tags,$form->newtags);
 
+					
+					if (Yii::app()->request->isAjaxRequest) {
+						echo json_encode(array('status'=>'OK', 'message'=>array('id'=>$message->id)));
+						
+						if (function_exists('fastcgi_finish_request')) {
+							fastcgi_finish_request();
+						} else {
+							@ob_end_flush(); // Try to flush Yii's buffer if any
+							@flush();         // Try to flush system buffer
+							ignore_user_abort(true); // Continue script if client disconnects
+							set_time_limit(0); // Allow script to run longer for Tagger
+						}
+					}
+					else if (Yii::app()->request->isApiRequest) {
+						// This will echo the response directly
+						Yii::app()->api->okResponse($message); 
+						
+						if (function_exists('fastcgi_finish_request')) {
+							fastcgi_finish_request();
+						} else {
+							@ob_end_flush(); 
+							@flush();
+							ignore_user_abort(true);
+							set_time_limit(0); 
+						}
+					}
+					else { // Normal web request (typically a redirect)
+						$form->text=null;
+						// $message object is still needed for Tagger, so don't null it yet unless Tagger re-fetches.
+						// The Tagger code below uses the $message object.
+
+						$url = '';
+						if ($currentArea->type==Area::TYPE_FORUM) {
+							$url = $this->createUrl('message/index');
+						} else {
+							Yii::app()->user->setFlash('success', I::t('publish.success'));
+							$url = $this->createUrl('message/publish');
+						}
+						
+						// Manually send redirect headers instead of Yii's $this->redirect() to avoid script termination
+						header('Location: ' . $url);
+						header('HTTP/1.1 302 Moved Temporarily'); // Or other appropriate redirect status
+						// Send minimal body for redirect, or none.
+						// echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url='.$url.'"></head><body></body></html>';
+
+
+						if (function_exists('fastcgi_finish_request')) {
+							fastcgi_finish_request();
+						} else {
+							// Ensure headers are sent
+							@ob_end_flush(); // Send headers and any buffered output
+							@flush();
+							ignore_user_abort(true);
+							set_time_limit(0);
+						}
+					}
 					// Tagger Integration - Automatic audio tagging
 					// Check use_tagger flag (default true for backward compatibility)
 					$useTaggerByDefault = true; // Definir la variable aquí
@@ -390,29 +446,10 @@ class MessageController extends Controller
 						}
 					} else {
 						Yii::log("Skipping Tagger integration: useTagger=" . ($useTagger ? 'true' : 'false') . 
-						    ", attachment count=" . count($message->attachments), 'info');
+							", attachment count=" . count($message->attachments), 'info');
 					}
 					// End of Tagger Integration
-
-					if (Yii::app()->request->isAjaxRequest) {
-						echo json_encode(array('status'=>'OK', 'message'=>array('id'=>$message->id)));
-						Yii::app()->end();
-					}
-					else if (Yii::app()->request->isApiRequest) {
-						echo Yii::app()->api->okResponse($message);
-						Yii::app()->end();
-					}
-					else {
-						$form->text=null;
-						$message=null;
-					
-						if ($currentArea->type==Area::TYPE_FORUM) $this->redirect(array('message/index'));
-						else {
-							Yii::app()->user->setFlash('success', I::t('publish.success'));
-							$this->redirect(array('message/publish'));
-							Yii::app()->end();
-						}
-					}
+					Yii::app()->end();
 				}
 				else {
 					Attachment::saveFailedUploads($uploadedfiles);
