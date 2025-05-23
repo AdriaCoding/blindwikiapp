@@ -13,7 +13,7 @@ export interface MessagesResponse extends ServerResponse {
 }
 
 export interface MessageResponse extends ServerResponse {
-  data?: Message;
+  data?: Message[] | Message; // Can be either an array or single message
 }
 
 export interface CommentResponse extends ServerResponse {
@@ -25,9 +25,12 @@ export interface GetPostsCleanResponse extends CleanResponse {
   messages: Message[];
 }
 
-export interface GetMessageCleanResponse extends CleanResponse {
+export type GetMessageCleanResponse = {
+  success: boolean;
   message?: Message;
-}
+  errorMessage?: string;
+  details?: string;  // Add details field for error information
+};
 
 export interface CommentCleanResponse extends CleanResponse {
   comments?: Comment[];
@@ -390,22 +393,32 @@ export async function publishMessage(
     
     const serverResponse = response.data as MessageResponse;
     
-    if (serverResponse.status === "ok" && serverResponse.data?.id) {
-      // Llamar al tagger de forma asíncrona sin esperar respuesta
-      processTagger(serverResponse.data.id).catch(error => {
-        console.error("Background tagger processing failed:", error);
-      });
+    if (serverResponse.status === "ok") {
+      // Handle both array and single message responses
+      const messageData = Array.isArray(serverResponse.data) 
+        ? serverResponse.data[0]  // Get first message from array
+        : serverResponse.data;    // Use single message directly
 
-      return {
-        success: true,
-        message: serverResponse.data,
-      };
-    } else {
-      return {
-        success: false,
-        errorMessage: serverResponse.error?.message || "Failed to publish message",
-      };
+      if (messageData?.id) {
+        // Llamar al tagger de forma asíncrona sin esperar respuesta
+        processTagger(messageData.id).catch(error => {
+          console.error("[publishMessage] Background tagger processing failed:", error);
+        });
+
+        return {
+          success: true,
+          message: messageData,
+        };
+      }
     }
+
+    // Handle error case
+    console.error('[publishMessage] Server returned error:', serverResponse.error);
+    return {
+      success: false,
+      errorMessage: serverResponse.error?.message || "Failed to publish message",
+      details: serverResponse.error?.message
+    };
     
   } catch (error) {
     console.error("Error publishing message:", error);
