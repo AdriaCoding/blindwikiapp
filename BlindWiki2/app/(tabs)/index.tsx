@@ -1,4 +1,4 @@
-import { StyleSheet, Alert, Platform } from 'react-native';
+import { StyleSheet, Alert, Platform, ActivityIndicator } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { InstructionsText } from '@/components/InstructionsText';
 import LocationComponent from '@/components/Location';
@@ -7,19 +7,23 @@ import { View } from 'react-native';
 import StyledButton from '@/components/StyledButton';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
+import { publishMessage } from "@/services/messageService";
 import { useLocation } from '@/contexts/LocationContext';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
-
+import Colors from '@/constants/Colors';
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
-  const { location, getCurrentLocation, isLoading, error: locationError } = useLocation();
+  const { location, getCurrentLocation, isLoading: locationLoading, error: locationError, address } = useLocation();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingInstance, setRecordingInstance] = useState<Audio.Recording | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isPlayingRecording, setIsPlayingRecording] = useState(false);
+
     // Running‐range per platform for Min–Max scaling
     const rangeRef = useRef<any>({
       android: { min: Infinity, max: -Infinity },
@@ -57,8 +61,8 @@ export default function HomeScreen() {
   const startRecording = async () => {
     try {
       // Check if we have location data
-      console.log("Location: ", location, "isLoading: ", isLoading, "locationError: ", locationError);
-      if (!location || isLoading || locationError) {
+      console.log("Location: ", location, "isLoading: ", locationLoading, "locationError: ", locationError);
+      if (!location || locationLoading || locationError) {
         if (locationError) {
           Alert.alert(
             t('recording.errorTitle'),
@@ -66,7 +70,7 @@ export default function HomeScreen() {
           );
           return;
         }
-        if (isLoading) {
+        if (locationLoading) {
           Alert.alert(
             t('recording.errorTitle'),
             t('recording.locationIsLoading')
@@ -240,15 +244,37 @@ export default function HomeScreen() {
               setIsRecording(false);
               setAudioLevel(0);
               
-              // Navigate to edit screen with the new recording URI
-              router.push({
-                pathname: '/edit',
-                params: { 
-                  recordingUri: newUri,
-                  latitude: location?.coords.latitude?.toString() || '',
-                  longitude: location?.coords.longitude?.toString() || ''
-                }
-              });
+              // Show quick publish alert
+              Alert.alert(t("edit.quickPublishTitle"), "", [
+                {
+                  text: t("edit.publishButton"),
+                  onPress: () => {
+                    // Call handleQuickPublish directly
+                    handleQuickPublish();
+                  },
+                },
+                {
+                  text: t("edit.quickPublishChangeTags"),
+                  onPress: () => {
+                    router.push({
+                      pathname: '/edit',
+                      params: { 
+                        recordingUri: newUri,
+                        latitude: location?.coords.latitude?.toString() || '',
+                        longitude: location?.coords.longitude?.toString() || ''
+                      }
+                    });
+                  },
+                },
+                {
+                  text: t("common.cancel"),
+                  style: "cancel",
+                  onPress: () => {
+                    setRecordingUri(null);
+                    setIsRecording(false);
+                  },
+                },
+              ]);
             } else {
               throw new Error('Copied file not found');
             }
@@ -283,6 +309,50 @@ export default function HomeScreen() {
         t('recording.errorTitle'),
         t('recording.stopError')
       );
+    }
+  };
+
+  const handleQuickPublish = async () => {
+    if (!recordingUri || !location?.coords.latitude || !location?.coords.longitude) {
+      Alert.alert(t("edit.missingData"));
+      return;
+    }
+
+    // Set uploading state first
+    setIsUploading(true);
+    setIsRecording(false); // Ensure recording state is false
+
+    try {
+      const addressText = address
+        ? `${address.street || ""} ${address.city || ""}, ${
+            address.country || ""
+          }`.trim()
+        : "";
+
+      const response = await publishMessage(
+        recordingUri,
+        location.coords.latitude.toString(),
+        location.coords.longitude.toString(),
+        addressText,
+        "" // No tags for quick publish
+      );
+
+      if (response.success) {
+        setIsUploading(false); // Reset uploading state before showing alert
+        Alert.alert(t("edit.publishSuccess"), t("edit.publishSuccessMessage"), [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(tabs)"),
+          },
+        ]);
+      } else {
+        setIsUploading(false); // Reset uploading state before showing alert
+        Alert.alert(t("edit.publishFailed"), response.errorMessage);
+      }
+    } catch (error) {
+      console.error("Error publishing message:", error);
+      setIsUploading(false); // Reset uploading state before showing alert
+      Alert.alert(t("edit.publishFailed"), t("edit.networkError"));
     }
   };
   
@@ -340,14 +410,20 @@ export default function HomeScreen() {
       <InstructionsText>{t('home.info-gps')}</InstructionsText>
       <LocationComponent />
       <InstructionsText>{t('home.info-record')}</InstructionsText>
-      <StyledButton 
-        onPress={toggleRecording}
-        title={t('home.record')}
-        style={styles.recordButton}
-        textStyle={styles.recordButtonText}
-        isRecording={isRecording}
-        audioLevel={audioLevel}
-      />
+      {isUploading ? (
+        <View style={[styles.recordButton, styles.activityContainer]}>
+          <ActivityIndicator size="large" color={Colors.light.button.text} />
+        </View>
+      ) : (
+        <StyledButton 
+          onPress={toggleRecording}
+          title={t('home.record')}
+          style={styles.recordButton}
+          textStyle={styles.recordButtonText}
+          isRecording={isRecording}
+          audioLevel={audioLevel}
+        />
+      )}
     </View>
   );
 }
@@ -365,5 +441,11 @@ const styles = StyleSheet.create({
   },
   recordButtonText: {
     fontSize: 20,
+  },
+  activityContainer: {
+    backgroundColor: Colors.light.button.background,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -54,24 +54,6 @@ export default function EditScreen() {
     : "";
   const [isUploading, setIsUploading] = useState(false);
 
-  // Show quick publish alert on mount
-  useEffect(() => {
-    Alert.alert(t("edit.quickPublishTitle"), "", [
-      {
-        text: t("edit.publishButton"),
-        onPress: handlePublish,
-      },
-      {
-        text: t("edit.quickPublishChangeTags"),
-        style: "cancel",
-      },
-      {
-        text: t("common.cancel"),
-        style: "cancel",
-        onPress: () => router.back(),
-      },
-    ]);
-  }, []);
 
   // Load proposed tags on component mount
   useEffect(() => {
