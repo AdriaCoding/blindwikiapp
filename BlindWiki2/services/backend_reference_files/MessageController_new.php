@@ -32,7 +32,7 @@ class MessageController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', 
-				'actions'=>array('publish', 'uploadImage'),
+				'actions'=>array('publish', 'uploadImage', 'processTagger'),
 				'roles'=>array(
 					'Publish'=> array(
 						'area'=>$this->currentArea,
@@ -138,120 +138,6 @@ class MessageController extends Controller
 	}
 
 	
-	/**
-	 * Runs Python Tagger submodule to process the audio file.
-	 * 
-	 * @param string $audioFilePath Path to the WAV/MP3 file
-	 * @return array ['tags'=>[['tag'=>'foo','similarity'=>0.7],...], 'transcription'=>'...']
-	 */
-	protected function useTagger($audioFilePath)
-	{
-		// Check if the file exists
-		if (!file_exists($audioFilePath)) {
-			Yii::log("Audio file not found: $audioFilePath", 'error');
-			return array('tags' => array(), 'transcription' => '');
-		}
-		
-		// Build the command to execute the script
-		$script = "/srv/www/blind.wiki/public_html/Tagger/run_tagger.sh";
-		
-		// Check if the script exists and is executable
-		if (!file_exists($script)) {
-			Yii::log("Tagger script not found: $script", 'error');
-			return array('tags' => array(), 'transcription' => '');
-		}
-		
-		// Check script permissions
-		$permissions = fileperms($script);
-		$isExecutable = ($permissions & 0x0040) || ($permissions & 0x0008) || ($permissions & 0x0001);
-		Yii::log("Tagger script permissions: " . decoct($permissions) . ", executable: " . ($isExecutable ? 'yes' : 'no'), 'info');
-		
-		// Use output buffer and direct execution
-		$scriptArgument = escapeshellarg($audioFilePath);
-		$cmd = "$script $scriptArgument";
-		Yii::log("Executing Tagger command: $cmd", 'info');
-		
-		// Set a longer timeout (5 minutes)
-		$defaultTimeout = ini_get('max_execution_time');
-		set_time_limit(300);
-		
-		// Execute command and capture output directly
-		$startTime = microtime(true);
-		$output = array();
-		$ret = 0;
-		exec($cmd." 2>&1", $output, $ret);
-		$endTime = microtime(true);
-		$executionTime = round($endTime - $startTime, 2);
-		
-		Yii::log("Tagger execution completed in {$executionTime} seconds with exit code: $ret", 'info');
-		
-		// Reset timeout to default
-		set_time_limit($defaultTimeout);
-		
-		// Log each line of output separately to ensure everything is captured
-		Yii::log("Tagger output START", 'info');
-		foreach ($output as $index => $line) {
-			Yii::log("Tagger output line " . ($index + 1) . ": " . $line, 'info');
-		}
-		Yii::log("Tagger output END", 'info');
-		
-		// Use a non-newline separator for the full output
-		$fullOutput = implode(" | ", $output);
-		Yii::log("Tagger complete output (pipe-separated): " . $fullOutput, 'info');
-		
-		if ($ret !== 0) {
-			Yii::log("Error executing Tagger (code: $ret) - See output above", 'error');
-			Yii::log("SUGGESTION: Verify the Tagger script manually by running the following command on the server:", 'error');
-			Yii::log("cd /srv/www/blind.wiki/public_html && ./Tagger/run_tagger.sh " . escapeshellarg($audioFilePath), 'error');
-			Yii::log("Check for Python dependencies and environment setup", 'error');
-			return array('tags' => array(), 'transcription' => '');
-		}
-		
-		// Look for JSON in the console output
-		Yii::log("Processing console output from Tagger", 'info');
-		
-		// Find where the JSON begins (after "Resultado:")
-		$jsonLines = array();
-		$foundResultado = false;
-		
-		foreach ($output as $line) {
-			if ($foundResultado) {
-				$jsonLines[] = $line;
-			} elseif (trim($line) === "Resultado:") {
-				$foundResultado = true;
-			}
-		}
-		
-		// Extract information directly from console output
-		$transcription = '';
-		$tags = array();
-		$outputStr = implode("\n", $output);
-		
-		// Extract transcription
-		if (preg_match('/"transcription":\s*"([^"]*)"/', $outputStr, $matches)) {
-			$transcription = $matches[1];
-		}
-		
-		// Extract tags
-		preg_match_all('/"tag":\s*"([^"]*)"\s*,\s*"similarity":\s*([\d\.]+)/', $outputStr, $matches, PREG_SET_ORDER);
-		foreach ($matches as $match) {
-			if (!empty($match[1])) {
-				$tags[] = array(
-					'tag' => $match[1],
-					'similarity' => (float)$match[2]
-				);
-			}
-		}
-		
-		Yii::log("Extraction completed. Transcription: " . substr($transcription, 0, 50) . "... Tags: " . count($tags), 'info');
-		
-		return array(
-			'transcription' => $transcription,
-			'tags' => $tags
-		);
-	}
-
-	// Modified actionPublish method to integrate Tagger
 	public function actionPublish()
 	{	
 	    
@@ -327,129 +213,25 @@ class MessageController extends Controller
 					if ($form->audioDataUri!=null) $dataUris[]=$form->audioDataUri;
 					$attsuccess=$message->createAttachments($uploadedfiles, isset($_REQUEST['uploadedImage'])?$_REQUEST['uploadedImage']:null, $dataUris);
 					$message->setTags($form->tags,$form->newtags);
-
-					
 					if (Yii::app()->request->isAjaxRequest) {
 						echo json_encode(array('status'=>'OK', 'message'=>array('id'=>$message->id)));
-						
-						if (function_exists('fastcgi_finish_request')) {
-							fastcgi_finish_request();
-						} else {
-							@ob_end_flush(); // Try to flush Yii's buffer if any
-							@flush();         // Try to flush system buffer
-							ignore_user_abort(true); // Continue script if client disconnects
-							set_time_limit(0); // Allow script to run longer for Tagger
-						}
+						Yii::app()->end();
 					}
 					else if (Yii::app()->request->isApiRequest) {
-						// This will echo the response directly
-						Yii::app()->api->okResponse($message); 
-						
-						if (function_exists('fastcgi_finish_request')) {
-							fastcgi_finish_request();
-						} else {
-							@ob_end_flush(); 
-							@flush();
-							ignore_user_abort(true);
-							set_time_limit(0); 
-						}
+						echo Yii::app()->api->okResponse($message);
+						Yii::app()->end();
 					}
-					else { // Normal web request (typically a redirect)
+					else {
 						$form->text=null;
-						// $message object is still needed for Tagger, so don't null it yet unless Tagger re-fetches.
-						// The Tagger code below uses the $message object.
-
-						$url = '';
-						if ($currentArea->type==Area::TYPE_FORUM) {
-							$url = $this->createUrl('message/index');
-						} else {
-							Yii::app()->user->setFlash('success', I::t('publish.success'));
-							$url = $this->createUrl('message/publish');
-						}
-						
-						// Manually send redirect headers instead of Yii's $this->redirect() to avoid script termination
-						header('Location: ' . $url);
-						header('HTTP/1.1 302 Moved Temporarily'); // Or other appropriate redirect status
-						// Send minimal body for redirect, or none.
-						// echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url='.$url.'"></head><body></body></html>';
-
-
-						if (function_exists('fastcgi_finish_request')) {
-							fastcgi_finish_request();
-						} else {
-							// Ensure headers are sent
-							@ob_end_flush(); // Send headers and any buffered output
-							@flush();
-							ignore_user_abort(true);
-							set_time_limit(0);
-						}
-					}
-					// Tagger Integration - Automatic audio tagging
-					// Check use_tagger flag (default true for backward compatibility)
-					$useTaggerByDefault = true; // Definir la variable aquí
-					$useTagger = (bool) Yii::app()->request->getParam('use_tagger', $useTaggerByDefault);
-					Yii::log("Tagger integration starting. useTagger flag: " . ($useTagger ? 'true' : 'false'), 'info');
+						$message=null;
 					
-					if ($useTagger && count($message->attachments) > 0) {
-						Yii::log("Message has " . count($message->attachments) . " attachments, looking for audio files", 'info');
-						
-						foreach ($message->attachments as $attachment) {
-							// Only process audio files - use the type constant instead of mime_type
-							Yii::log("Checking attachment ID: " . $attachment->id . ", type: " . $attachment->type, 'info');
-							
-							if ($attachment->type == Attachment::TYPE_AUDIO) {
-								try {
-									// Path to the audio file
-									$audioFilePath = Yii::getPathOfAlias('webroot.uploads') . "/". $attachment->local_filename;
-									Yii::log("Found audio attachment, path: " . $audioFilePath, 'info');
-									
-									// Execute the tagger
-									$taggerResult = $this->useTagger($audioFilePath);
-									Yii::log("Tagger execution completed, processing results", 'info');
-									
-									// Set message text to transcription if original text is empty
-									if (empty($message->text) && !empty($taggerResult['transcription'])) {
-										$message->text = $taggerResult['transcription'];
-										$message->save(false);
-										Yii::log("Text set from transcription: " . substr($message->text, 0, 50) . "...", 'info');
-									}
-									
-									// Extract all tags returned by the tagger
-									$autoTags = array();
-									if (!empty($taggerResult['tags'])) {
-										foreach ($taggerResult['tags'] as $tagInfo) {
-											$autoTags[] = $tagInfo['tag'];
-										}
-										
-										if (!empty($autoTags)) {
-											// Pass array; second parameter true merges with existing tags
-											Yii::log("Adding " . count($autoTags) . " tags to message: " . implode(", ", $autoTags), 'info');
-											$message->setNewTags($autoTags, true);
-											$message->updateTagSummaries('add');
-											$message->save(false);
-											
-											Yii::log("Tagger: tags added to message {$message->id}: " . implode(',', $autoTags), 'info');
-										} else {
-											Yii::log("No valid tags found in Tagger results", 'info');
-										}
-									} else {
-										Yii::log("Tagger returned empty tags array", 'info');
-									}
-								} catch (Exception $e) {
-									Yii::log("Error executing Tagger: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 'error');
-								}
-								
-								// Only process the first audio attachment
-								Yii::log("Processing complete for first audio attachment", 'info');
-								break;
-							}
+						if ($currentArea->type==Area::TYPE_FORUM) $this->redirect(array('message/index'));
+						else {
+							Yii::app()->user->setFlash('success', I::t('publish.success'));
+							$this->redirect(array('message/publish'));
+							Yii::app()->end();
 						}
-					} else {
-						Yii::log("Skipping Tagger integration: useTagger=" . ($useTagger ? 'true' : 'false') . 
-							", attachment count=" . count($message->attachments), 'info');
 					}
-					// End of Tagger Integration
-					Yii::app()->end();
 				}
 				else {
 					Attachment::saveFailedUploads($uploadedfiles);
@@ -1254,6 +1036,162 @@ class MessageController extends Controller
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
+		}
+	}
+
+	/**
+	 * Endpoint para procesar un mensaje con el tagger.
+	 * Este endpoint es asíncrono y permite al frontend decidir cuándo ejecutar el tagger.
+	 * 
+	 * @param integer $id ID del mensaje a procesar
+	 */
+	public function actionProcessTagger($id)
+	{
+		// Verificar permisos - solo el autor del mensaje o administradores pueden ejecutar el tagger
+		$message = Message::model()->findByPk($id);
+		if (!$message) {
+			throw new CHttpException(404, 'Mensaje no encontrado');
+		}
+
+		if (!Yii::app()->user->checkAccess('EditMessage', array('area'=>$message->area)) &&
+			!Yii::app()->user->checkAccess('EditOwnMessage', array('message'=>$message))) {
+			throw new CHttpException(403, 'No tienes permiso para procesar este mensaje');
+		}
+
+		// Buscar adjuntos de audio
+		$audioFound = false;
+		foreach ($message->attachments as $attachment) {
+			if ($attachment->type == Attachment::TYPE_AUDIO) {
+				try {
+					$audioFilePath = Yii::getPathOfAlias('webroot.uploads') . "/" . $attachment->local_filename;
+					Yii::log("Procesando audio: " . $audioFilePath, 'info');
+					
+					// Verificar que el archivo existe
+					if (!file_exists($audioFilePath)) {
+						Yii::log("Audio file not found: $audioFilePath", 'error');
+						continue;
+					}
+					
+					// Preparar el script tagger
+					$script = "/srv/www/blind.wiki/public_html/Tagger/run_tagger.sh";
+					if (!file_exists($script)) {
+						throw new CException("Tagger script not found: $script");
+					}
+					
+					// Verificar permisos del script
+					$permissions = fileperms($script);
+					$isExecutable = ($permissions & 0x0040) || ($permissions & 0x0008) || ($permissions & 0x0001);
+					Yii::log("Tagger script permissions: " . decoct($permissions) . ", executable: " . ($isExecutable ? 'yes' : 'no'), 'info');
+					
+					// Preparar y ejecutar el comando
+					$scriptArgument = escapeshellarg($audioFilePath);
+					$cmd = "$script $scriptArgument";
+					Yii::log("Executing Tagger command: $cmd", 'info');
+					
+					// Configurar timeout
+					$defaultTimeout = ini_get('max_execution_time');
+					set_time_limit(300); // 5 minutos
+					
+					// Ejecutar el comando
+					$startTime = microtime(true);
+					$output = array();
+					$ret = 0;
+					exec($cmd." 2>&1", $output, $ret);
+					$endTime = microtime(true);
+					$executionTime = round($endTime - $startTime, 2);
+					
+					// Restaurar timeout
+					set_time_limit($defaultTimeout);
+					
+					// Logging
+					Yii::log("Tagger execution completed in {$executionTime} seconds with exit code: $ret", 'info');
+					Yii::log("Tagger output START", 'info');
+					foreach ($output as $index => $line) {
+						Yii::log("Tagger output line " . ($index + 1) . ": " . $line, 'info');
+					}
+					Yii::log("Tagger output END", 'info');
+					
+					// Log completo
+					$fullOutput = implode(" | ", $output);
+					Yii::log("Tagger complete output (pipe-separated): " . $fullOutput, 'info');
+					
+					if ($ret !== 0) {
+						throw new CException("Error executing Tagger (code: $ret)");
+					}
+					
+					// Procesar la salida JSON
+					Yii::log("Processing console output from Tagger", 'info');
+					
+					// Extraer información
+					$transcription = '';
+					$tags = array();
+					$outputStr = implode("\n", $output);
+					
+					// Extraer transcripción
+					if (preg_match('/"transcription":\s*"([^"]*)"/', $outputStr, $matches)) {
+						$transcription = $matches[1];
+					}
+					
+					// Extraer tags
+					preg_match_all('/"tag":\s*"([^"]*)"\s*,\s*"similarity":\s*([\d\.]+)/', $outputStr, $matches, PREG_SET_ORDER);
+					$newTags = array();
+					foreach ($matches as $match) {
+						if (!empty($match[1])) {
+							$newTags[] = $match[1];
+						}
+					}
+					
+					Yii::log("Extraction completed. Transcription: " . substr($transcription, 0, 50) . "... Tags: " . count($newTags), 'info');
+					
+					// Actualizar mensaje
+					if (empty($message->text) && !empty($transcription)) {
+						$message->text = $transcription;
+						$message->save(false);
+						Yii::log("Texto actualizado con transcripción", 'info');
+					}
+					
+					// Añadir nuevos tags sin eliminar los existentes
+					if (!empty($newTags)) {
+						Yii::log("Añadiendo tags: " . implode(", ", $newTags), 'info');
+						$message->setNewTags($newTags, true); // true para mantener tags existentes
+						$message->updateTagSummaries('add');
+						$message->save(false);
+					}
+					
+					$audioFound = true;
+					break; // Solo procesar el primer audio encontrado
+					
+				} catch (Exception $e) {
+					Yii::log("Error procesando audio: " . $e->getMessage() . "\n" . $e->getTraceAsString(), 'error');
+					if (Yii::app()->request->isApiRequest) {
+						echo Yii::app()->api->errorResponse(array(
+							'error' => 'Error procesando audio',
+							'details' => $e->getMessage()
+						));
+						Yii::app()->end();
+					}
+					throw $e;
+				}
+			}
+		}
+		
+		if (!$audioFound) {
+			if (Yii::app()->request->isApiRequest) {
+				echo Yii::app()->api->errorResponse(array(
+					'error' => 'No se encontraron archivos de audio en el mensaje'
+				));
+				Yii::app()->end();
+			}
+			throw new CHttpException(400, 'No se encontraron archivos de audio en el mensaje');
+		}
+
+		// Refrescar el mensaje para obtener los cambios
+		$message->refresh();
+		
+		if (Yii::app()->request->isApiRequest) {
+			echo Yii::app()->api->okResponse($message);
+		} else {
+			$this->redirect(array('message/viewSingle', 'id' => $message->id));
 		}
 	}
 }
