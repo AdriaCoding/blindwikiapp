@@ -90,6 +90,12 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
       <View style={styles.settingContainer}>
+        <StyledButton
+          title={t("settings.about")}
+          onPress={() => router.push("/about")}
+        />
+      </View>
+      <View style={styles.settingContainer}>
         {!isLoggedIn() ? (
           <StyledButton
             title={t("login.title")}

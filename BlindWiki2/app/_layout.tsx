@@ -131,6 +131,7 @@ function RootLayoutNav() {
       <Stack.Screen name="login" options={{title: "Log In"}} />
       <Stack.Screen name="signup" options={{title: "Sign Up"}} />
       <Stack.Screen name="edit" options={{title: "Edit Post"}} />
+      <Stack.Screen name="about" options={{title: "About"}} />
     </Stack>
   );
 
