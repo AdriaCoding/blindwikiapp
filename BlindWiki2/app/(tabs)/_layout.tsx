@@ -114,7 +114,7 @@ export default function TabLayout() {
         name="settings"
         options={{
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="sliders" color={color} />
+            <TabBarIcon name="user" color={color} />
           ),
           tabBarLabel: t('settings.tabLabel'),
         }}
