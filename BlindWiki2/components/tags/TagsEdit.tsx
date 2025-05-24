@@ -22,24 +22,6 @@ export default function TagsEdit({
   const { t } = useTranslation();
   const [newTagInput, setNewTagInput] = useState("");
 
-  // Seleccionar todas las etiquetas propuestas por defecto
-  useEffect(() => {
-    if (allTags.length > 0) {
-      // Verificar si hay alguna etiqueta seleccionada
-      const hasSelectedTags = allTags.some(tag => tag.selected);
-      
-      // Si no hay etiquetas seleccionadas, seleccionar todas por defecto
-      if (!hasSelectedTags) {
-        // Actualizar las etiquetas en el componente padre
-        const updatedTags = allTags.map(tag => ({
-          ...tag,
-          selected: true
-        }));
-        onTagsChange(updatedTags);
-      }
-    }
-  }, [allTags]);
-
   const handleTagSelect = (tag: Tag) => {
     // Invertir el estado de selección de la etiqueta
     const updatedTags = allTags.map(t => {
