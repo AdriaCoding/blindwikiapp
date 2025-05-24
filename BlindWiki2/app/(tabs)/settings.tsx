@@ -14,6 +14,7 @@ import { SettingPicker } from "@/components/SettingPicker";
 import { router } from "expo-router";
 import { Alert } from "react-native";
 import { useAuth } from "@/contexts/AuthContext";
+import { handleExitApp } from "./exit";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -105,6 +106,12 @@ export default function SettingsScreen() {
           <StyledButton title={t("settings.logout.title")} onPress={handleLogout} />
         )}
       </View>
+      <View style={[styles.settingContainer, styles.exitContainer]}>
+        <StyledButton
+          title={t("exit.title")}
+          onPress={() => handleExitApp(t)}
+        />
+      </View>
     </View>
   );
 }
@@ -121,6 +128,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 24, // Adds space between settings
     paddingVertical: 8, // Adds internal padding
+  },
+  exitContainer: {
+    marginTop: 'auto', // Pushes the exit button to the bottom
   },
   checkboxContainer: {
     alignItems: "center", // Centers items horizontally
