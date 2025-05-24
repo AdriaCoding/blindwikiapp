@@ -15,7 +15,7 @@ import { Platform, View, StyleSheet, Dimensions } from "react-native";
 
 // Only enable in development
 import { setupDebug } from "@/utils/debug";
-import LoadingScreen from "./loading";
+import AboutScreen from "./about";
 
 if (__DEV__) {
   setupDebug();
@@ -139,7 +139,7 @@ function RootLayoutNav() {
     return (
       <View style={styles.webContainer}>
         <View style={styles.phoneContainer}>
-          {isLoading ? <LoadingScreen loading={true} /> : content}
+          {isLoading ? <AboutScreen loading={true} /> : content}
         </View>
       </View>
     );
@@ -148,7 +148,7 @@ function RootLayoutNav() {
   // For native platforms or web on mobile, render normally
   return (
     <>
-      {isLoading ? <LoadingScreen loading={true} /> : content}
+      {isLoading ? <AboutScreen loading={true} /> : content}
     </>
   );
 }

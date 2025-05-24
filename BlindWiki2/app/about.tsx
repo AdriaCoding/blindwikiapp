@@ -10,11 +10,11 @@ import Colors from "../constants/Colors";
 import { useTranslation } from "react-i18next";
 
 // Add the prop type
-type LoadingScreenProps = {
+type AboutScreenProps = {
   loading?: boolean;
 };
 
-export default function LoadingScreen({ loading = false }: LoadingScreenProps) {
+export default function AboutScreen({ loading = false }: AboutScreenProps) {
   const { t } = useTranslation();
   return (
     <View style={styles.loadingContainer}>
