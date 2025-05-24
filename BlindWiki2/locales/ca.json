@@ -105,11 +105,15 @@
     "editTags": "Editar etiquetes",
     "failedToRefreshComments": "Error en actualitzar comentaris",
     "failedToUpdateTags": "Error en actualitzar etiquetes",
+    "hideTranscription": "Amaga la transcripció",
     "listen": "Escoltar",
+    "noTranscription": "No hi ha transcripció disponible.",
     "playbackError": "Error de reproducció",
     "playbackErrorMessage": "No s'ha pogut reproduir aquest àudio.",
     "stopPlayback": "Aturar",
-    "unexpectedError": "S'ha produït un error inesperat"
+    "transcription": "Transcripció: ",
+    "unexpectedError": "S'ha produït un error inesperat",
+    "viewTranscription": "Mostra la transcripció"
   },
   "myMessages": {
     "error": {

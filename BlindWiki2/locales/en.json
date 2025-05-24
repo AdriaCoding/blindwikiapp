@@ -105,11 +105,15 @@
     "editTags": "Edit Tags",
     "failedToRefreshComments": "Failed to refresh comments",
     "failedToUpdateTags": "Failed to update tags",
+    "hideTranscription": "Hide Transcription",
     "listen": "Listen",
+    "noTranscription": "No transcription available.",
     "playbackError": "Playback Error",
     "playbackErrorMessage": "Unable to play this audio.",
     "stopPlayback": "Stop",
-    "unexpectedError": "An unexpected error occurred"
+    "transcription": "Transcription: ",
+    "unexpectedError": "An unexpected error occurred",
+    "viewTranscription": "View Transcription"
   },
   "myMessages": {
     "error": {

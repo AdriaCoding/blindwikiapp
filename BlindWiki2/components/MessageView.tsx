@@ -16,6 +16,7 @@ export interface MessageActions {
   onDelete?: (event: GestureResponderEvent) => void;
   onViewComments?: (event: GestureResponderEvent) => void;
   onDirection?: (event: GestureResponderEvent) => void;
+  onViewTranscription?: (event: GestureResponderEvent) => void;
 }
 
 /**
@@ -262,6 +263,9 @@ export function useMessageActions(
       onDirection: (event: GestureResponderEvent) => {
         handleDirections(message);
       },
+      onViewTranscription: (event: GestureResponderEvent) => {
+        // No-op or could optionally alert the transcription
+      },
     };
   };
 
@@ -304,6 +308,7 @@ export default function MessageComponent({
                   null;
   
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [showTranscription, setShowTranscription] = useState(false);
 
   // Event handler for audio playback status changes
   const handlePlaybackStatusChange = (isPlaying: boolean) => {
@@ -376,6 +381,18 @@ export default function MessageComponent({
           style={styles.actionButton}
         />
       )}
+      {actions.onViewTranscription && (
+        <StyledButton 
+          title={showTranscription ? t("message.hideTranscription") : t("message.viewTranscription")}
+          onPress={() => setShowTranscription(v => !v)}
+          style={styles.actionButton}
+          accessibilityLabel={m.text ? t("message.transcription") + m.text : t("message.noTranscription")}
+          accessibilityRole="button"
+        />
+      )}
+      {showTranscription && (
+        <Text style={styles.transcriptionText}>{m.text}</Text>
+      )}
     </View>
   );
 }
@@ -397,5 +414,10 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginBottom: 4,
+  },
+  transcriptionText: {
+    marginVertical: 8,
+    fontSize: 16,
+    color: Colors.light.text,
   },
 });

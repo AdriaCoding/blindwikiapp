@@ -6,6 +6,7 @@ import {
   ViewStyle,
   TextStyle,
   StyleProp,
+  AccessibilityRole,
 } from "react-native";
 import { useState } from "react";
 import Colors from "@/constants/Colors";
@@ -18,6 +19,8 @@ interface StyledButtonProps {
   textStyle?: StyleProp<TextStyle>;
   isRecording?: boolean;
   audioLevel?: number;
+  accessibilityLabel?: string;
+  accessibilityRole?: AccessibilityRole;
 }
 
 export default function StyledButton({
@@ -27,6 +30,8 @@ export default function StyledButton({
   textStyle,
   isRecording = false,
   audioLevel = 0,
+  accessibilityLabel,
+  accessibilityRole = "button",
 }: StyledButtonProps) {
   const [isPressed, setIsPressed] = useState(false);
 
@@ -40,7 +45,8 @@ export default function StyledButton({
 
   if (isRecording) {
     return (
-      <TouchableOpacity onPress={onPress} style={[styles.recordingContainer, style]}>
+      <TouchableOpacity onPress={onPress} style={[styles.recordingContainer, style]} accessibilityLabel={accessibilityLabel}
+      accessibilityRole={accessibilityRole}>
         <RecordingAnimation onPress={onPress} audioLevel={audioLevel} />
       </TouchableOpacity>
     );
@@ -57,6 +63,7 @@ export default function StyledButton({
         style,
       ]}
       activeOpacity={0.8}
+      accessibilityLabel={accessibilityLabel}
     >
       <Text style={[styles.text, textStyle]}>{title}</Text>
     </TouchableOpacity>

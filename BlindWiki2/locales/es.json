@@ -105,11 +105,15 @@
     "editTags": "Editar etiquetas",
     "failedToRefreshComments": "Error al actualizar comentarios",
     "failedToUpdateTags": "Error al actualizar etiquetas",
+    "hideTranscription": "Ocultar transcripción",
     "listen": "Escuchar",
+    "noTranscription": "No hay transcripción disponible.",
     "playbackError": "Error de reproducción",
     "playbackErrorMessage": "No se ha podido reproducir este audio.",
     "stopPlayback": "Detener",
-    "unexpectedError": "Se ha producido un error inesperado"
+    "transcription": "Transcripción: ",
+    "unexpectedError": "Se ha producido un error inesperado",
+    "viewTranscription": "Ver transcripción"
   },
   "myMessages": {
     "error": {

@@ -48,6 +48,7 @@ export default function TagsView({ messages }: { messages: Message[] }) {
       onListen: allActions.onListen,
       onViewComments: allActions.onViewComments,
       onDirection: allActions.onDirection,
+      onViewTranscription: allActions.onViewTranscription,
       // Otras acciones se establecen como undefined
       onEditTags: undefined,
       onDelete: undefined
