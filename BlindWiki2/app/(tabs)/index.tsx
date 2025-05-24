@@ -12,56 +12,130 @@ import { useLocation } from '@/contexts/LocationContext';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import Colors from '@/constants/Colors';
+
+const AUDIO_CONFIG = {
+  allowsRecordingIOS: true,
+  playsInSilentModeIOS: true,
+  staysActiveInBackground: true,
+};
+
+const RECORDING_OPTIONS: Audio.RecordingOptions = {
+  ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
+  android: {
+    extension: '.mp3',
+    outputFormat: Audio.AndroidOutputFormat.AAC_ADTS,
+    audioEncoder: Audio.AndroidAudioEncoder.AAC,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    bitRate: 128000,
+  },
+  ios: {
+    extension: '.aac',
+    outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
+    audioQuality: Audio.IOSAudioQuality.HIGH,
+    sampleRate: 44100,
+    numberOfChannels: 2,
+    bitRate: 128000,
+    linearPCMBitDepth: 16,
+    linearPCMIsBigEndian: false,
+    linearPCMIsFloat: false,
+  }
+};
+
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { isLoggedIn } = useAuth();
-  const { location, getCurrentLocation, isLoading: locationLoading, error: locationError, address } = useLocation();
+  const { location, isLoading: locationLoading, error: locationError, address } = useLocation();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingInstance, setRecordingInstance] = useState<Audio.Recording | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isPlayingRecording, setIsPlayingRecording] = useState(false);
 
-    // Running‐range per platform for Min–Max scaling
-    const rangeRef = useRef<any>({
-      android: { min: Infinity, max: -Infinity },
-      ios:     { min: Infinity, max: -Infinity },
-    });
-  
-    // Update min/max range
-    function updateRange(stats: any, x: number) {
-      stats.min = Math.min(stats.min, x);
-      stats.max = Math.max(stats.max, x);
+  const rangeRef = useRef<any>({
+    android: { min: Infinity, max: -Infinity },
+    ios: { min: Infinity, max: -Infinity },
+  });
+
+  // Define stopRecording before it's used in useEffect
+  const stopRecording = async () => {
+    if (!recordingInstance) return;
+    
+    try {
+      await recordingInstance.stopAndUnloadAsync();
+      const originalUri = recordingInstance.getURI();
+      
+      if (!originalUri || !(await FileSystem.getInfoAsync(originalUri)).exists) {
+        throw new Error('Recording file not found');
+      }
+
+      const timestamp = Date.now();
+      const extension = Platform.OS === 'ios' ? '.aac' : '.mp3';
+      const newUri = `${FileSystem.documentDirectory}recording-${timestamp}${extension}`;
+      
+      await FileSystem.copyAsync({ from: originalUri, to: newUri });
+      
+      if (!(await FileSystem.getInfoAsync(newUri)).exists) {
+        throw new Error('Failed to save recording');
+      }
+
+      setRecordingInstance(null);
+      setIsRecording(false);
+      setAudioLevel(0);
+      
+      Alert.alert(t("edit.quickPublishTitle"), "", [
+        {
+          text: t("edit.publishButton"),
+          onPress: () => handleQuickPublish(newUri),
+        },
+        {
+          text: t("edit.quickPublishChangeTags"),
+          onPress: () => {
+            router.push({
+              pathname: '/edit',
+              params: { 
+                recordingUri: newUri,
+                latitude: location?.coords.latitude?.toString() || '',
+                longitude: location?.coords.longitude?.toString() || ''
+              }
+            });
+          },
+        },
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+          onPress: () => setIsRecording(false),
+        },
+      ]);
+    } catch (err) {
+      console.error('Failed to stop recording:', err);
+      setIsRecording(false);
+      setRecordingInstance(null);
+      setAudioLevel(0);
+      Alert.alert(t('recording.errorTitle'), t('recording.stopError'));
     }
-  // Request recording permissions on component mount
+  };
+
   useEffect(() => {
     (async () => {
       const { status } = await Audio.requestPermissionsAsync();
       setHasPermission(status === 'granted');
+      if (status === 'granted') {
+        await Audio.setAudioModeAsync(AUDIO_CONFIG);
+      }
     })();
-    
-    // Set audio mode for recording
-    Audio.setAudioModeAsync({
-      allowsRecordingIOS: true,
-      playsInSilentModeIOS: true,
-      staysActiveInBackground: true,
-    });
-    
-    // Cleanup function
+
     return () => {
       if (recordingInstance) {
         stopRecording();
       }
     };
   }, []);
-  
-  // Function to start recording
+
   const startRecording = async () => {
     try {
       // Check if we have location data
-      console.log("Location: ", location, "isLoading: ", locationLoading, "locationError: ", locationError);
       if (!location || locationLoading || locationError) {
         if (locationError) {
           Alert.alert(
@@ -84,320 +158,91 @@ export default function HomeScreen() {
         return;
       }
 
-      // Web platform handling for recording
-      if (Platform.OS === 'web') {
-        try {
-          // Check if browser supports MediaRecorder
-          if (!window.MediaRecorder) {
-            Alert.alert(
-              t('recording.errorTitle'),
-              'Su navegador no soporta la grabación de audio'
-            );
-            return;
-          }
-
-          // Request microphone permission
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          
-          // Para web, simular niveles de audio ya que la API no proporciona metering
-          // Iniciar un temporizador para simular cambios en el nivel de audio
-          const simulateAudioLevel = () => {
-            // Generar un valor aleatorio entre 0.3 y 0.9 para que sea visible
-            const simulatedLevel = 0.3 + (Math.random() * 0.6);
-            setAudioLevel(simulatedLevel);
-          };
-          
-          // Actualizar cada 200ms para simular cambios en el nivel de audio
-          const intervalId = setInterval(simulateAudioLevel, 200);
-          
-          // Guardar el ID del intervalo para limpiarlo después
-          // @ts-ignore - Almacenar en el objeto window para acceso global
-          window._recordingIntervalId = intervalId;
-        } catch (webError) {
-          console.error('Web: Error accessing microphone', webError);
-          Alert.alert(
-            t('recording.errorTitle'),
-            'Error al acceder al micrófono. Asegúrese de que su navegador tiene permisos para usar el micrófono.'
-          );
-          return;
-        }
-      }
-
-      // Configure recording
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-      
-      // Custom recording options for AAC format
-      const recordingOptions: Audio.RecordingOptions = {
-        ...Audio.RecordingOptionsPresets.HIGH_QUALITY,
-        android: {
-          extension: '.aac',
-          outputFormat: Audio.AndroidOutputFormat.AAC_ADTS,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.aac',
-          outputFormat: Audio.IOSOutputFormat.MPEG4AAC,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        }
-      };
-      
       const { recording } = await Audio.Recording.createAsync(
-        recordingOptions,
+        RECORDING_OPTIONS,
         (status) => {
           if (status.isRecording && status.metering !== undefined) {
+            const platform = Platform.OS;
+            const range = rangeRef.current[platform];
             const dB = status.metering;
-            const platform = Platform.OS; // 'android' or 'ios'
-            const range = (rangeRef.current as any)[platform];
-
-            updateRange(range, dB);
-            let normalized = range.max > range.min
-              ? (dB - range.min) / (range.max - range.min)
+            
+            range.min = Math.min(range.min, dB);
+            range.max = Math.max(range.max, dB);
+            
+            const normalized = range.max > range.min
+              ? Math.max(0, Math.min(1, (dB - range.min) / (range.max - range.min)))
               : 0;
-            normalized = Math.max(0, Math.min(1, normalized));
 
             setAudioLevel(normalized);
           }
         },
         100
       );
+      
       setRecordingInstance(recording);
       setIsRecording(true);
     } catch (err) {
-      console.error('Failed to start recording', err);
-      Alert.alert(
-        t('recording.errorTitle'),
-        t('recording.startError')
-      );
-    }
-  };
-  
-  // Function to stop recording
-  const stopRecording = async () => {
-    if (!recordingInstance) return;
-    
-    try {
-      // Limpiar intervalo de simulación de audio para web
-      if (Platform.OS === 'web' && (window as any)._recordingIntervalId) {
-        clearInterval((window as any)._recordingIntervalId);
-        (window as any)._recordingIntervalId = null;
-      }
-      
-      await recordingInstance.stopAndUnloadAsync();
-      const originalUri = recordingInstance.getURI();
-      
-      if (originalUri) {
-        // Web platform handling
-        if (Platform.OS === 'web') {
-          setRecordingUri(originalUri);
-          setRecordingInstance(null);
-          setIsRecording(false);
-          setAudioLevel(0);
-          
-          // Navigate to edit screen with the recording URI
-          router.push({
-            pathname: '/edit',
-            params: { 
-              recordingUri: originalUri,
-              latitude: location?.coords.latitude?.toString() || '',
-              longitude: location?.coords.longitude?.toString() || ''
-            }
-          });
-          return;
-        }
-        
-        // Native platforms (iOS/Android)
-        // Ensure the file exists before proceeding
-        const fileInfo = await FileSystem.getInfoAsync(originalUri);
-        
-        if (fileInfo.exists) {
-          // Create a new file in app's documents directory with a simple name
-          const timestamp = Date.now();
-          const extension = Platform.OS === 'ios' ? '.aac' : '.mp3';
-          const newFilename = `recording-${timestamp}${extension}`;
-          const newUri = `${FileSystem.documentDirectory}${newFilename}`;
-          
-          try {
-            // Copy the file to a location with a simpler path
-            await FileSystem.copyAsync({
-              from: originalUri,
-              to: newUri
-            });
-            
-            // Verify the new file exists
-            const newFileInfo = await FileSystem.getInfoAsync(newUri);
-            
-            if (newFileInfo.exists) {
-              setRecordingUri(newUri);
-              setRecordingInstance(null);
-              setIsRecording(false);
-              setAudioLevel(0);
-              
-              // Show quick publish alert
-              Alert.alert(t("edit.quickPublishTitle"), "", [
-                {
-                  text: t("edit.publishButton"),
-                  onPress: () => {
-                    // Call handleQuickPublish directly
-                    handleQuickPublish();
-                  },
-                },
-                {
-                  text: t("edit.quickPublishChangeTags"),
-                  onPress: () => {
-                    router.push({
-                      pathname: '/edit',
-                      params: { 
-                        recordingUri: newUri,
-                        latitude: location?.coords.latitude?.toString() || '',
-                        longitude: location?.coords.longitude?.toString() || ''
-                      }
-                    });
-                  },
-                },
-                {
-                  text: t("common.cancel"),
-                  style: "cancel",
-                  onPress: () => {
-                    setRecordingUri(null);
-                    setIsRecording(false);
-                  },
-                },
-              ]);
-            } else {
-              throw new Error('Copied file not found');
-            }
-          } catch (copyError) {
-            console.error('Failed to copy recording:', copyError);
-            
-            // Fall back to using the original URI if copy failed
-            setRecordingUri(originalUri);
-            setRecordingInstance(null);
-            setIsRecording(false);
-            setAudioLevel(0);
-            
-            router.push({
-              pathname: '/edit',
-              params: { 
-                recordingUri: originalUri,
-                latitude: location?.coords.latitude?.toString() || '',
-                longitude: location?.coords.longitude?.toString() || ''
-              }
-            });
-          }
-        } else {
-          throw new Error('Recording file not found');
-        }
-      }
-    } catch (err) {
-      console.error('Failed to stop recording', err);
-      setIsRecording(false);
-      setRecordingInstance(null);
-      setAudioLevel(0);
-      Alert.alert(
-        t('recording.errorTitle'),
-        t('recording.stopError')
-      );
+      console.error('Failed to start recording:', err);
+      Alert.alert(t('recording.errorTitle'), t('recording.startError'));
     }
   };
 
-  const handleQuickPublish = async () => {
-    if (!recordingUri || !location?.coords.latitude || !location?.coords.longitude) {
+  const handleQuickPublish = async (uri: string) => {
+    if (!uri || !location?.coords.latitude || !location?.coords.longitude) {
       Alert.alert(t("edit.missingData"));
       return;
     }
 
-    // Set uploading state first
     setIsUploading(true);
-    setIsRecording(false); // Ensure recording state is false
+    setIsRecording(false);
 
     try {
       const addressText = address
-        ? `${address.street || ""} ${address.city || ""}, ${
-            address.country || ""
-          }`.trim()
+        ? `${address.street || ""} ${address.city || ""}, ${address.country || ""}`.trim()
         : "";
 
       const response = await publishMessage(
-        recordingUri,
+        uri,
         location.coords.latitude.toString(),
         location.coords.longitude.toString(),
         addressText,
-        "" // No tags for quick publish
+        ""
       );
 
+      setIsUploading(false);
+      
       if (response.success) {
-        setIsUploading(false); // Reset uploading state before showing alert
         Alert.alert(t("edit.publishSuccess"), t("edit.publishSuccessMessage"), [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(tabs)"),
-          },
+          { text: "OK", onPress: () => router.replace("/(tabs)") }
         ]);
       } else {
-        setIsUploading(false); // Reset uploading state before showing alert
         Alert.alert(t("edit.publishFailed"), response.errorMessage);
       }
     } catch (error) {
       console.error("Error publishing message:", error);
-      setIsUploading(false); // Reset uploading state before showing alert
+      setIsUploading(false);
       Alert.alert(t("edit.publishFailed"), t("edit.networkError"));
     }
   };
-  
-  // Toggle recording function
+
   const toggleRecording = async () => {
-    // Check if user is logged in
     if (!isLoggedIn()) {
-      Alert.alert(
-        t('login.required'),
-        t('login.recordingMessage'),
-        [
-          {
-            text: t('common.cancel'),
-            style: 'cancel'
-          },
-          {
-            text: t('login.title'),
-            onPress: () => router.push('/login')
-          }
-        ]
-      );
+      Alert.alert(t('login.required'), t('login.recordingMessage'), [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('login.title'), onPress: () => router.push('/login') }
+      ]);
       return;
     }
-    
-    // Check and request permission if not already granted
+
     if (hasPermission === null) {
       const { status } = await Audio.requestPermissionsAsync();
       setHasPermission(status === 'granted');
-      
       if (status !== 'granted') {
-        Alert.alert(
-          t('recording.permissionTitle'),
-          t('recording.permissionRequired')
-        );
+        Alert.alert(t('recording.permissionTitle'), t('recording.permissionRequired'));
         return;
       }
-    } else if (hasPermission === false) {
-      Alert.alert(
-        t('recording.permissionTitle'),
-        t('recording.permissionRequired')
-      );
-      return;
     }
-    
-    // Toggle recording state
+
     if (isRecording) {
       await stopRecording();
     } else {
