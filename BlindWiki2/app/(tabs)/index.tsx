@@ -12,6 +12,7 @@ import { useLocation } from '@/contexts/LocationContext';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import Colors from '@/constants/Colors';
+import { playAudio, stopAudio } from '@/utils/audioUtils';
 
 const AUDIO_CONFIG = {
   allowsRecordingIOS: true,
@@ -51,14 +52,13 @@ export default function HomeScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [isPlayingRecording, setIsPlayingRecording] = useState(false);
+  const [previewSound, setPreviewSound] = useState<Audio.Sound | null>(null);
 
   const rangeRef = useRef<any>({
     android: { min: Infinity, max: -Infinity },
     ios: { min: Infinity, max: -Infinity },
   });
 
-  // Define stopRecording before it's used in useEffect
   const stopRecording = async () => {
     if (!recordingInstance) return;
     
@@ -80,6 +80,14 @@ export default function HomeScreen() {
         throw new Error('Failed to save recording');
       }
 
+      // Start playback of the preview
+      const { sound } = await playAudio(originalUri, {
+        onError: (error) => {
+          console.error('Preview playback error:', error);
+        }
+      });
+      setPreviewSound(sound);
+      
       setRecordingInstance(null);
       setIsRecording(false);
       setAudioLevel(0);
@@ -87,11 +95,17 @@ export default function HomeScreen() {
       Alert.alert(t("edit.quickPublishTitle"), "", [
         {
           text: t("edit.publishButton"),
-          onPress: () => handleQuickPublish(newUri),
+          onPress: async () => {
+            await stopAudio(sound);
+            setPreviewSound(null);
+            handleQuickPublish(newUri);
+          },
         },
         {
           text: t("edit.quickPublishChangeTags"),
-          onPress: () => {
+          onPress: async () => {
+            await stopAudio(sound);
+            setPreviewSound(null);
             router.push({
               pathname: '/edit',
               params: { 
@@ -105,7 +119,11 @@ export default function HomeScreen() {
         {
           text: t("common.cancel"),
           style: "cancel",
-          onPress: () => setIsRecording(false),
+          onPress: async () => {
+            await stopAudio(sound);
+            setPreviewSound(null);
+            setIsRecording(false);
+          },
         },
       ]);
     } catch (err) {
@@ -132,6 +150,15 @@ export default function HomeScreen() {
       }
     };
   }, []);
+
+  // Add cleanup effect for preview sound
+  useEffect(() => {
+    return () => {
+      if (previewSound) {
+        stopAudio(previewSound);
+      }
+    };
+  }, [previewSound]);
 
   const startRecording = async () => {
     try {
