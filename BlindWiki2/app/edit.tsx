@@ -28,12 +28,6 @@ export default function EditScreen() {
   // Store recording URI directly
   const [recordingUri] = useState<string>(params.recordingUri || "");
 
-  // Reference to the AudioButton component for controlling playback externally
-  const audioButtonRef = useRef(null);
-
-  // Playback state tracking
-  const [isPlaying, setIsPlaying] = useState(false);
-
   // Use params for latitude/longitude if provided, otherwise use context
   const [latitude] = useState<string>(
     params.latitude || location?.coords.latitude?.toString() || ""
@@ -136,7 +130,6 @@ export default function EditScreen() {
       <AudioButton
         audioUri={recordingUri}
         autoPlay={true}
-        onPlaybackStatusChange={setIsPlaying}
       />
 
       <Text style={styles.title}>{t("edit.tagsLabel")}</Text>
