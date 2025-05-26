@@ -4,14 +4,17 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
         {
-            "name": "Python Debugger: Current File with Arguments",
+            "name": "Python: Debug Tagger",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "module": "AI.Tagger.main",
+            "args": [
+                "--audio_file",
+                ".\\AI\\audios_test\\barcelones.wav"
+            ],
             "console": "integratedTerminal",
-            "args": "${command:pickArgs}"
+            "justMyCode": true
         }
     ]
 }
