@@ -1080,12 +1080,33 @@ class MessageController extends Controller
 					
 					// Verificar permisos del script
 					$permissions = fileperms($script);
-					$isExecutable = ($permissions & 0x0040) || ($permissions & 0x0008) || ($permissions & 0x0001);
+					$isExecutable = ($permissions & 0x0040) || ($permissions & 0x0008) || ($permissions & 0x0001); // Checks execute permission for owner, group, or others
 					Yii::log("Tagger script permissions: " . decoct($permissions) . ", executable: " . ($isExecutable ? 'yes' : 'no'), 'info');
+					if (!$isExecutable) {
+						throw new CException("Tagger script is not executable: $script. Permissions: " . decoct($permissions));
+					}
 					
+					// Definir la ruta para el archivo JSON de salida del tagger
+					// Path: webroot/Tagger/output/message_id_timestamp.json
+					$outputJsonDir = Yii::getPathOfAlias('webroot') . "/Tagger/output";
+					if (!is_dir($outputJsonDir)) {
+						if (!mkdir($outputJsonDir, 0777, true)) {
+							throw new CException("Failed to create Tagger output directory: $outputJsonDir");
+						}
+						Yii::log("Created Tagger output directory: $outputJsonDir", 'info');
+					}
+					if (!is_writable($outputJsonDir)) {
+						throw new CException("Tagger output directory is not writable: $outputJsonDir");
+					}
+
+					$timestamp = time();
+					$outputJsonFileName = "{$id}_{$timestamp}.json";
+					$outputJsonPath = $outputJsonDir . "/" . $outputJsonFileName;
+
 					// Preparar y ejecutar el comando
-					$scriptArgument = escapeshellarg($audioFilePath);
-					$cmd = "$script $scriptArgument";
+					$scriptAudioFileArgument = escapeshellarg($audioFilePath);
+					$scriptJsonOutputArgument = escapeshellarg($outputJsonPath); // Second argument for the shell script
+					$cmd = "$script $scriptAudioFileArgument $scriptJsonOutputArgument";
 					Yii::log("Executing Tagger command: $cmd", 'info');
 					
 					// Configurar timeout
@@ -1094,71 +1115,100 @@ class MessageController extends Controller
 					
 					// Ejecutar el comando
 					$startTime = microtime(true);
-					$output = array();
-					$ret = 0;
-					exec($cmd." 2>&1", $output, $ret);
+					$outputLog = array(); // Will store stdout/stderr from the script (for logging)
+					$ret = 0; // Exit code
+					exec($cmd." 2>&1", $outputLog, $ret); // Capture stdout and stderr
 					$endTime = microtime(true);
 					$executionTime = round($endTime - $startTime, 2);
 					
 					// Restaurar timeout
 					set_time_limit($defaultTimeout);
 					
-					// Logging
-					Yii::log("Tagger execution completed in {$executionTime} seconds with exit code: $ret", 'info');
-					Yii::log("Tagger output START", 'info');
-					foreach ($output as $index => $line) {
-						Yii::log("Tagger output line " . ($index + 1) . ": " . $line, 'info');
+					// Log stdout/stderr from the Tagger script
+					Yii::log("Tagger execution completed in {$executionTime} seconds with exit code: $ret", $ret === 0 ? 'info' : 'error');
+					Yii::log("Tagger script output (logs) START", 'info');
+					foreach ($outputLog as $index => $line) {
+						Yii::log("Tagger log line " . ($index + 1) . ": " . $line, 'info');
 					}
-					Yii::log("Tagger output END", 'info');
-					
-					// Log completo
-					$fullOutput = implode(" | ", $output);
-					Yii::log("Tagger complete output (pipe-separated): " . $fullOutput, 'info');
+					Yii::log("Tagger script output (logs) END", 'info');
 					
 					if ($ret !== 0) {
-						throw new CException("Error executing Tagger (code: $ret)");
+						// Even if the script failed, the JSON might contain error details from Python
+						$errorContext = "Error executing Tagger (code: $ret).";
+						if (file_exists($outputJsonPath)) {
+							$jsonContent = file_get_contents($outputJsonPath);
+							$errorContext .= " Partial/Error JSON content: " . $jsonContent;
+						} else {
+							$errorContext .= " Output JSON file not found at $outputJsonPath.";
+						}
+						Yii::log($errorContext, 'error');
+						throw new CException("Error executing Tagger (code: $ret). Check application logs for details and Tagger script output.");
 					}
 					
-					// Procesar la salida JSON
-					Yii::log("Processing console output from Tagger", 'info');
-					
-					// Extraer información
-					$transcription = '';
-					$tags = array();
-					$outputStr = implode("\n", $output);
-					
-					// Extraer transcripción
-					if (preg_match('/"transcription":\s*"([^"]*)"/', $outputStr, $matches)) {
-						$transcription = $matches[1];
+					// Procesar el archivo JSON de salida
+					Yii::log("Processing Tagger output JSON file: $outputJsonPath", 'info');
+					if (!file_exists($outputJsonPath)) {
+						Yii::log("Tagger output JSON file not found after successful script execution: $outputJsonPath", 'error');
+						throw new CException("Tagger output JSON file not found: $outputJsonPath. Script executed successfully but file is missing.");
 					}
 					
-					// Extraer tags
-					preg_match_all('/"tag":\s*"([^"]*)"\s*,\s*"similarity":\s*([\d\.]+)/', $outputStr, $matches, PREG_SET_ORDER);
+					$jsonContent = file_get_contents($outputJsonPath);
+					if ($jsonContent === false) {
+						Yii::log("Could not read Tagger output JSON file: $outputJsonPath", 'error');
+						throw new CException("Could not read Tagger output JSON file: $outputJsonPath");
+					}
+					
+					$taggerResult = json_decode($jsonContent, true); // true for associative array
+					if (json_last_error() !== JSON_ERROR_NONE) {
+						Yii::log("Error decoding Tagger output JSON: " . json_last_error_msg() . ". File: $outputJsonPath. Content: " . substr($jsonContent, 0, 500), 'error');
+						throw new CException("Error decoding Tagger output JSON: " . json_last_error_msg());
+					}
+					
+					// Extraer información del resultado decodificado
+					$transcription = isset($taggerResult['transcription']) ? $taggerResult['transcription'] : '';
 					$newTags = array();
-					foreach ($matches as $match) {
-						if (!empty($match[1])) {
-							$newTags[] = $match[1];
+					if (isset($taggerResult['tags']) && is_array($taggerResult['tags'])) {
+						foreach ($taggerResult['tags'] as $tagInfo) {
+							if (isset($tagInfo['tag']) && !empty($tagInfo['tag'])) {
+								$newTags[] = $tagInfo['tag'];
+							}
 						}
 					}
 					
-					Yii::log("Extraction completed. Transcription: " . substr($transcription, 0, 50) . "... Tags: " . count($newTags), 'info');
+					Yii::log("Extraction from JSON completed. Transcription (first 50 chars): " . substr($transcription, 0, 50) . "... Number of Tags: " . count($newTags), 'info');
 					
 					// Actualizar mensaje
 					if (empty($message->text) && !empty($transcription)) {
 						$message->text = $transcription;
-						$message->save(false);
-						Yii::log("Texto actualizado con transcripción", 'info');
+						// $message->save(false); // Consider if save should be conditional or grouped
+						Yii::log("Message text will be updated with transcription.", 'info');
 					}
 					
 					// Añadir nuevos tags sin eliminar los existentes
 					if (!empty($newTags)) {
-						Yii::log("Añadiendo tags: " . implode(", ", $newTags), 'info');
+						Yii::log("Adding tags to message: " . implode(", ", $newTags), 'info');
 						$message->setNewTags($newTags, true); // true para mantener tags existentes
 						$message->updateTagSummaries('add');
-						$message->save(false);
+					}
+
+					if ((empty($message->text) && !empty($transcription)) || !empty($newTags)) {
+						if ($message->save(false)) {
+							Yii::log("Message (ID: $id) saved successfully with new transcription/tags.", 'info');
+						} else {
+							Yii::log("Failed to save message (ID: $id) with new transcription/tags.", 'error');
+							throw new CException("Failed to save message after processing with Tagger.");
+						}
+					} else {
+						Yii::log("No changes to message text or tags from Tagger output for message ID: $id.", 'info');
 					}
 					
 					$audioFound = true;
+
+					// Opcional: Eliminar el archivo JSON después de procesarlo si no se necesita para depuración prolongada
+					// if (file_exists($outputJsonPath)) {
+					//     unlink($outputJsonPath);
+					//     Yii::log("Cleaned up Tagger output JSON file: $outputJsonPath", 'info');
+					// }
 					break; // Solo procesar el primer audio encontrado
 					
 				} catch (Exception $e) {
