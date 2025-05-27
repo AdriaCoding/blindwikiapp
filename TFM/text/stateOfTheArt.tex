@@ -19,7 +19,7 @@ Utiliza JavaScript y React para crear aplicaciones móviles mediante una arquite
 
 \subsubsection{Análisis Comparativo}
 En la siguiente tabla \ref{tab:framework-comparison} se muestra un resumen de las características de los frameworks considerados para el desarrollo de la aplicación blind wiki.
-\begin{table}[h]
+\begin{table}[ht]
     \centering
     \caption{Comparación de Frameworks Multiplataforma}
     \label{tab:framework-comparison}
@@ -47,202 +47,18 @@ En la siguiente tabla \ref{tab:framework-comparison} se muestra un resumen de la
 Para el desarrollo de BlindWiki 2.0, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y no el rendimiento interno de la aplicación.
 
 \subsection{Reconocimiento Automático de Habla (ASR)}
-Nos interesa el reconocimiento automático de habla para la identificación del idioma de las grabaciones de audio. Eso facilitará para la etiquetación de las grabaciones con el idioma correcto, y tambien las traducciones posteriores.
+Nos interesa representar las notas de voz de los usuarios de blind wiki en formato de texto, para facilitar los procesos posteriores de traducción y tagging. Esta tarea se conoce como Automatic Speech Translation (ASR).
 
-\TODO{Repasar esta sección}
+En la actualidad existen múltiples modelos preentrenados para esta tarea, y un conjunto de benchmarks para evaluar su rendimiento.
 
-\paragraph{Principales avances técnicos:}
-\begin{itemize}
-    \item Modelos multilingües unificados que comparten parámetros entre idiomas
-    \item Técnicas de cuantización para ejecución en dispositivos móviles ($<$500MB)
-    \item Integración nativa con aceleradores neuronales (NPUs)
-\end{itemize}
+explicar aquí brevemente las benchmarks que luego usaremos en la comparación
 
-\paragraph{Métricas Clave y Benchmarks}
-En la Tabla \ref{tab:asr-metrics} se presentan las métricas clave de los principales modelos ASR.
-
-\begin{table}[h]
-    \centering
-    \caption{Métricas de Modelos ASR}
-    \label{tab:asr-metrics}
-    \begin{tabular}{|l|c|c|c|c|}
-        \hline
-        \textbf{Modelo} & \textbf{WER (EN)} & \textbf{Tiempo Inferencia (ms)} & \textbf{Memoria (MB)} & \textbf{Idiomas} \\
-        \hline
-        Whisper v3 & 4.2\% & 320 & 310 & 97 \\
-        \hline
-        Wav2Vec 3.0 & 3.9\% & 280 & 450 & 102 \\
-        \hline
-        NVIDIA NeMo ASR & 4.5\% & 210 & 680 & 50 \\
-        \hline
-    \end{tabular}
-\end{table}
-
-Para aplicaciones móviles, el balance entre precisión (WER $<$5\%) y eficiencia computacional ($<$300ms de latencia) es crítico. Los modelos cuantizados de Whisper muestran mejor relación rendimiento-tamaño\cite{jia2022translatotron2highqualitydirect}.
-
-\paragraph{Estado del Arte y Modelos Líderes}
-Los sistemas ASR modernos combinan arquitecturas transformer con técnicas de autoentrenamiento a escala masiva. Según PapersWithCode, los modelos líderes en 2025 muestran las siguientes características:
-
-\begin{itemize}
-    \item \textbf{Whisper v3 (OpenAI)}: Mantiene su posición dominante con un WER (Word Error Rate) de 4.2\% en inglés y $<$8\% promedio en 97 idiomas\cite{statcounter2025}. Su arquitectura encoder-decoder permite procesar audios de hasta 30s con alta precisión.
-    \item \textbf{Wav2Vec 3.0 (Meta)}: Emplea aprendizaje auto-supervisado con 1M horas de audio no etiquetado, logrando un WER de 3.9\% en inglés\cite{jia2022cvss}. Su capacidad de fine-tuning para dominios específicos lo hace ideal para aplicaciones especializadas.
-\end{itemize}
-
-\subsection{Traducción de Voz a Texto (Speech-to-Text Translation)}
-Tradicionalmente, este proceso se realizaba dos pasos:
-\begin{itemize}
-    \item Transcripción del audio a texto en el idioma original. (ASR)
-    \item Traducción del texto a texto en el idioma del usuario. (MT)
-\end{itemize}
-Sin embargo, esta aproximación presenta una limitación fundamental que es la pérdida de información sobre el ambiente, entonación, etc para el proceso de traducción, además del riesgo de la acumulación de errores.
-Los modelos más novedosos para esta tarea unifican ambos pasos del proceso en uno solo, son los denominados \textit{end-to-end} (E2E). Un paper reciente de \cite{SETHIYA2025101751} hace un estudio exhaustivo de los modelos E2E para S2TT.
+\subsubsection{Whisper (OpenAI)}
 
 
+\subsection{Traducción de Texto a Texto (T2TT)}
 
+\subsection{Modelos de traduccion de Voz a Texto (S2TT) vs modelos en cascada}
 
+\subsection{Identificación automática de tags}
 
-\paragraph{Enfoques y Arquitecturas Dominantes}
-Los sistemas modernos implementan pipelines end-to-end que eliminan la necesidad de transcripción intermedia:
-
-\begin{itemize}
-    \item \textbf{SpeechMatrix (Meta)}: Modelo unificado que procesa directamente waveform a texto traducido, alcanzando 22.1 BLEU en EN$\rightarrow$ES\cite{zhou2024preservingspeakerinformationdirect}. Emplea attention cross-lingual en el espacio de características acústicas.
-    \item \textbf{Google Translatotron 3}: Arquitectura multimodal que integra contexto visual (para vídeo) con entrada de audio, mejorando la precisión contextual en 18\%\cite{jia2022cvss}.
-\end{itemize}
-
-\paragraph{Retos técnicos:}
-\begin{itemize}
-    \item Alineación fonética-transfónica entre idiomas
-    \item Manejo de code-switching (mezcla de idiomas)
-    \item Conservación de entonación y puntuación
-\end{itemize}
-
-\paragraph{Comparativa de Rendimiento}
-En la Tabla \ref{tab:s2t-metrics} se muestran las métricas de rendimiento de los principales modelos de traducción voz-texto.
-
-\begin{table}[h]
-    \centering
-    \caption{Métricas de Modelos S2T}
-    \label{tab:s2t-metrics}
-    \begin{tabular}{|l|c|c|c|c|}
-        \hline
-        \textbf{Modelo} & \textbf{BLEU (EN$\rightarrow$ES)} & \textbf{Latencia (s)} & \textbf{Memoria (GB)} & \textbf{Idiomas} \\
-        \hline
-        SpeechMatrix-Large & 22.1 & 1.2 & 2.3 & 50 \\
-        \hline
-        Translatotron 3 & 24.3 & 2.1 & 4.8 & 30 \\
-        \hline
-        FairSeq S2TT & 19.8 & 0.9 & 1.7 & 45 \\
-        \hline
-    \end{tabular}
-\end{table}
-
-Los modelos híbridos (ej: Whisper + NLLB) ofrecen ventajas en entornos con restricciones de recursos, aunque con penalización de 2-3 puntos BLEU\cite{jia2022translatotron2highqualitydirect}.
-
-\subsection{Traducción de Voz a Voz (Speech-to-Speech Translation)}
-
-
-\paragraph{Sistemas de Vanguardia}
-La traducción directa voz-voz requiere integrar síntesis vocal con preservación de características paralingüísticas:
-
-\begin{itemize}
-    \item \textbf{UnitY (Meta)}: Arquitectura de tres etapas (ASR $\rightarrow$ Traducción $\rightarrow$ TTS) unificada, logrando MOS (Mean Opinion Score) de 4.1/5 en preservación de entonación\cite{zhou2024preservingspeakerinformationdirect}.
-    \item \textbf{VioLA (Microsoft)}: Modelo end-to-end que genera espectrogramas directamente, reduciendo la latencia total en 40\% comparado con sistemas cascada\cite{jia2022cvss}.
-\end{itemize}
-
-\paragraph{Componentes críticos:}
-\begin{itemize}
-    \item Codificadores de características vocales (ej: HuBERT)
-    \item Modelos de prosodia cross-lingual
-    \item Síntesis neural de voz multihablante
-\end{itemize}
-
-\paragraph{Evaluación de Calidad}
-En la Tabla \ref{tab:s2s-metrics} se presentan las métricas de calidad de los principales sistemas de traducción voz-voz.
-
-\begin{table}[h]
-    \centering
-    \caption{Métricas de Calidad S2S}
-    \label{tab:s2s-metrics}
-    \begin{tabular}{|l|c|c|c|c|}
-        \hline
-        \textbf{Modelo} & \textbf{MOS Calidad} & \textbf{MOS Naturalidad} & \textbf{Latencia (s)} & \textbf{Idiomas} \\
-        \hline
-        UnitY & 4.1 & 4.3 & 2.4 & 36 \\
-        \hline
-        VioLA & 3.9 & 4.0 & 1.8 & 28 \\
-        \hline
-        Transpeech & 3.7 & 3.9 & 3.2 & 25 \\
-        \hline
-    \end{tabular}
-\end{table}
-
-Los sistemas modernos priorizan la preservación de:
-\begin{enumerate}
-    \item Identidad vocal del hablante original
-    \item Entonación y énfasis emocional
-    \item Fluidez conversacional natural
-\end{enumerate}
-
-\subsection{Integración en Aplicaciones Móviles}
-
-Para implementar estas capacidades en entornos multiplataforma, se recomienda:
-
-\paragraph{Arquitectura de Referencia:}
-\begin{itemize}
-    \item Entrada de Voz $\rightarrow$ ASR en Dispositivo
-    \item ASR $\rightarrow$ Texto $\rightarrow$ Traducción Textual
-    \item ASR $\rightarrow$ Embeddings $\rightarrow$ Traducción Directa
-    \item Traducción $\rightarrow$ TTS Multilingüe $\rightarrow$ Salida de Voz
-\end{itemize}
-
-\paragraph{Consideraciones Clave:}
-\begin{enumerate}
-    \item \textbf{Optimización para Hardware Heterogéneo:}
-    \begin{itemize}
-        \item Uso de Core ML para iOS y Android NNAPI
-        \item Cuantización dinámica basada en capacidad del dispositivo
-    \end{itemize}
-    
-    \item \textbf{Manejo de Contexto:}
-    \begin{itemize}
-        \item Memoria conversacional de corto plazo (últimos 3 turnos)
-        \item Detección automática de dominio (medical, legal, etc.)
-    \end{itemize}
-    
-    \item \textbf{Accesibilidad:}
-    \begin{itemize}
-        \item Integración con APIs de accesibilidad nativas (TalkBack/VoiceOver)
-        \item Modo de alta contraste para visualización de transcripciones
-    \end{itemize}
-\end{enumerate}
-
-Los frameworks como React Native permiten implementar estas funciones mediante:
-\begin{itemize}
-    \item Módulos nativos para procesamiento de audio
-    \item Workers para ejecución en segundo plano
-    \item Integración con APIs de síntesis de voz multiplataforma
-\end{itemize}
-
-\subsubsection{Retos Futuros y Direcciones de Investigación}
-
-\begin{enumerate}
-    \item \textbf{Privacidad y Procesamiento Local:}
-    \begin{itemize}
-        \item Técnicas de federated learning para actualizar modelos sin compartir datos
-        \item Encriptación homomórfica para procesamiento seguro en la nube
-    \end{itemize}
-    
-    \item \textbf{Lenguas Minoritarias:}
-    \begin{itemize}
-        \item Técnicas de few-shot learning con $<$1h de datos
-        \item Modelos de transferencia cross-lingual
-    \end{itemize}
-    
-    \item \textbf{Evaluación de Calidad:}
-    \begin{itemize}
-        \item Métricas basadas en LLMs (BERTScore, BLEURT)
-        \item Sistemas de evaluación automática multimodal
-    \end{itemize}
-\end{enumerate}
-
-La convergencia entre avances en modelos de IA y optimizaciones para móvil está permitiendo experiencias de traducción en tiempo real con calidad casi humana, eliminando barreras lingüísticas en aplicaciones críticas como telemedicina, educación global y servicios públicos multilingües\cite{jia2022cvss}\cite{jia2022translatotron2highqualitydirect}\cite{zhou2024preservingspeakerinformationdirect}.
