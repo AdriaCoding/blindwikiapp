@@ -59,6 +59,9 @@ explicar aquí brevemente las benchmarks que luego usaremos en la comparación
 \subsection{Traducción de Texto a Texto (T2TT)}
 
 \subsection{Modelos de traduccion de Voz a Texto (S2TT) vs modelos en cascada}
+Una de las preguntas que nos plantea el proyecto es si es conveniente usar primero un modelo de ASR y luego un modelo de T2TT, lo cual se conoce como un esquema en cascada, o si es mejor usar un modelo que genere las traducciónes directamente del audio (S2TT).
+
+According to the most recent IWSLT Evaluation Campaign \cite{iwslt-findings}, y otros estudios \cite{etchegoyhen2022cascade} \cite{Sethiya2025}, los modelos en cascada demuestran ser más efectivos que los modelos directos en cuanto a calidad de traducción, especialmente para los idiomas con baja disponibilidad de datos, como el gallego, que es uno de los idiomas objetivo de la aplicación.
 
 \subsection{Identificación automática de tags}
 
