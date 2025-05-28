@@ -586,7 +586,7 @@ export async function audioPlayed(attachmentId: string): Promise<CleanResponse> 
 export async function processAudioWithSeamlessServer(
   audioFilePath: string
 ): Promise<{ success: boolean; audioBlob?: Blob; errorMessage?: string; details?: string; }> {
-  const SEAMLESS_SERVER_URL = 'http://100.112.0.35:8080/';
+  const SEAMLESS_SERVER_URL = 'https://ai-server-739559409286.europe-west1.run.app/';
 
   try {
     const fileInfo = await FileSystem.getInfoAsync(audioFilePath);
@@ -615,6 +615,7 @@ export async function processAudioWithSeamlessServer(
     const tgtLang = APP_TO_SEAMLESS_LANG[currentAppLang] || 'eng'; // Default to 'eng' if not found
     formData.append("tgt_lang", tgtLang);
 
+    console.log(`Attempting to connect to seamless server at: ${SEAMLESS_SERVER_URL}`);
     console.log(`Sending audio to seamless server: ${filename}, type: ${mimeType}, target_lang: ${tgtLang}`);
 
     const response = await axios({
@@ -641,10 +642,16 @@ export async function processAudioWithSeamlessServer(
     }
   } catch (error) {
     console.error("Error processing audio with seamless server:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error details:", {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
+    }
     const errorMessage =
-      axios.isAxiosError(error) && error.response
-        ? `Server error: ${error.response.status} - ${error.response.data}`
-        : error instanceof Error
+      error instanceof Error
         ? error.message
         : "Failed to process audio with seamless server";
     return {
