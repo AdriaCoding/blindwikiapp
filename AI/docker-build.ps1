@@ -1,17 +1,25 @@
 $PROJECT_ID = "blindwikiai"
 $REGION = "europe-west1"
-$IMAGE_NAME = "ai-server"
+$IMAGE_NAME = "europe-west1-docker.pkg.dev/blindwikiai/cloud-run-source-deploy/ai-server"
 $IMAGE_TAG = "$REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/$IMAGE_NAME"
 # Or for Container Registry: $IMAGE_TAG = "gcr.io/$PROJECT_ID/$IMAGE_NAME"
 
-docker build -t "$IMAGE_TAG" .
+Write-Host "Building Docker image..."
+docker build -t $IMAGE_NAME .
+
+# If build successful, push to registry
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Build successful. Pushing to registry..."
+    docker push $IMAGE_NAME
+} else {
+    Write-Error "Build failed!"
+    exit 1
+}
 
 #gcloud artifacts repositories create cloud-run-source-deploy `
 #--repository-format=docker `
 #--location=europe-west1 `
 #--description="Docker repository for Cloud Run deployments"
-
-docker push "${IMAGE_TAG}"
 
 gcloud run deploy $IMAGE_NAME `
     --image "$IMAGE_TAG" `

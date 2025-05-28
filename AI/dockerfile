@@ -4,20 +4,40 @@ FROM python:3.11-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+# Install system dependencies first
+RUN apt-get update && apt-get install -y \
+    libsndfile1 \
+    build-essential \
+    ffmpeg \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy and install seamless communication
 COPY seamless_communication /app/seamless_communication
 COPY seamless_expressive_pts /app/seamless_expressive_pts
 
-RUN apt-get update && apt-get install -y libsndfile1 build-essential ffmpeg && rm -rf /var/lib/apt/lists/*
+# Install seamless communication
 RUN cd seamless_communication && pip install .
 
+# Create model directory and download models during build
+RUN mkdir -p /root/.cache/fairseq2 && \
+    mkdir -p /root/.cache/torch/hub/checkpoints
+
+# Download SeamlessM4T model - this ensures it's available offline
+RUN python -c "from seamless_communication.models.inference import Translator; t = Translator('seamlessM4T_v2_large', 'vocoder_v2', device='cpu')"
+
+# Copy the server code
 COPY http_seamless.py /app
+
 # Make port 8080 available to the world outside this container
 # (Cloud Run will map its external port to this one via the PORT env var)
 EXPOSE 8080
 
-# Define environment variable
+# Define environment variables
 ENV PYTHONUNBUFFERED=1
+# Prevent model from trying to download again
+ENV TORCH_HOME=/root/.cache/torch
+ENV FAIRSEQ2_CACHE_DIR=/root/.cache/fairseq2
 
 # Run http_seamless.py when the container launches
 CMD ["python", "http_seamless.py"]
