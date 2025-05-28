@@ -8,6 +8,12 @@ import ca from './ca.json';
 
 export type SupportedLanguage = 'en' | 'es' | 'ca';
 
+export const APP_TO_SEAMLESS_LANG: Record<SupportedLanguage, string> = {
+  en: 'eng',
+  es: 'spa',
+  ca: 'cat',
+};
+
 export const createLanguageItems = (t: (key: string) => string): Array<{label: string, value: SupportedLanguage}> => [
   { label: t('settings.language.en'), value: 'en' },
   { label: t('settings.language.es'), value: 'es' },

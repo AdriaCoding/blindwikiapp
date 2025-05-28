@@ -10,6 +10,7 @@
   },
   "common": {
     "cancel": "Cancel",
+    "close": "Close",
     "no": "No",
     "ok": "OK",
     "save": "Save",
@@ -113,7 +114,15 @@
     "stopPlayback": "Stop",
     "transcription": "Transcription: ",
     "unexpectedError": "An unexpected error occurred",
-    "viewTranscription": "View Transcription"
+    "viewTranscription": "View Transcription",
+    "getAudioTranslation": "Process Audio",
+    "noAudioForProcessing": "No audio available for this message.",
+    "failedToDownloadAudio": "Failed to download audio file.",
+    "failedToProcessAudio": "Failed to process audio with seamless server.",
+    "failedToSaveProcessedAudio": "Failed to save processed audio.",
+    "failedToReadAudioBlob": "Failed to read audio blob.",
+    "audioProcessedSuccessfully": "Audio processed successfully by seamless server.",
+    "unexpectedErrorProcessingAudio": "An unexpected error occurred while processing audio."
   },
   "myMessages": {
     "error": {
@@ -212,5 +221,12 @@
     "error": "An error occurred loading world data",
     "title": "World",
     "tabLabel": "World"
+  },
+  "modal": {
+    "audioReady": "Processed audio is ready:",
+    "processingAudio": "Processing audio!",
+    "processingAudioWait": "Processing audio, please wait...",
+    "processingError": "Error processing audio:",
+    "readyToProcess": "Ready to process audio."
   }
 }
