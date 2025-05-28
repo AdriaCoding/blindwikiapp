@@ -6,6 +6,8 @@ import { useAuth } from "@/contexts/AuthContext"; // Add this import
 import axios from 'axios'; // Import axios for HTTP requests
 import { Platform } from 'react-native';
 import { Alert } from 'react-native';
+import { APP_TO_SEAMLESS_LANG, SupportedLanguage } from '@/locales/i18n'; // Import the new map and type
+import i18n from '@/locales/i18n'; // Import i18n to get current language
 
 // Server response interfaces
 export interface MessagesResponse extends ServerResponse {
@@ -584,7 +586,7 @@ export async function audioPlayed(attachmentId: string): Promise<CleanResponse> 
 export async function processAudioWithSeamlessServer(
   audioFilePath: string
 ): Promise<{ success: boolean; audioBlob?: Blob; errorMessage?: string; details?: string; }> {
-  const SEAMLESS_SERVER_URL = 'https://ai-server-739559409286.europe-southwest1.run.app/';
+  const SEAMLESS_SERVER_URL = 'http://100.112.0.35:8080/';
 
   try {
     const fileInfo = await FileSystem.getInfoAsync(audioFilePath);
@@ -608,7 +610,12 @@ export async function processAudioWithSeamlessServer(
 
     formData.append("audio_file", fileBlob as any);
 
-    console.log(`Sending audio to seamless server: ${filename}, type: ${mimeType}`);
+    // Get the current app language and map it to seamless language code
+    const currentAppLang = i18n.language as SupportedLanguage;
+    const tgtLang = APP_TO_SEAMLESS_LANG[currentAppLang] || 'eng'; // Default to 'eng' if not found
+    formData.append("tgt_lang", tgtLang);
+
+    console.log(`Sending audio to seamless server: ${filename}, type: ${mimeType}, target_lang: ${tgtLang}`);
 
     const response = await axios({
       method: 'post',

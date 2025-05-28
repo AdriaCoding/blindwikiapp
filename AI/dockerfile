@@ -5,13 +5,13 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
-COPY http_seamless.py /app
 COPY seamless_communication /app/seamless_communication
 COPY seamless_expressive_pts /app/seamless_expressive_pts
 
-RUN apt-get update && apt-get install -y libsndfile1 build-essential && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libsndfile1 build-essential ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN cd seamless_communication && pip install .
 
+COPY http_seamless.py /app
 # Make port 8080 available to the world outside this container
 # (Cloud Run will map its external port to this one via the PORT env var)
 EXPOSE 8080
