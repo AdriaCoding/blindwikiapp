@@ -6,11 +6,11 @@ WORKDIR /app
 
 # Copy the current directory contents into the container at /app
 COPY http_seamless.py /app
+COPY seamless_communication /app/seamless_communication
+COPY seamless_expressive_pts /app/seamless_expressive_pts
 
-# Install any needed packages specified in requirements.txt
-# For this simple server, there are no external dependencies.
-# If you had a requirements.txt, you would uncomment the next line:
-# RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y libsndfile1 build-essential && rm -rf /var/lib/apt/lists/*
+RUN cd seamless_communication && pip install .
 
 # Make port 8080 available to the world outside this container
 # (Cloud Run will map its external port to this one via the PORT env var)
