@@ -46,13 +46,15 @@ En la siguiente tabla \ref{tab:framework-comparison} se muestra un resumen de la
 
 Para el desarrollo de BlindWiki 2.0, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y no el rendimiento interno de la aplicación.
 
-\subsection{Speech-to-Text Translation}
-Para la tarea de generar traducciones de las notas de voz a todos los idiomas de la app \ref{tab:supported-languages}, hubiese sido 
-\subsection{Reconocimiento Automático de Habla (ASR)}
+\subsection{Traduccion de Audios}
+Para poder desarrollar la feature de traduccion de audios, se ha hecho un análisis dele stado del arte de los modelos de IA de código abierto más relevantes. Estos se dividen en cuatro familias principales, según la tarea que estos realizan.
+
+Hoy en dia, el acceso a modelos de traduccion con rendimiento SOTA está fácilmente al alcance de personas sin conocimientos de programacíon gracias a los productos SaSS de diversas compañías. BlindWiki es un proyecto benéfico, con escasa financiación, por lo que es preciso utilizar modelos de gratuitos o de código abierto. También hemos limitado nuestro análisis a modelos preentrenados, con buenos rendimientos en zero-shot.
+
+\subsubsection{Reconocimiento Automático de Habla (ASR)}
 
 El reconocimiento automático de habla (ASR) es fundamental para convertir las notas de voz de los usuarios de BlindWiki en texto, facilitando así la traducción y el etiquetado posterior.
 
-Debido al estado de los datos en BlindWiki, es preciso usar un modelo ASR generalista, capaz de dar buenos resultados sin necesidad de fine-tuning. Debe ser un modelo multilingüe, para cubrir a la totalidad de usuarios de la aplicación. Además, el modelo debe de ser robusto a audios de baja calidad con ruido, ya que los usuarios suelen grabar sus notas en entornos urbanos.
 
 Nuestro caso de uso encuentra otra limitación, que es que el servidor de backend de blind wiki tine no dispone de GPU, por lo que es preciso restringir nuestra mirada a modelos más ligeros o con optimizaciones para cpu.
 
@@ -64,7 +66,6 @@ El modelo es facilmente accesible desde la librería de transformers de Hugging 
 \subsubsection{Identificación de idiomas (LID)}
 Los modelos de traducción automática de texto requieren que se les proporcione tanto el idioma de salida, como el idioma de entrada. Por lo tanto, es necesario integrar un modelo de identificación de idiomas (LID) en el pipeline de traducción.
 
-Para el caso de BlindWiki, se ha optado por usar el modelo de identificación de idiomas de Alexandra Institute. El principal motivo de su elección es su baja latencia en CPU y uso de Memoria. En su última versión soporta la detección de 2102 idiomas, muchos más de los que se encuentran disponibles en la aplicación (ver tabla \ref{tab:supported-languages}). Eso garantiza que el modelo pueda seguir siendo útil para el proyecto a largo plazo, en caso de que se impulse el soporte de más idiomas.
 
 \subsection{Traducción de Texto a Texto (T2TT)}
 Una vez identificado el idioma de la nota original, necesitamos traducir su transcripción a todos los idiomas en los que se encuentra disponible la aplicación (ver tabla \ref{tab:supported-languages}). 
@@ -73,10 +74,17 @@ Es en este punto de la pipeline donde la eficiencia computacional es más críti
 
 
 
-\subsection{Modelos de traduccion de Voz a Texto (S2TT) vs modelos en cascada}
-Una de las preguntas que nos plantea el proyecto es si es conveniente usar primero un modelo de ASR, luego un modelo LID, y finalmente un modelo de T2TT, lo cual se conoce como un esquema en cascada, o si es mejor usar un modelo que genere las traducciones directamente del audio (S2TT).
+\subsubsection{Especificación de la solución}
 
-According to the most recent IWSLT Evaluation Campaign \cite{iwslt-findings}, y otros estudios \cite{etchegoyhen2022cascade} \cite{Sethiya2025}, los modelos en cascada demuestran ser más efectivos que los modelos directos en cuanto a calidad de traducción, especialmente para los idiomas con baja disponibilidad de datos, como el gallego, que es uno de los idiomas objetivo de la aplicación.
+El proceso tradicional para traducir audios involucra el uso de varios modelos especializados en cascada. Primero, se implementa un modulo de ASR para obtener las transcripciones del audio, luego se identifica el lenguage de la transcripcion con un módulo de LID, luego se traduce la transcripción a todos los idiomas de destino, y finalmente mediante lectores de pantalla el usuario escucha las traducciones.
+
+Nuestra propuesta de innovación es usar un modelo end-to-end para esta tarea. Si bien es cierto que en la actualidad todos los benchmarks \cite{iwslt-findings} y estudios \cite{etchegoyhen2022cascade}, \cite{Sethiya2025} apuntan que en general la calidad de los textos traducidos es superior con el uso de un esquema en cascada, también se reconoce que el gap es cada vez más estrecho.
+No obstante, el motivo de peso que nos lleva a implementar el modelo end-to-end es la capacidad que este tiene de preservar la informacion no-verbal del audio original. Aspectos como la prosodia del hablante, y los sonidos de fondo se pierden invariablemente tras la primera fase de ASR del esquema en cascada. En la actualidad, los modelos end-to-end más avanzados son capaces de replicar la voz del hablante original de forma casi indistinguible.  
+Para los usuarios ciegos de blind wiki, esto tiene un interés todavía mayor. Siempre que interactúan con sus dispositivos digitales, ecuchan de forma constante la voz robótica de sus lectores de pantalla. Por eso creemos que escuchar las traducciones con una voz alternativa, más humana, captivará mucho más su atención. 
+
+La decisión final es usar los modelos de Seamless Communication, por su gran versatilidad y cobertura de idiomas. Al ser BlindWiki2.0 un proyecto sin ánimo de lucro, desarrollado por un estudiante, MetaAI nos concedió una copia del modelo closed-source SeamlessExpressive.
+
+Nuestra solución consistirá en realizar las traducciones de audio con SeamlessExpressive cuando el idioma objetivo esté entre los idiomas soportados por el modelo (Inglés, Español, Alemán, Francés, Chino o Italiano), y para el resto de idiomas usar SeamlessM4T.
 
 \subsection{Identificación automática de tags}
 
