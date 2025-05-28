@@ -10,6 +10,7 @@
   },
   "common": {
     "cancel": "Cancelar",
+    "close": "Cerrar",
     "no": "No",
     "ok": "Aceptar",
     "save": "Guardar",
@@ -113,7 +114,15 @@
     "stopPlayback": "Detener",
     "transcription": "Transcripción: ",
     "unexpectedError": "Se ha producido un error inesperado",
-    "viewTranscription": "Ver transcripción"
+    "viewTranscription": "Ver transcripción",
+    "getAudioTranslation": "Procesar audio",
+    "noAudioForProcessing": "No hay audio disponible para este mensaje.",
+    "failedToDownloadAudio": "No se pudo descargar el archivo de audio.",
+    "failedToProcessAudio": "No se pudo procesar el audio con el servidor seamless.",
+    "failedToSaveProcessedAudio": "No se pudo guardar el audio procesado.",
+    "failedToReadAudioBlob": "No se pudo leer el blob de audio.",
+    "audioProcessedSuccessfully": "El audio fue procesado correctamente por el servidor seamless.",
+    "unexpectedErrorProcessingAudio": "Ocurrió un error inesperado al procesar el audio."
   },
   "myMessages": {
     "error": {
@@ -212,5 +221,12 @@
     "error": "Se ha producido un error al cargar los datos del mundo",
     "title": "Mundo",
     "tabLabel": "Mundo"
+  },
+  "modal": {
+    "audioReady": "El audio procesado está listo:",
+    "processingAudio": "¡Procesando audio!",
+    "processingAudioWait": "Procesando audio, por favor espera...",
+    "processingError": "Error al procesar el audio:",
+    "readyToProcess": "Listo para procesar el audio."
   }
 }

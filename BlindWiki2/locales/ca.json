@@ -10,6 +10,7 @@
   },
   "common": {
     "cancel": "Cancel·lar",
+    "close": "Tancar",
     "no": "No",
     "ok": "Acceptar",
     "save": "Desar",
@@ -113,7 +114,15 @@
     "stopPlayback": "Aturar",
     "transcription": "Transcripció: ",
     "unexpectedError": "S'ha produït un error inesperat",
-    "viewTranscription": "Mostra la transcripció"
+    "viewTranscription": "Mostra la transcripció",
+    "getAudioTranslation": "Processar àudio",
+    "noAudioForProcessing": "No hi ha àudio disponible per a aquest missatge.",
+    "failedToDownloadAudio": "No s'ha pogut descarregar l'arxiu d'àudio.",
+    "failedToProcessAudio": "No s'ha pogut processar l'àudio amb el servidor seamless.",
+    "failedToSaveProcessedAudio": "No s'ha pogut desar l'àudio processat.",
+    "failedToReadAudioBlob": "No s'ha pogut llegir el blob d'àudio.",
+    "audioProcessedSuccessfully": "L'àudio s'ha processat correctament pel servidor seamless.",
+    "unexpectedErrorProcessingAudio": "S'ha produït un error inesperat en processar l'àudio."
   },
   "myMessages": {
     "error": {
@@ -212,5 +221,12 @@
     "error": "S'ha produït un error en carregar les dades del món",
     "title": "Món",
     "tabLabel": "Món"
+  },
+  "modal": {
+    "audioReady": "L'àudio processat està llest:",
+    "processingAudio": "Processant àudio!",
+    "processingAudioWait": "Processant àudio, si us plau espera...",
+    "processingError": "Error en processar l'àudio:",
+    "readyToProcess": "Preparat per processar l'àudio."
   }
 }

@@ -8,6 +8,7 @@ import { Message } from "@/models/message";
 import { TagsList } from "@/components/tags/TagsList";
 import { useTranslation } from "react-i18next";
 import CommentsModal from "../CommentsModal";
+import AudioTranslationModal from '../AudioTranslationModal';
 
 // Parent component: tracks the selected tags in one state.
 export default function TagsView({ messages }: { messages: Message[] }) {
@@ -35,7 +36,14 @@ export default function TagsView({ messages }: { messages: Message[] }) {
     commentingMessage,
     isCommentsModalVisible,
     setIsCommentsModalVisible,
-    refreshMessageComments
+    refreshMessageComments,
+    isProcessing,
+    isAudioTranslationModalVisible,
+    currentProcessingMessage,
+    translatedAudioUriMap,
+    isTranslationPendingMap,
+    translationErrorMap,
+    closeAudioTranslationModal,
   } = useMessageActions(
     filteredMessages, 
     setFilteredMessages
@@ -51,7 +59,8 @@ export default function TagsView({ messages }: { messages: Message[] }) {
       onViewTranscription: allActions.onViewTranscription,
       // Otras acciones se establecen como undefined
       onEditTags: undefined,
-      onDelete: undefined
+      onDelete: undefined,
+      onOpenAudioTranslationModal: allActions.onOpenAudioTranslationModal,
     };
   };
 
@@ -75,6 +84,14 @@ export default function TagsView({ messages }: { messages: Message[] }) {
     }
   };
 
+  // Determine props for AudioTranslationModal based on currentProcessingMessage
+  const currentMessageId = currentProcessingMessage?.id;
+  const modalIsProcessing = currentMessageId ? !!isTranslationPendingMap[currentMessageId] : false;
+  const modalProcessedAudioUri = currentMessageId ? translatedAudioUriMap[currentMessageId] || null : null;
+  const modalProcessingError = currentMessageId ? translationErrorMap[currentMessageId] || null : null;
+  const modalOriginalAudioUri = currentProcessingMessage?.attachments?.find(att => att.type === 'audio')?.url || 
+                                currentProcessingMessage?.attachments?.find(att => att.type === 'audio')?.externalUrl || null;
+
   return (
     <>
       <InstructionsText>
@@ -92,6 +109,7 @@ export default function TagsView({ messages }: { messages: Message[] }) {
           key={message.id}
           m={message}
           actions={getLimitedActionsForMessage(message)}
+          isProcessing={isProcessing}
         />
       ))}
 
@@ -102,6 +120,18 @@ export default function TagsView({ messages }: { messages: Message[] }) {
         message={commentingMessage}
         onCommentAdded={refreshMessageComments}
       />
+
+      {/* Render the Audio Processing Modal */}
+      {currentProcessingMessage && (
+        <AudioTranslationModal
+          visible={isAudioTranslationModalVisible}
+          onClose={closeAudioTranslationModal}
+          isProcessing={modalIsProcessing}
+          processedAudioUri={modalProcessedAudioUri}
+          processingError={modalProcessingError}
+          originalAudioUri={modalOriginalAudioUri} 
+        />
+      )}
     </>
   );
 }

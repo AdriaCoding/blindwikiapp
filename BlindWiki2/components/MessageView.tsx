@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, GestureResponderEvent, Alert, Linking, Platform } from "react-native";
 import StyledButton from "./StyledButton";
 import AudioButton from "./AudioButton";
 import { Message } from "@/models/message";
 import Colors from "@/constants/Colors";
-import { deleteMessage, updateMessageTags, audioPlayed, getMessages } from '@/services/messageService';
+import { deleteMessage, updateMessageTags, audioPlayed, getMessages, processAudioWithSeamlessServer } from '@/services/messageService';
+import * as FileSystem from 'expo-file-system';
 import { useTranslation } from "react-i18next";
 import { Tag } from "@/models/tag";
-import CommentsModal from "./CommentsModal";
 
 // Message Actions Interface
 export interface MessageActions {
@@ -17,6 +17,7 @@ export interface MessageActions {
   onViewComments?: (event: GestureResponderEvent) => void;
   onDirection?: (event: GestureResponderEvent) => void;
   onViewTranscription?: (event: GestureResponderEvent) => void;
+  onOpenAudioTranslationModal?: (event: GestureResponderEvent) => void;
 }
 
 /**
@@ -37,6 +38,16 @@ export function useMessageActions(
   // Estado para el modal de comentarios
   const [isCommentsModalVisible, setIsCommentsModalVisible] = useState(false);
   const [commentingMessage, setCommentingMessage] = useState<Message | null>(null);
+
+  // States for the new audio processing modal
+  const [isAudioTranslationModalVisible, setIsAudioTranslationModalVisible] = useState(false);
+  const [currentProcessingMessage, setCurrentProcessingMessage] = useState<Message | null>(null);
+  // Store translated URIs: key is original message ID
+  const [translatedAudioUriMap, setTranslatedAudioUriMap] = useState<Record<string, string | null>>({});
+  // Track pending translations: key is original message ID
+  const [isTranslationPendingMap, setIsTranslationPendingMap] = useState<Record<string, boolean>>({});
+  // Track translation errors: key is original message ID
+  const [translationErrorMap, setTranslationErrorMap] = useState<Record<string, string | null>>({});
 
   /**
    * Handle message deletion
@@ -227,6 +238,104 @@ export function useMessageActions(
       .catch(err => console.error('Error abriendo el mapa:', err));
   };
 
+  const processAndSaveAudio = useCallback(async (messageToProcess: Message) => {
+    if (!messageToProcess || !messageToProcess.id) return;
+    const messageId = messageToProcess.id;
+
+    // If already pending, do nothing
+    if (isTranslationPendingMap[messageId]) return;
+    // If already processed, do nothing (this check also happens in openAudioTranslationModal)
+    if (translatedAudioUriMap[messageId]) return; 
+
+    const audioAttachment = messageToProcess.attachments?.find(att => att.type === 'audio');
+    const originalAudioUrl = audioAttachment?.url || audioAttachment?.externalUrl;
+
+    if (!originalAudioUrl) {
+      setTranslationErrorMap(prev => ({ ...prev, [messageId]: t("message.noAudioForProcessing") }));
+      return;
+    }
+
+    setIsTranslationPendingMap(prev => ({ ...prev, [messageId]: true }));
+    setTranslationErrorMap(prev => ({ ...prev, [messageId]: null }));
+    setIsProcessing(true); // Global processing indicator
+
+    try {
+      const originalFilenameWithQuery = originalAudioUrl.substring(originalAudioUrl.lastIndexOf('/') + 1);
+      const originalFilename = originalFilenameWithQuery.split('?')[0];
+      const extension = originalFilename.split('.').pop() || 'mp3';
+      const baseFilename = originalFilename.substring(0, originalFilename.lastIndexOf('.'));
+      
+      const downloadedOriginalUri = FileSystem.cacheDirectory + `temp_original_${messageId}_${originalFilename}`;
+      console.log(`Downloading original audio from ${originalAudioUrl} to ${downloadedOriginalUri}`);
+      const downloadResult = await FileSystem.downloadAsync(originalAudioUrl, downloadedOriginalUri);
+
+      if (downloadResult.status !== 200) {
+        throw new Error(t("message.failedToDownloadAudio"));
+      }
+      console.log('Original download complete, URI:', downloadResult.uri);
+
+      const serviceResponse = await processAudioWithSeamlessServer(downloadResult.uri);
+      // Clean up downloaded original file after processing
+      await FileSystem.deleteAsync(downloadResult.uri, { idempotent: true });
+
+      if (serviceResponse.success && serviceResponse.audioBlob) {
+        const translatedFilename = `${baseFilename}_translated.${extension}`;
+        const translatedLocalUri = FileSystem.documentDirectory + translatedFilename; // Save in a more persistent location
+        
+        // Convert Blob to base64 string to save with FileSystem
+        const reader = new FileReader();
+        reader.readAsDataURL(serviceResponse.audioBlob);
+        await new Promise<void>((resolve, reject) => {
+          reader.onloadend = async () => {
+            try {
+              if (typeof reader.result === 'string') {
+                const base64Data = reader.result.split(',')[1];
+                await FileSystem.writeAsStringAsync(translatedLocalUri, base64Data, { encoding: FileSystem.EncodingType.Base64 });
+                setTranslatedAudioUriMap(prev => ({ ...prev, [messageId]: translatedLocalUri }));
+                console.log('Processed audio saved to:', translatedLocalUri);
+                resolve();
+              } else {
+                throw new Error('Failed to read Blob as base64 string');
+              }
+            } catch (saveError: any) {
+              console.error("Error saving processed audio:", saveError);
+              setTranslationErrorMap(prev => ({ ...prev, [messageId]: saveError.message || t("message.failedToSaveProcessedAudio") }));
+              reject(saveError);
+            }
+          };
+          reader.onerror = (error) => {
+            console.error("FileReader error:", error);
+            setTranslationErrorMap(prev => ({ ...prev, [messageId]: t("message.failedToReadAudioBlob") }));
+            reject(error);
+          };
+        });
+      } else {
+        throw new Error(serviceResponse.errorMessage || t("message.failedToProcessAudio"));
+      }
+    } catch (err: any) {
+      console.error("Error in processAndSaveAudio:", err);
+      setTranslationErrorMap(prev => ({ ...prev, [messageId]: err.message || t("message.unexpectedErrorProcessingAudio") }));
+    } finally {
+      setIsTranslationPendingMap(prev => ({ ...prev, [messageId]: false }));
+      setIsProcessing(false); // Global processing indicator
+    }
+  }, [t, isTranslationPendingMap, translatedAudioUriMap]);
+
+  const openAudioTranslationModal = (messageToProcess: Message) => {
+    setCurrentProcessingMessage(messageToProcess);
+    setIsAudioTranslationModalVisible(true);
+    // If not already processed and not pending, start the process
+    if (messageToProcess && messageToProcess.id && !translatedAudioUriMap[messageToProcess.id] && !isTranslationPendingMap[messageToProcess.id]) {
+      processAndSaveAudio(messageToProcess);
+    }
+  };
+
+  const closeAudioTranslationModal = () => {
+    setIsAudioTranslationModalVisible(false);
+    // Optionally, you might want to clear currentProcessingMessage or errors specific to it when modal closes definitely
+    // setCurrentProcessingMessage(null); 
+  };
+
   /**
    * Create MessageActions object for a specific message
    */
@@ -266,6 +375,9 @@ export function useMessageActions(
       onViewTranscription: (event: GestureResponderEvent) => {
         // No-op or could optionally alert the transcription
       },
+      onOpenAudioTranslationModal: (event: GestureResponderEvent) => {
+        openAudioTranslationModal(message);
+      },
     };
   };
 
@@ -286,7 +398,16 @@ export function useMessageActions(
     commentingMessage,
     isCommentsModalVisible,
     setIsCommentsModalVisible,
-    refreshMessageComments
+    refreshMessageComments,
+    // Modal related states and functions
+    isAudioTranslationModalVisible,
+    currentProcessingMessage,
+    translatedAudioUriMap,
+    isTranslationPendingMap,
+    translationErrorMap,
+    openAudioTranslationModal,
+    closeAudioTranslationModal,
+    processAndSaveAudio,
   };
 }
 
@@ -296,9 +417,11 @@ export function useMessageActions(
 export default function MessageComponent({
   m,
   actions,
+  isProcessing,
 }: {
   m: Message;
   actions: MessageActions;
+  isProcessing?: boolean;
 }) {
   const { t } = useTranslation();
   
@@ -392,6 +515,13 @@ export default function MessageComponent({
       )}
       {showTranscription && (
         <Text style={styles.transcriptionText}>{m.text}</Text>
+      )}
+      {actions.onOpenAudioTranslationModal && audioUrl && (
+        <StyledButton 
+          title={isProcessing ? t("modal.processingAudio") : t("message.getAudioTranslation")}
+          onPress={actions.onOpenAudioTranslationModal}
+          style={styles.actionButton}
+        />
       )}
     </View>
   );

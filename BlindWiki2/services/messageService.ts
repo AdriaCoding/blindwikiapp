@@ -6,6 +6,8 @@ import { useAuth } from "@/contexts/AuthContext"; // Add this import
 import axios from 'axios'; // Import axios for HTTP requests
 import { Platform } from 'react-native';
 import { Alert } from 'react-native';
+import { APP_TO_SEAMLESS_LANG, SupportedLanguage } from '@/locales/i18n'; // Import the new map and type
+import i18n from '@/locales/i18n'; // Import i18n to get current language
 
 // Server response interfaces
 export interface MessagesResponse extends ServerResponse {
@@ -572,6 +574,82 @@ export async function audioPlayed(attachmentId: string): Promise<CleanResponse> 
       success: false,
       errorMessage:
         error instanceof Error ? error.message : "Failed to record audio play",
+    };
+  }
+}
+
+/**
+ * Sends audio to a local seamless server and expects the same audio back.
+ * @param audioFilePath Path to the audio file to process
+ * @returns A clean response indicating success or failure, and potentially the echoed audio data/path
+ */
+export async function processAudioWithSeamlessServer(
+  audioFilePath: string
+): Promise<{ success: boolean; audioBlob?: Blob; errorMessage?: string; details?: string; }> {
+  const SEAMLESS_SERVER_URL = 'http://100.112.0.35:8080/';
+
+  try {
+    const fileInfo = await FileSystem.getInfoAsync(audioFilePath);
+    if (!fileInfo.exists) {
+      return {
+        success: false,
+        errorMessage: "Audio file not found at the specified path",
+      };
+    }
+
+    const filename = audioFilePath.split('/').pop() || `audio.${Platform.OS === 'ios' ? 'm4a' : 'mp3'}`;
+    const extension = filename.split('.').pop()?.toLowerCase() || (Platform.OS === 'ios' ? 'm4a' : 'mp3');
+    const mimeType = getMimeTypeForExtension(extension);
+
+    const formData = new FormData();
+    const fileBlob = {
+      uri: audioFilePath,
+      name: filename,
+      type: mimeType,
+    };
+
+    formData.append("audio_file", fileBlob as any);
+
+    // Get the current app language and map it to seamless language code
+    const currentAppLang = i18n.language as SupportedLanguage;
+    const tgtLang = APP_TO_SEAMLESS_LANG[currentAppLang] || 'eng'; // Default to 'eng' if not found
+    formData.append("tgt_lang", tgtLang);
+
+    console.log(`Sending audio to seamless server: ${filename}, type: ${mimeType}, target_lang: ${tgtLang}`);
+
+    const response = await axios({
+      method: 'post',
+      url: SEAMLESS_SERVER_URL,
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      responseType: 'blob',
+    });
+
+    if (response.status === 200 && response.data) {
+      console.log('Received audio back from seamless server:', response.headers['content-type'], response.data.size + ' bytes');
+      return {
+        success: true,
+        audioBlob: response.data as Blob,
+      };
+    } else {
+      return {
+        success: false,
+        errorMessage: `Server returned status ${response.status}`,
+      };
+    }
+  } catch (error) {
+    console.error("Error processing audio with seamless server:", error);
+    const errorMessage =
+      axios.isAxiosError(error) && error.response
+        ? `Server error: ${error.response.status} - ${error.response.data}`
+        : error instanceof Error
+        ? error.message
+        : "Failed to process audio with seamless server";
+    return {
+      success: false,
+      errorMessage: errorMessage,
     };
   }
 }
