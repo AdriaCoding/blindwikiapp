@@ -6,6 +6,8 @@ BlindWiki2/services/backend_reference_files/main.php
 SeamlessExpressive/*.pt
 SeamlessExpressive/seamless
 AI/Tagger/embeddings
+AI/seamless_communication
+AI/seamless
 
 # Office intermediate files
 ~$* 
