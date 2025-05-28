@@ -575,3 +575,74 @@ export async function audioPlayed(attachmentId: string): Promise<CleanResponse> 
     };
   }
 }
+
+/**
+ * Sends audio to a local seamless server and expects the same audio back.
+ * @param audioFilePath Path to the audio file to process
+ * @returns A clean response indicating success or failure, and potentially the echoed audio data/path
+ */
+export async function processAudioWithSeamlessServer(
+  audioFilePath: string
+): Promise<{ success: boolean; audioBlob?: Blob; errorMessage?: string; details?: string; }> {
+  const SEAMLESS_SERVER_URL = 'https://ai-server-739559409286.europe-southwest1.run.app/';
+
+  try {
+    const fileInfo = await FileSystem.getInfoAsync(audioFilePath);
+    if (!fileInfo.exists) {
+      return {
+        success: false,
+        errorMessage: "Audio file not found at the specified path",
+      };
+    }
+
+    const filename = audioFilePath.split('/').pop() || `audio.${Platform.OS === 'ios' ? 'm4a' : 'mp3'}`;
+    const extension = filename.split('.').pop()?.toLowerCase() || (Platform.OS === 'ios' ? 'm4a' : 'mp3');
+    const mimeType = getMimeTypeForExtension(extension);
+
+    const formData = new FormData();
+    const fileBlob = {
+      uri: audioFilePath,
+      name: filename,
+      type: mimeType,
+    };
+
+    formData.append("audio_file", fileBlob as any);
+
+    console.log(`Sending audio to seamless server: ${filename}, type: ${mimeType}`);
+
+    const response = await axios({
+      method: 'post',
+      url: SEAMLESS_SERVER_URL,
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      responseType: 'blob',
+    });
+
+    if (response.status === 200 && response.data) {
+      console.log('Received audio back from seamless server:', response.headers['content-type'], response.data.size + ' bytes');
+      return {
+        success: true,
+        audioBlob: response.data as Blob,
+      };
+    } else {
+      return {
+        success: false,
+        errorMessage: `Server returned status ${response.status}`,
+      };
+    }
+  } catch (error) {
+    console.error("Error processing audio with seamless server:", error);
+    const errorMessage =
+      axios.isAxiosError(error) && error.response
+        ? `Server error: ${error.response.status} - ${error.response.data}`
+        : error instanceof Error
+        ? error.message
+        : "Failed to process audio with seamless server";
+    return {
+      success: false,
+      errorMessage: errorMessage,
+    };
+  }
+}
