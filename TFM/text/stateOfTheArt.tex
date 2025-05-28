@@ -1,6 +1,6 @@
 \section{Estado del Arte}
 
-En esta sección discutiremos los últimos avances en tecnologías de desarrollo de aplicaciones móviles multiplataforma, y el estado del arte en la traducción automatica Speech-to-Speech (S2ST) y el reconocimiento automático del habla (ASR).
+Antes de la implementación de la aplicación, se ha llevado a cabo un estudio de la literatura para identificar las tecnologías y modelos más relevantes en el desarrollo de aplicaciones móviles multiplataforma, y en las tareas de procesamiento de lenguaje natural y traducción de idiomas anteriormente mencionadas.
 
 \subsection{Desarrollo de Aplicaciones Móviles Multiplataforma}
 
@@ -46,20 +46,35 @@ En la siguiente tabla \ref{tab:framework-comparison} se muestra un resumen de la
 
 Para el desarrollo de BlindWiki 2.0, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y no el rendimiento interno de la aplicación.
 
+\subsection{Speech-to-Text Translation}
+Para la tarea de generar traducciones de las notas de voz a todos los idiomas de la app \ref{tab:supported-languages}, hubiese sido 
 \subsection{Reconocimiento Automático de Habla (ASR)}
-Nos interesa representar las notas de voz de los usuarios de blind wiki en formato de texto, para facilitar los procesos posteriores de traducción y tagging. Esta tarea se conoce como Automatic Speech Translation (ASR).
 
-En la actualidad existen múltiples modelos preentrenados para esta tarea, y un conjunto de benchmarks para evaluar su rendimiento.
+El reconocimiento automático de habla (ASR) es fundamental para convertir las notas de voz de los usuarios de BlindWiki en texto, facilitando así la traducción y el etiquetado posterior.
 
-explicar aquí brevemente las benchmarks que luego usaremos en la comparación
+Debido al estado de los datos en BlindWiki, es preciso usar un modelo ASR generalista, capaz de dar buenos resultados sin necesidad de fine-tuning. Debe ser un modelo multilingüe, para cubrir a la totalidad de usuarios de la aplicación. Además, el modelo debe de ser robusto a audios de baja calidad con ruido, ya que los usuarios suelen grabar sus notas en entornos urbanos.
 
-\subsubsection{Whisper (OpenAI)}
+Nuestro caso de uso encuentra otra limitación, que es que el servidor de backend de blind wiki tine no dispone de GPU, por lo que es preciso restringir nuestra mirada a modelos más ligeros o con optimizaciones para cpu.
 
+\paragraph{Whisper}
+Teniendo en cuenta todas esas limitaciones, el modelo Whisper es un buen candidato para el proyecto, ya que tiene soporte para más de ....
+
+El modelo es facilmente accesible desde la librería de transformers de Hugging Face, y está disponible en diversos tamaños, desde X paramaetros hasta Y parametros.
+
+\subsubsection{Identificación de idiomas (LID)}
+Los modelos de traducción automática de texto requieren que se les proporcione tanto el idioma de salida, como el idioma de entrada. Por lo tanto, es necesario integrar un modelo de identificación de idiomas (LID) en el pipeline de traducción.
+
+Para el caso de BlindWiki, se ha optado por usar el modelo de identificación de idiomas de Alexandra Institute. El principal motivo de su elección es su baja latencia en CPU y uso de Memoria. En su última versión soporta la detección de 2102 idiomas, muchos más de los que se encuentran disponibles en la aplicación (ver tabla \ref{tab:supported-languages}). Eso garantiza que el modelo pueda seguir siendo útil para el proyecto a largo plazo, en caso de que se impulse el soporte de más idiomas.
 
 \subsection{Traducción de Texto a Texto (T2TT)}
+Una vez identificado el idioma de la nota original, necesitamos traducir su transcripción a todos los idiomas en los que se encuentra disponible la aplicación (ver tabla \ref{tab:supported-languages}). 
+
+Es en este punto de la pipeline donde la eficiencia computacional es más crítica, ya que es preciso ejecutar el módulo de traducción para cada uno de los idiomas soportados. Nuestra aproximación inicial fue usar el modelo NLLB-200 \cite{ott2020nllb}, pero rápidamente nos dimos cuenta de que su uso de RAM (10GB) y tiempo de ejecución (8s por traducción) en el servidor de backend eran absolutamente prohibitivos.
+
+
 
 \subsection{Modelos de traduccion de Voz a Texto (S2TT) vs modelos en cascada}
-Una de las preguntas que nos plantea el proyecto es si es conveniente usar primero un modelo de ASR y luego un modelo de T2TT, lo cual se conoce como un esquema en cascada, o si es mejor usar un modelo que genere las traducciónes directamente del audio (S2TT).
+Una de las preguntas que nos plantea el proyecto es si es conveniente usar primero un modelo de ASR, luego un modelo LID, y finalmente un modelo de T2TT, lo cual se conoce como un esquema en cascada, o si es mejor usar un modelo que genere las traducciones directamente del audio (S2TT).
 
 According to the most recent IWSLT Evaluation Campaign \cite{iwslt-findings}, y otros estudios \cite{etchegoyhen2022cascade} \cite{Sethiya2025}, los modelos en cascada demuestran ser más efectivos que los modelos directos en cuanto a calidad de traducción, especialmente para los idiomas con baja disponibilidad de datos, como el gallego, que es uno de los idiomas objetivo de la aplicación.
 

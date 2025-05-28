@@ -114,10 +114,14 @@
 %Seccions i altres
 \RequirePackage{titlesec}
 \titleformat{\section}
-          {\normalfont\Huge\bfseries} 
+          {\normalfont\Huge\bfseries}
           {\thesection.}
-          {1ex \@plus.2ex}
+          {1em}
           {}
+\titlespacing*{\section}
+          {0pt}
+          {3.5ex plus 1ex minus .2ex}
+          {2.3ex plus .2ex}
 \titleformat{\subsection}
           {\normalfont\LARGE\bfseries} 
           {\LARGE\thesubsection}
