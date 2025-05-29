@@ -17,61 +17,47 @@ Framework que utiliza Dart como lenguaje y un motor de renderizado propio (Skia)
 Utiliza JavaScript y React para crear aplicaciones móviles mediante una arquitectura puente que conecta JavaScript con componentes nativos de la plataforma. Sus ventajas incluyen el aprovechamiento del ecosistema JavaScript/npm, la utilización de componentes UI nativos reales, y la facilidad de transición desde el desarrollo web. Además, React Native ofrece integración directa con los componentes nativos de accesibilidad, heredando automáticamente las mejoras del sistema operativo. No obstante, el puente JavaScript-Nativo puede limitar el rendimiento en comparación con Flutter.
 
 
-\subsubsection{Análisis Comparativo}
-En la siguiente tabla \ref{tab:framework-comparison} se muestra un resumen de las características de los frameworks considerados para el desarrollo de la aplicación blind wiki.
-\begin{table}[ht]
-    \centering
-    \caption{Comparación de Frameworks Multiplataforma}
-    \label{tab:framework-comparison}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{Característica} & \textbf{Flutter} & \textbf{React Native} \\
-        \hline
-        Lenguaje & Dart & JavaScript \\
-        \hline
-        Arquitectura UI & Motor propio & Componentes nativos \\
-        \hline
-        Rendimiento & Excelente & Bueno \\
-        \hline
-        Hot Reload & Sí & Sí \\
-        \hline
-        Curva Aprendizaje & Moderada & Baja (dev JS) \\
-        \hline
-        Madurez & Media (2017) & Alta (2015) \\
-        \hline
-        Accesibilidad & Árbol semántico & Componentes nativos \\
-        \hline
-    \end{tabular}
-\end{table}
+\paragraph{Especificación de la solución}
+Para el desarrollo de BlindWiki 2.0, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y las latencias de los modelos de IA, no el rendimiento interno de la aplicación.
 
-Para el desarrollo de BlindWiki 2.0, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y no el rendimiento interno de la aplicación.
+También se ha optado por usar Expo Go, una aplicación que permite probar fácilmente las aplicaciones de React Native en cualquier dispositivo, y experimentar con los cambios en el código en tiempo real. También se ha usado Expo Application Services para los despliegues finales de la app.   
 
 \subsection{Traduccion de Audios}
 Para poder desarrollar la feature de traduccion de audios, se ha hecho un análisis dele stado del arte de los modelos de IA de código abierto más relevantes. Estos se dividen en cuatro familias principales, según la tarea que estos realizan.
 
 Hoy en dia, el acceso a modelos de traduccion con rendimiento SOTA está fácilmente al alcance de personas sin conocimientos de programacíon gracias a los productos SaSS de diversas compañías. BlindWiki es un proyecto benéfico, con escasa financiación, por lo que es preciso utilizar modelos de gratuitos o de código abierto. También hemos limitado nuestro análisis a modelos preentrenados, con buenos rendimientos en zero-shot.
 
-\subsubsection{Reconocimiento Automático de Habla (ASR)}
+\subsubsection{Reconocimiento Automático de Habla (ASR)}  
+La conversión de audio a texto está muy generalizada en la actualidad. Productos como Alexa, Siri, o Google Asistant llevan estando presentes en la sociedad de la información desde hace muchos años.
 
-El reconocimiento automático de habla (ASR) es fundamental para convertir las notas de voz de los usuarios de BlindWiki en texto, facilitando así la traducción y el etiquetado posterior.
 
 
-Nuestro caso de uso encuentra otra limitación, que es que el servidor de backend de blind wiki tine no dispone de GPU, por lo que es preciso restringir nuestra mirada a modelos más ligeros o con optimizaciones para cpu.
+%\paragraph{Whisper}
 
-\paragraph{Whisper}
-Teniendo en cuenta todas esas limitaciones, el modelo Whisper es un buen candidato para el proyecto, ya que tiene soporte para más de ....
+%\paragraph{UN tercer modelo?}
 
-El modelo es facilmente accesible desde la librería de transformers de Hugging Face, y está disponible en diversos tamaños, desde X paramaetros hasta Y parametros.
+
+\subsubsection{Identificación de Idiomas (LID)}  
+La mayoría de modelos de traducción texto a texto requieren que se les especifique tanto el idioma de entrada como el de salidad. Para nuestro caso de uso, donde no podemos anticipar el idioma del usuario, sería preciso implementar un modelo de clasificación del idioma.
+
+En la actualidad, los modelos de LID están altamente optimizados. Lo normal es que su latencia se mantenga en el orden de los milisegundos, aún siendo ejecutadas en la CPU.
+
+
+%\paragraph{FastText}
+
+\subsubsection{Traducción de Texto a Texto (T2TT)}  
+La tarea de traducción de Texto a Texto también se denomina como Machine Translation en la literatura. Tradicionalmente, este proceso era llevado a cabo mediante sistemas basados en reglas (\textit{Rule-Based Machine Translation, RBMT}) y posteriormente mediante modelos estadísticos (\textit{Statistical Machine Translation, SMT}), pero en la actualidad, los modelos basados en arquitecturas de transformadores (\textit{Transformer-based models}) lideran todos los benchmarks.
+
+
+\paragraph{NLLB}
+\paragraph{}
+\subsubsection{Traducción de Voz a Voz (S2ST)}
+\paragraph{Spatial Speech translation}
+\paragraph{Seamless Communication}
+\paragraph{}
 
 \subsubsection{Identificación de idiomas (LID)}
 Los modelos de traducción automática de texto requieren que se les proporcione tanto el idioma de salida, como el idioma de entrada. Por lo tanto, es necesario integrar un modelo de identificación de idiomas (LID) en el pipeline de traducción.
-
-
-\subsection{Traducción de Texto a Texto (T2TT)}
-Una vez identificado el idioma de la nota original, necesitamos traducir su transcripción a todos los idiomas en los que se encuentra disponible la aplicación (ver tabla \ref{tab:supported-languages}). 
-
-Es en este punto de la pipeline donde la eficiencia computacional es más crítica, ya que es preciso ejecutar el módulo de traducción para cada uno de los idiomas soportados. Nuestra aproximación inicial fue usar el modelo NLLB-200 \cite{ott2020nllb}, pero rápidamente nos dimos cuenta de que su uso de RAM (10GB) y tiempo de ejecución (8s por traducción) en el servidor de backend eran absolutamente prohibitivos.
-
 
 
 \subsubsection{Especificación de la solución}
