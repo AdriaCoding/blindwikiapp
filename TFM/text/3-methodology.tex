@@ -1,11 +1,36 @@
 \section{Specification and design of the solution}
 
-\subsection{Overview}
+\subsection{Desarrollo de Aplicaciones Móviles Multiplataforma}
+
+El desarrollo de aplicaciones multiplataforma ha evolucionado significativamente durante la última década como respuesta a la fragmentación del mercado móvil entre Android (71.9\%) e iOS (27.68\%) \cite{statcounter2025}, y la necesidad de optimizar recursos de desarrollo. El concepto fundamental \textit{"write once, run everywhere"} constituye el núcleo de esta filosofía.
+
+Históricamente, esta tecnología evolucionó desde enfoques basados en WebView (PhoneGap/Cordova) hacia frameworks de compilación a código nativo, hasta las soluciones actuales que equilibran rendimiento nativo con eficiencia de desarrollo. El rendimiento de nativo es de especial interés para el proyecto blind wiki, ya que eso proporciona una mayor compatibilidad con los lectores de pantalla (TalkBack en Android y VoiceOver en iOS).
+
+\subsubsection{Frameworks Considerados}
+
+\paragraph{Flutter (Google)}
+Framework que utiliza Dart como lenguaje y un motor de renderizado propio (Skia). Su arquitectura se compone de tres capas: el framework Dart, el motor C/C++ con Skia, y los wrappers específicos de plataforma. Entre sus ventajas, Flutter ofrece un rendimiento similar al nativo con 60 FPS en animaciones complejas, una interfaz de usuario consistente y personalizable en todas las plataformas, y widgets adaptables tanto de Material Design como de Cupertino. Además, cuenta con sistema de árbol semántico con descripciones para cada widget, perfectamente integrado con las APIs nativas de accesibilidad (TalkBack/VoiceOver).
+
+\paragraph{React Native (Meta)}
+Utiliza JavaScript y React para crear aplicaciones móviles mediante una arquitectura puente que conecta JavaScript con componentes nativos de la plataforma. Sus ventajas incluyen el aprovechamiento del ecosistema JavaScript/npm, la utilización de componentes UI nativos reales, y la facilidad de transición desde el desarrollo web. Además, React Native ofrece integración directa con los componentes nativos de accesibilidad, heredando automáticamente las mejoras del sistema operativo. No obstante, el puente JavaScript-Nativo puede limitar el rendimiento en comparación con Flutter.
 
 
-Disseny de blind wiki 1.0 vs disseny de blind wiki 2.0.
+\paragraph{Especificación de la solución}
+Para el desarrollo de BlindWiki 2.0, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y las latencias de los modelos de IA, no el rendimiento interno de la aplicación.
 
+También se ha optado por usar Expo Go, una aplicación que permite probar fácilmente las aplicaciones de React Native en cualquier dispositivo, y experimentar con los cambios en el código en tiempo real. También se ha usado Expo Application Services para los despliegues finales de la app.   
 
-Comentar breument el perquè escullo React Native per fer la app.
+\subsection{Design desitions}
+\subsection{AI integration}
 
-Detall sobre el model de traducció el·legit.
+\subsubsection{Especificación de la solución}
+
+El proceso tradicional para traducir audios involucra el uso de varios modelos especializados en cascada. Primero, se implementa un modulo de ASR para obtener las transcripciones del audio, luego se identifica el lenguage de la transcripcion con un módulo de LID, luego se traduce la transcripción a todos los idiomas de destino, y finalmente mediante lectores de pantalla el usuario escucha las traducciones.
+
+Nuestra propuesta de innovación es usar un modelo end-to-end para esta tarea. Si bien es cierto que en la actualidad todos los benchmarks \cite{iwslt-findings} y estudios \cite{etchegoyhen2022cascade}, \cite{Sethiya2025} apuntan que en general la calidad de los textos traducidos es superior con el uso de un esquema en cascada, también se reconoce que el gap es cada vez más estrecho.
+No obstante, el motivo de peso que nos lleva a implementar el modelo end-to-end es la capacidad que este tiene de preservar la informacion no-verbal del audio original. Aspectos como la prosodia del hablante, y los sonidos de fondo se pierden invariablemente tras la primera fase de ASR del esquema en cascada. En la actualidad, los modelos end-to-end más avanzados son capaces de replicar la voz del hablante original de forma casi indistinguible.  
+Para los usuarios ciegos de blind wiki, esto tiene un interés todavía mayor. Siempre que interactúan con sus dispositivos digitales, ecuchan de forma constante la voz robótica de sus lectores de pantalla. Por eso creemos que escuchar las traducciones con una voz alternativa, más humana, captivará mucho más su atención. 
+
+La decisión final es usar los modelos de Seamless Communication, por su gran versatilidad y cobertura de idiomas. Al ser BlindWiki2.0 un proyecto sin ánimo de lucro, desarrollado por un estudiante, MetaAI nos concedió una copia del modelo closed-source SeamlessExpressive.
+
+Nuestra solución consistirá en realizar las traducciones de audio con SeamlessExpressive cuando el idioma objetivo esté entre los idiomas soportados por el modelo (Inglés, Español, Alemán, Francés, Chino o Italiano), y para el resto de idiomas usar SeamlessM4T.

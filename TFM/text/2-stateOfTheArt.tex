@@ -1,41 +1,66 @@
 \section{Estado del Arte}
 
-Antes de la implementación de la aplicación, se ha llevado a cabo un estudio de la literatura para identificar las tecnologías y modelos más relevantes en el desarrollo de aplicaciones móviles multiplataforma, y en las tareas de procesamiento de lenguaje natural y traducción de idiomas anteriormente mencionadas.
+\subsection{Accessibility}
 
-\subsection{Desarrollo de Aplicaciones Móviles Multiplataforma}
+\subsection{The European Accessibility Act (EAA)}
 
-El desarrollo de aplicaciones multiplataforma ha evolucionado significativamente durante la última década como respuesta a la fragmentación del mercado móvil entre Android (71.9\%) e iOS (27.68\%) \cite{statcounter2025}, y la necesidad de optimizar recursos de desarrollo. El concepto fundamental \textit{"write once, run everywhere"} constituye el núcleo de esta filosofía.
+\subsubsection{BlindWiki: previous version}
+Arquitectura tecnológica y limitaciones
 
-Históricamente, esta tecnología evolucionó desde enfoques basados en WebView (PhoneGap/Cordova) hacia frameworks de compilación a código nativo, hasta las soluciones actuales que equilibran rendimiento nativo con eficiencia de desarrollo. El rendimiento de nativo es de especial interés para el proyecto blind wiki, ya que eso proporciona una mayor compatibilidad con los lectores de pantalla (TalkBack en Android y VoiceOver en iOS).
+La versión original de BlindWiki se fundamenta en un stack tecnológico que, aunque eficiente en su momento, presenta importantes obsolescencias en el contexto actual. La aplicación utiliza PhoneGap/Cordova como framework base para el empaquetado multiplataforma, complementado con Ionic 1 y Angular.js para la interfaz de usuario y la lógica de la aplicación. Esta arquitectura híbrida permitió un desarrollo relativamente rápido y económico, pero actualmente presenta limitaciones críticas:
 
-\subsubsection{Frameworks Considerados}
+Rendimiento degradado: Los frameworks utilizados no aprovechan las optimizaciones nativas modernas, resultando en una experiencia de usuario menos fluida especialmente en dispositivos Android e iOS recientes
 
-\paragraph{Flutter (Google)}
-Framework que utiliza Dart como lenguaje y un motor de renderizado propio (Skia). Su arquitectura se compone de tres capas: el framework Dart, el motor C/C++ con Skia, y los wrappers específicos de plataforma. Entre sus ventajas, Flutter ofrece un rendimiento similar al nativo con 60 FPS en animaciones complejas, una interfaz de usuario consistente y personalizable en todas las plataformas, y widgets adaptables tanto de Material Design como de Cupertino. Además, cuenta con sistema de árbol semántico con descripciones para cada widget, perfectamente integrado con las APIs nativas de accesibilidad (TalkBack/VoiceOver).
+Compatibilidad limitada con lectores de pantalla: La integración con tecnologías de asistencia como TalkBack y VoiceOver es subóptima, afectando la accesibilidad fundamental para el público objetivo
 
-\paragraph{React Native (Meta)}
-Utiliza JavaScript y React para crear aplicaciones móviles mediante una arquitectura puente que conecta JavaScript con componentes nativos de la plataforma. Sus ventajas incluyen el aprovechamiento del ecosistema JavaScript/npm, la utilización de componentes UI nativos reales, y la facilidad de transición desde el desarrollo web. Además, React Native ofrece integración directa con los componentes nativos de accesibilidad, heredando automáticamente las mejoras del sistema operativo. No obstante, el puente JavaScript-Nativo puede limitar el rendimiento en comparación con Flutter.
+Dificultades de mantenimiento: La obsolescencia de Ionic 1 y Angular.js complica la implementación de nuevas funcionalidades y la corrección de vulnerabilidades de seguridad.
+
+\subsubsection{Be My Eyes: a modern app for the visually impaired}
+Be My Eyes se ha consolidado como una de las aplicaciones de asistencia visual más innovadoras y ampliamente adoptadas en el ecosistema de tecnologías para personas con discapacidad visual. La aplicación genera descripciones textuales de imágenes caturadas por el usuario, además de conectar a usuarios con impedimento visual con voluntarios videntes a través de videollamadas en tiempo real.
 
 
-\paragraph{Especificación de la solución}
-Para el desarrollo de BlindWiki 2.0, se ha optado por React Native, por su mayor madurez, y por que presenta una curva de aprendizaje más suave para el desarrollador. Las limitaciones en cuanto a al rendimiento de React Native en comparación con Flutter no son críticas para el proyecto, ya que los principales cuellos de botella son las conexiones con el servidor y las latencias de los modelos de IA, no el rendimiento interno de la aplicación.
 
-También se ha optado por usar Expo Go, una aplicación que permite probar fácilmente las aplicaciones de React Native en cualquier dispositivo, y experimentar con los cambios en el código en tiempo real. También se ha usado Expo Application Services para los despliegues finales de la app.   
 
-\subsection{Traduccion de Audios}
-Para poder desarrollar la feature de traduccion de audios, se ha hecho un análisis dele stado del arte de los modelos de IA de código abierto más relevantes. Estos se dividen en cuatro familias principales, según la tarea que estos realizan.
 
-Hoy en dia, el acceso a modelos de traduccion con rendimiento SOTA está fácilmente al alcance de personas sin conocimientos de programacíon gracias a los productos SaSS de diversas compañías. BlindWiki es un proyecto benéfico, con escasa financiación, por lo que es preciso utilizar modelos de gratuitos o de código abierto. También hemos limitado nuestro análisis a modelos preentrenados, con buenos rendimientos en zero-shot.
+Modelo de funcionamiento y características principales
+
+El modelo operativo de Be My Eyes se basa en una red colaborativa que supera el medio millón de usuarios ciegos registrados globalmente. La aplicación ofrece tres modalidades principales de asistencia:
+
+Volunteer calls: Conexión directa con voluntarios videntes para obtener asistencia visual en tiempo real
+
+Be My AI: Integración con inteligencia artificial para reconocimiento automático de objetos y lectura de texto
+
+Specialized Help: Colaboración con empresas especializadas para soporte técnico específico
+
+Ventajas tecnológicas y de usabilidad
+
+Be My Eyes presenta varias ventajas significativas respecto a soluciones tradicionales de navegación asistida. Su interfaz está optimizada para lectores de pantalla nativos, garantizando una experiencia de usuario fluida y accesible. La aplicación aprovecha las capacidades avanzadas de las cámaras modernas de smartphones, permitiendo a los voluntarios proporcionar descripciones detalladas del entorno del usuario en tiempo real.
+
+La integración de inteligencia artificial mediante "Be My AI" representa un avance notable, ofreciendo reconocimiento automático de objetos, lectura de texto (OCR) y descripción de escenas sin requerir intervención humana. Esta funcionalidad reduce la dependencia de la disponibilidad de voluntarios y proporciona asistencia inmediata en situaciones donde la privacidad o la urgencia son prioritarias.
+
+Limitaciones y diferencias conceptuales
+
+A pesar de sus fortalezas, Be My Eyes presenta limitaciones fundamentales que contrastan con enfoques colaborativos persistentes. La principal diferencia radica en la naturaleza efímera versus persistente de la información: mientras Be My Eyes proporciona asistencia sincrónica y puntual, sistemas como BlindWiki construyen repositorios permanentes de información urbana reutilizable por la comunidad.
+
+Be My Eyes depende críticamente de la disponibilidad de voluntarios y de conectividad estable a internet, limitando su utilidad en entornos de baja conectividad o durante horas de menor actividad voluntaria. Además, la información proporcionada no se almacena ni indexa para beneficio de futuros usuarios que transiten por las mismas ubicaciones.
+
+
+\subsection{Procesamiento de lenguaje y traducción automática}
+%% Un poco de introducción sobre los modelos de traducción y NLP.
+
+
+Para poder desarrollar la feature de traduccion de audios, se ha hecho un análisis del estado del arte de los modelos de IA más relecantes. Debido a los requerimientos de nuestro proyecto, nuesto análisis se limita a modelos de código abierto o gratuitos, sin necesidad de entrenamiento o fine-tuning, y con amplio soporte multilingüe. Estos se dividen en cuatro familias principales, según la tarea que estos realizan.
 
 \subsubsection{Reconocimiento Automático de Habla (ASR)}  
 La conversión de audio a texto está muy generalizada en la actualidad. Productos como Alexa, Siri, o Google Asistant llevan estando presentes en la sociedad de la información desde hace muchos años.
 
+\paragraph{Whisper}
 
+\paragraph{Wav2vec}
 
-%\paragraph{Whisper}
+%\paragraph{Algun otro modelo multilingue?}
 
-%\paragraph{UN tercer modelo?}
-
+%\paragraph{Whisper.cpp, una gran opcion para edge computing}
 
 \subsubsection{Identificación de Idiomas (LID)}  
 La mayoría de modelos de traducción texto a texto requieren que se les especifique tanto el idioma de entrada como el de salidad. Para nuestro caso de uso, donde no podemos anticipar el idioma del usuario, sería preciso implementar un modelo de clasificación del idioma.
@@ -48,29 +73,40 @@ En la actualidad, los modelos de LID están altamente optimizados. Lo normal es 
 \subsubsection{Traducción de Texto a Texto (T2TT)}  
 La tarea de traducción de Texto a Texto también se denomina como Machine Translation en la literatura. Tradicionalmente, este proceso era llevado a cabo mediante sistemas basados en reglas (\textit{Rule-Based Machine Translation, RBMT}) y posteriormente mediante modelos estadísticos (\textit{Statistical Machine Translation, SMT}), pero en la actualidad, los modelos basados en arquitecturas de transformadores (\textit{Transformer-based models}) lideran todos los benchmarks.
 
+\paragraph{NLLB-200}
+\paragraph{SMalLL-100}
 
-\paragraph{NLLB}
-\paragraph{}
 \subsubsection{Traducción de Voz a Voz (S2ST)}
-\paragraph{Spatial Speech translation}
+\paragraph{Translatrotron 2}
 \paragraph{Seamless Communication}
-\paragraph{}
-
-\subsubsection{Identificación de idiomas (LID)}
-Los modelos de traducción automática de texto requieren que se les proporcione tanto el idioma de salida, como el idioma de entrada. Por lo tanto, es necesario integrar un modelo de identificación de idiomas (LID) en el pipeline de traducción.
-
-
-\subsubsection{Especificación de la solución}
-
-El proceso tradicional para traducir audios involucra el uso de varios modelos especializados en cascada. Primero, se implementa un modulo de ASR para obtener las transcripciones del audio, luego se identifica el lenguage de la transcripcion con un módulo de LID, luego se traduce la transcripción a todos los idiomas de destino, y finalmente mediante lectores de pantalla el usuario escucha las traducciones.
-
-Nuestra propuesta de innovación es usar un modelo end-to-end para esta tarea. Si bien es cierto que en la actualidad todos los benchmarks \cite{iwslt-findings} y estudios \cite{etchegoyhen2022cascade}, \cite{Sethiya2025} apuntan que en general la calidad de los textos traducidos es superior con el uso de un esquema en cascada, también se reconoce que el gap es cada vez más estrecho.
-No obstante, el motivo de peso que nos lleva a implementar el modelo end-to-end es la capacidad que este tiene de preservar la informacion no-verbal del audio original. Aspectos como la prosodia del hablante, y los sonidos de fondo se pierden invariablemente tras la primera fase de ASR del esquema en cascada. En la actualidad, los modelos end-to-end más avanzados son capaces de replicar la voz del hablante original de forma casi indistinguible.  
-Para los usuarios ciegos de blind wiki, esto tiene un interés todavía mayor. Siempre que interactúan con sus dispositivos digitales, ecuchan de forma constante la voz robótica de sus lectores de pantalla. Por eso creemos que escuchar las traducciones con una voz alternativa, más humana, captivará mucho más su atención. 
-
-La decisión final es usar los modelos de Seamless Communication, por su gran versatilidad y cobertura de idiomas. Al ser BlindWiki2.0 un proyecto sin ánimo de lucro, desarrollado por un estudiante, MetaAI nos concedió una copia del modelo closed-source SeamlessExpressive.
-
-Nuestra solución consistirá en realizar las traducciones de audio con SeamlessExpressive cuando el idioma objetivo esté entre los idiomas soportados por el modelo (Inglés, Español, Alemán, Francés, Chino o Italiano), y para el resto de idiomas usar SeamlessM4T.
+%% Hablar aquí de seamlessm4t y de seamlessexpressive
+\paragraph{SimulTron}
+%% Interesante para Edge Computing
 
 \subsection{Identificación automática de tags}
 
+La generación automática de etiquetas para notas de voz ha emergido como un área de investigación crucial para la organización y accesibilidad del contenido multimedia. El problema se aborda principalmente mediante sistemas que combinan transcripción automática con análisis semántico del texto resultante.
+
+\paragraph{Embeddings semánticos y representación vectorial}
+
+La aproximación fundamental emplea embeddings semánticos generados a partir de transcripciones ASR. Los Word Embeddings se tratan de los pesos de una red neuronal ajustada para predecir a partir de una palabra su contexto o a partir del contexto, la propia palabra. Al ajustar una red para hacer este tipo de predicciones, se condensa la información del contexto en una serie de números reales que forman un vector que proyectado en un espacio dimensional permite realizar operaciones aritméticas y geométricas.
+
+Modelos como BERT proporcionan representaciones vectoriales del texto que capturan significado y contexto de las notas de voz, proyectando el contenido semántico en un espacio dimensional donde las operaciones aritméticas y geométricas reflejan relaciones de significado. BERT es capaz de tomar en consideración tanto el contexto de detrás de la palabra que tomamos como referencia como las palabras posteriores por lo que se trata de un modelo muy completo para comprender la transcripción del audio.
+
+\paragraph{Radius Nearest Neighbors (RNN): Etiquetado por proximidad}
+
+El método RNN asocia etiquetas basándose en proximidad semántica en el espacio de embeddings. Al computar todos los embeddings de un texto, se puede calcular un embedding mediano ponderado según atención a los elementos del texto y a partir del embedding de las diferentes etiquetas, calcular las distancias con todas las etiquetas y mostrar las etiquetas a una distancia menor de un cierto threshold numérico.
+
+La principal ventaja de RNN radica en su capacidad de generar un número variable de etiquetas por nota de voz, adaptándose dinámicamente al contenido semántico. Sin embargo, presenta alta sensibilidad a hiperparámetros como la métrica de distancia y el radio de búsqueda. El problema de este método es una alta sensibilidad a hiper parámetros como la métrica de distancia y el radio que debería tomar en consideración por lo que durante el desarrollo se deberán ajustar meticulosamente estos parámetros.
+
+\paragraph{K-Nearest Neighbors (KNN): Control de cardinalidad}
+
+KNN ofrece una alternativa que permite control directo sobre el número de etiquetas generadas, seleccionando las K etiquetas más próximas al embedding promedio del texto. En lugar de considerar el radio, se consideran los K embeddings de etiquetas más próximos al embedding promedio del texto. Esta aproximación simplifica la parametrización del sistema y garantiza consistencia en el número de etiquetas por nota de voz.
+
+El principal problema que presenta esta metodología se trata de que ya no se encuentra una relación de 1 a n entre el audio y las etiquetas. Sin embargo, permite controlar directamente el número de etiquetas que se devuelven como un hiperparámetro. La eficacia de KNN depende tanto del hiperparámetro K como de la métrica de distancia empleada.
+
+\paragraph{HDBSCAN: Clustering jerárquico por densidad}
+
+HDBSCAN representa la solución más sofisticada, empleando clustering jerárquico por densidad para identificar grupos de etiquetas similares. El uso de un método de clustering por densidades permite devolver multitud de etiquetas similares entre ellas adicionalmente, esto permite definir también una relación de 1 a n entre el texto y las etiquetas.
+
+El atractivo de HDBSCAN como algoritmo de clustering se encuentra en su robustez frente a diversos casos y su sencilla selección de hiper parámetros, ya que a diferencia de otros métodos como DBSCAN no se necesita seleccionar una epsilon ni un mínimo de puntos. Una vez computados los clusters, tan solo sería necesario devolver las etiquetas del cluster en el que se encuentra el embedding promedio del texto
