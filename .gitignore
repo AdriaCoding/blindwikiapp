@@ -7,7 +7,7 @@ SeamlessExpressive/*.pt
 SeamlessExpressive/seamless
 AI/Tagger/embeddings
 AI/seamless_communication
-AI/seamless
+AI/seamless*
 AI/seamless_expressive_pts
 # Office intermediate files
 ~$* 

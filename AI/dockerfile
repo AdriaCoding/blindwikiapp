@@ -16,18 +16,19 @@ RUN apt-get update && apt-get install -y \
 COPY seamless_communication /app/seamless_communication
 COPY seamless_expressive_pts /app/seamless_expressive_pts
 
-# Install seamless communication
-RUN cd seamless_communication && pip install .
+# Install seamless communication in development mode to ensure proper package structure
+RUN cd seamless_communication && pip install -e .
 
-# Create model directory and download models during build
-RUN mkdir -p /root/.cache/fairseq2 && \
-    mkdir -p /root/.cache/torch/hub/checkpoints
+# Create model directory
+RUN mkdir -p /root/.cache/fairseq2/assets
 
-# Download SeamlessM4T model - this ensures it's available offline
-RUN python -c "from seamless_communication.models.inference import Translator; t = Translator('seamlessM4T_v2_large', 'vocoder_v2', device='cpu')"
+# Copy pre-downloaded models maintaining the exact directory structure with hash directories
+COPY seamless_m4t/ /root/.cache/fairseq2/assets/
 
 # Copy the server code
 COPY http_seamless.py /app
+
+COPY audios_test/example.wav /app/audios_test/example.wav
 
 # Make port 8080 available to the world outside this container
 # (Cloud Run will map its external port to this one via the PORT env var)
@@ -36,7 +37,6 @@ EXPOSE 8080
 # Define environment variables
 ENV PYTHONUNBUFFERED=1
 # Prevent model from trying to download again
-ENV TORCH_HOME=/root/.cache/torch
 ENV FAIRSEQ2_CACHE_DIR=/root/.cache/fairseq2
 
 # Run http_seamless.py when the container launches
